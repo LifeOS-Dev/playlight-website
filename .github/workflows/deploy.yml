@@ -1,0 +1,36 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build for Vercel
+        env:
+          NITRO_PRESET: vercel
+        run: bun run build
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@57
+
+      - name: Deploy prebuilt to production
+        env:
+          VERCEL_ORG_ID: team_x2AmM2wA4clTucseAU9HmPEV
+          VERCEL_PROJECT_ID: prj_ymcOgz6JV0BgoFYZN3pLohAQvaOp
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
