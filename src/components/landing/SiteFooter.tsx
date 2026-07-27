@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div className="flex items-center gap-3">
           <Logo size={20} />
           <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            · stealth · 2026
+            · playlight · 2026
           </span>
         </div>
         <nav className="flex items-center gap-6 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
