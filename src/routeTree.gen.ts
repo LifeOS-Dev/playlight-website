@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as DeleteRouteImport } from './routes/delete'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SupportRoute = SupportRouteImport.update({
@@ -23,6 +24,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeleteRoute = DeleteRouteImport.update({
+  id: '/delete',
+  path: '/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/support'
+  fullPaths: '/' | '/delete' | '/privacy' | '/support'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/support'
-  id: '__root__' | '/' | '/privacy' | '/support'
+  to: '/' | '/delete' | '/privacy' | '/support'
+  id: '__root__' | '/' | '/delete' | '/privacy' | '/support'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DeleteRoute: typeof DeleteRoute
   PrivacyRoute: typeof PrivacyRoute
   SupportRoute: typeof SupportRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/delete': {
+      id: '/delete'
+      path: '/delete'
+      fullPath: '/delete'
+      preLoaderRoute: typeof DeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DeleteRoute: DeleteRoute,
   PrivacyRoute: PrivacyRoute,
   SupportRoute: SupportRoute,
 }

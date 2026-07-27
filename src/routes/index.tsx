@@ -77,6 +77,15 @@ function Index() {
           </Link>
         </div>
       </main>
+
+      <div className="absolute inset-x-0 bottom-4 z-10 flex justify-center px-6 md:bottom-6">
+        <Link
+          to="/delete"
+          className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground/40 transition-colors hover:text-muted-foreground/70"
+        >
+          Delete account or data
+        </Link>
+      </div>
     </div>
   );
 }

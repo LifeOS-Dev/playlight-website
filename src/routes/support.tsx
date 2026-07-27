@@ -70,10 +70,14 @@ function SupportPage() {
             <div>
               <h3 className="text-lg font-medium text-foreground">How do I delete my account?</h3>
               <p className="mt-2">
-                You can delete your account directly inside the app under{" "}
-                <span className="text-foreground">Settings → Account → Delete Account</span>. Your
-                data is permanently removed from our active database within 30 days. If you cannot
-                access the app, email us and we will handle the deletion for you.
+                Full steps are on our{" "}
+                <Link to="/delete" className="text-accent underline-offset-4 hover:underline">
+                  Delete Account or Data
+                </Link>{" "}
+                page. In short: use{" "}
+                <span className="text-foreground">Settings → Account → Delete Account</span> in
+                the app, or email hello@playlight.app if you cannot access the app. Your data is
+                permanently removed from our active database within 30 days.
               </p>
             </div>
 
