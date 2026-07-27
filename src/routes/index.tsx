@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { Orb } from "@/components/landing/Orb";
 import { SpotlightBackground } from "@/components/landing/SpotlightBackground";
-import { Apple, Play, ArrowUpRight } from "lucide-react";
+import { Apple, Play } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,15 +67,7 @@ function Index() {
           </a>
         </div>
 
-        <Link
-          to="/details"
-          className="group mt-8 inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
-        >
-          More information
-          <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
-
-        <div className="mt-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+        <div className="mt-10 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
           <Link to="/privacy" className="transition-colors hover:text-foreground">
             Privacy Policy
           </Link>
