@@ -1,0 +1,17 @@
+# PlayLight
+
+> PlayLight (also styled Play Light) is a life management and productivity app by Light Technologies — a calm orb that helps you visualize and navigate your day with focus, protocols, goals, and memory of what you meant to do.
+
+PlayLight is available at https://www.playlight.app. Contact: hello@playlight.app. Company: Light Technologies.
+
+## Pages
+
+- [Home](https://www.playlight.app/): Product landing — download links and overview.
+- [About](https://www.playlight.app/about): Story of Playlight — the orb, protocols, plans, and memory.
+- [Support](https://www.playlight.app/support): How to get help, FAQs, and contact email.
+- [Privacy Policy](https://www.playlight.app/privacy): What data is collected, how it is used, and user rights.
+- [Delete Account or Data](https://www.playlight.app/delete): How to request account or data deletion.
+
+## Optional
+
+- [Full LLM context](https://www.playlight.app/llms-full.txt): Concatenated markdown of the pages above for single-fetch ingestion.

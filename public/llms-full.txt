@@ -1,0 +1,152 @@
+# PlayLight
+
+> PlayLight (also styled Play Light) is a life management and productivity app by Light Technologies — a calm orb that helps you visualize and navigate your day with focus, protocols, goals, and memory of what you meant to do.
+
+PlayLight is available at https://www.playlight.app. Contact: hello@playlight.app. Company: Light Technologies.
+
+This file concatenates the primary site pages for LLM ingestion. Prefer https://www.playlight.app/llms.txt when only an index is needed.
+
+## Home
+
+URL: https://www.playlight.app/
+
+# PlayLight
+
+A tool to visualize and navigate your life.
+
+PlayLight is a mobile life-management app. The website offers App Store and Google Play download entry points, links to the about story, privacy policy, support, and account deletion.
+
+## About
+
+URL: https://www.playlight.app/about
+
+# About Playlight
+
+Playlight is a warm light for your day — a calm orb that helps you hold the day: focus, protocol, and a memory of what you meant to do.
+
+Story beats (one idea per frame):
+
+1. Your day has a light. — Scroll to meet it.
+2. But the day gets loud. — Tabs. Pings. Forgotten yeses.
+3. Playlight holds it. — One calm surface. No shouting.
+4. An orb that knows your day. — Rest. Focus. Bloom when you finish.
+5. A protocol you choose. — Habits as practice — not spam.
+6. Want becomes doing. — Goals and pillars → real tasks.
+7. It remembers what you meant. — Close the day. Hand off tomorrow.
+8. Evidence, not horoscopes. — Insights you can ask why.
+9. Come into the light. — Get Playlight.
+
+## Support
+
+URL: https://www.playlight.app/support
+
+# Support
+
+Light Technologies. Contact: hello@playlight.app. Response time: within 2 business days.
+
+We read every message. Whether you have a question, found a bug, or want to share feedback, the fastest way to reach us is by email.
+
+### Common Questions
+
+**How do I delete my account?**
+Full steps are on https://www.playlight.app/delete. Email hello@playlight.app from your account address (or use the form on that page). We acknowledge requests within about 2 business days. Deletion begins as an account soft-delete, then we purge or anonymise user-owned records under our deletion workflow — see the Privacy Policy.
+
+**I forgot my password.**
+Use the “Forgot password” link on the sign-in screen to receive a secure reset link by email. If the email never arrives, check your spam folder or contact us.
+
+**How do I report a bug or request a feature?**
+Email us with a short description and, if possible, your device model and app version. We triage feedback weekly and prioritise issues that affect the most users.
+
+**Where can I read your Privacy Policy?**
+https://www.playlight.app/privacy — it explains what we collect, how we use it, and your rights.
+
+## Privacy Policy
+
+URL: https://www.playlight.app/privacy
+
+# Privacy Policy
+
+Application: Play Light
+Version: Phase 1 — MVP Release (Backend-aligned patch)
+Effective Date: May 21, 2026
+Last Updated: August 10, 2026
+Entity: Light Technologies
+Contact: hello@playlight.app
+
+### Plain English Summary
+
+Play Light stores the account, device, security, and life-management information needed to operate the service. If you use AI features, we send the relevant message and selected account content to the configured AI provider to generate responses or insights. We may also process product-activity events, security telemetry, notification data, and service emails. We do not sell personal data or use it for third-party advertising. See the detailed sections on the website for vendors, retention, AI processing, analytics, and deletion.
+
+### 1. Who We Are
+
+Play Light is a life management and productivity application developed and operated by Light Technologies. This Privacy Policy applies to the Play Light mobile application and any associated website (together, the “Service”).
+
+### 2. What Information We Collect and Why
+
+We collect information needed to operate Play Light, secure accounts, deliver notifications and email, provide optional AI features, and improve the Service. We do not collect data for third-party advertising.
+
+Categories include: account and profile data (email, name, username, phone, date of birth, password hash, provider identities); authentication and security data (pending registration, refresh sessions, password-reset tokens, login history, security events, optional geo-IP); device and notification data (device ID, platform, app version, Expo push token); user-created life-management data (tasks, projects, habits, wealth, time allocations, arcs, notes, problems); AI conversations, memories, insights, embeddings, and usage logs; product analytics and activity events; support and communications data; and technical/operational logs.
+
+Sensitive content warning: life-management fields can reveal health, mental-health, financial, employment, relationship, identity, or other sensitive information depending on what a user enters.
+
+### 3–4. Uses and Recipients
+
+Purposes include providing the Service, authentication and security, email delivery (Resend), push notifications (Expo/push infrastructure), AI generation and insights (Groq, OpenAI, Google Gemini, and/or DeepSeek as configured), embeddings/retrieval, product analytics, support, and legal compliance.
+
+We do not sell personal data or share it for third-party advertising. Processors may include Supabase/AWS hosting, Resend, Google/Apple identity providers, Expo/push infrastructure, AI providers, ipgeolocation.io (when geo-IP is enabled), and logging/monitoring platforms.
+
+### 5. International Data Transfers
+
+Data may be processed outside your country. Where required (including GDPR), we rely on DPAs and SCCs as applicable.
+
+### 6. Security and Retention
+
+Security includes TLS/HTTPS, hashed passwords/tokens, and role-based access. Retention varies by category: active accounts retain profile and content; soft-deleted accounts are purged/anonymised under the deletion workflow; refresh sessions ~30 days default cleanup; password-reset tokens ~7 days default; technical logs typically up to ~90 days; backups/vendor copies may persist ~30 additional days; security/audit records may be retained longer; legal holds as required.
+
+### 7. Rights and Deletion
+
+Rights include access, correction, deletion, portability, restriction, objection, withdraw consent, and complaint to a DPA. Deletion is requested via hello@playlight.app or https://www.playlight.app/delete. Deletion begins as soft-delete (devices revoked), then purge/anonymisation of user-owned records. Do not rely on an in-app Settings → Delete Account path until that flow is shipped.
+
+### 8. Cookies / Tracking
+
+No third-party advertising cookies. Local storage for sign-in/preferences. First-party product analytics events may be collected when enabled (see Section 2.6 on the website).
+
+### 9. Children’s Privacy
+
+Not intended under 13 (or under 16 in the EEA). Date of birth / eligibility data may be collected at registration.
+
+### 10. Advertising and AI Processing
+
+No ads or ad SDKs. AI features may send messages and selected account content to configured providers. Insights, memories, embeddings, and usage logs are stored and retained as described above.
+
+### 11–12. Changes and Contact
+
+Material changes update the Last Updated date, are published at the public URL, and may include in-app notice. Contact: Light Technologies · Play Light · hello@playlight.app · https://www.playlight.app/delete
+
+Phase 1 (MVP) — Version 1.1 — Last updated August 10, 2026
+
+## Delete Account or Data
+
+URL: https://www.playlight.app/delete
+
+# Delete your Play Light account
+
+Submitting the form emails a deletion request to Light Technologies. We acknowledge verifiable requests within about 2 business days. Deletion currently begins as an account soft-delete (account marked deleted; devices revoked), then we purge or anonymise user-owned records under our deletion workflow.
+
+Contact: hello@playlight.app
+Response: within 2 business days · Purge: per deletion workflow (see Privacy Policy)
+
+### By email
+
+Email hello@playlight.app from your account email with the subject “Play Light account deletion request” and your account email address, or use the form on the delete page.
+
+### Delete data without deleting your account
+
+Choose “Delete some or all of my data, but keep my account” on the delete page form, or email hello@playlight.app and specify what to remove. We process verifiable requests within 30 days.
+
+### What is deleted vs kept
+
+- **Deleted or anonymised:** profile fields, credentials, life-management content, AI user-owned records, devices, and preferences (for full account deletion), subject to purge completion.
+- **May be kept:** security/audit events needed for abuse prevention, encrypted backups for a limited period, operational logs, aggregated de-identified data, or data required by law.
+
+See the Privacy Policy for full retention details.

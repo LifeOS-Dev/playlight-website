@@ -1,0 +1,109 @@
+/* A look inside — imported by LookInside.tsx.
+
+   Three device frames drawn in the same wireframe language as the road's
+   motifs, so showing the product doesn't break the world it was argued in. */
+
+.pl3-look {
+  position: relative;
+  z-index: 10;
+  width: min(1140px, 100%);
+  margin: 0 auto;
+  padding: clamp(70px, 13vh, 150px) clamp(20px, 5vw, 48px) clamp(40px, 8vh, 90px);
+}
+
+.pl3-look__head {
+  max-width: 34rem;
+}
+
+.pl3-look__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.pl3-look__title {
+  margin-top: 14px;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--filament);
+}
+
+.pl3-look__note {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--ash-dim);
+}
+
+.pl3-look__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 3vw, 40px);
+  margin-top: clamp(34px, 6vh, 64px);
+}
+
+.pl3-look__panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The frame: a device, implied rather than drawn in chrome. */
+.pl3-look__frame {
+  position: relative;
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  /* Near-opaque on purpose: the orb passes behind this section, and a
+     translucent frame let it shine through the screen like a torch. */
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(255, 174, 71, 0.08), transparent 62%),
+    rgba(9, 8, 13, 0.94);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+/* the light the screen sits under */
+.pl3-look__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 244, 226, 0.07);
+  pointer-events: none;
+}
+
+.pl3-look__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: rgba(255, 174, 71, 0.72);
+}
+
+.pl3-look__caption {
+  margin-top: clamp(16px, 2.4vh, 22px);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--filament);
+}
+
+.pl3-look__body {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ash);
+}
+
+@media (max-width: 860px) {
+  .pl3-look__row {
+    grid-template-columns: 1fr;
+    gap: clamp(34px, 6vh, 54px);
+  }
+
+  .pl3-look__frame {
+    width: min(320px, 100%);
+  }
+}

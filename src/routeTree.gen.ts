@@ -9,11 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as V3RouteImport } from './routes/v3'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DeleteRouteImport } from './routes/delete'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const V3Route = V3RouteImport.update({
+  id: '/v3',
+  path: '/v3',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -29,6 +36,11 @@ const DeleteRoute = DeleteRouteImport.update({
   path: '/delete',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,40 +49,55 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/v3': typeof V3Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/v3': typeof V3Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/v3': typeof V3Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/delete' | '/privacy' | '/support'
+  fullPaths: '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/delete' | '/privacy' | '/support'
-  id: '__root__' | '/' | '/delete' | '/privacy' | '/support'
+  to: '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
+  id: '__root__' | '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   DeleteRoute: typeof DeleteRoute
   PrivacyRoute: typeof PrivacyRoute
   SupportRoute: typeof SupportRoute
+  V3Route: typeof V3Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/v3': {
+      id: '/v3'
+      path: '/v3'
+      fullPath: '/v3'
+      preLoaderRoute: typeof V3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
@@ -92,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeleteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,9 +138,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   DeleteRoute: DeleteRoute,
   PrivacyRoute: PrivacyRoute,
   SupportRoute: SupportRoute,
+  V3Route: V3Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

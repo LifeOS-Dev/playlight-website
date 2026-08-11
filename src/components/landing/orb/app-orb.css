@@ -1,0 +1,197 @@
+/* ══════════════════════════════════════════════════════════════
+   App orb — brand-faithful port of los_client ShowcaseOrb / orb.mjs
+   ══════════════════════════════════════════════════════════════ */
+
+.app-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.app-orb__stage {
+  position: relative;
+  transform-origin: 50% 50%;
+}
+
+.app-orb__body {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: app-orb-breath 5.2s ease-in-out infinite;
+}
+
+.app-orb__corona {
+  animation: app-orb-corona 7s ease-in-out infinite;
+}
+
+.app-orb__aura {
+  animation: app-orb-aura 5.2s ease-in-out infinite;
+}
+
+.app-orb__ring {
+  animation: app-orb-ring 5.2s ease-in-out infinite;
+}
+
+.app-orb__core {
+  animation: app-orb-core 5.2s ease-in-out infinite;
+}
+
+.app-orb__wisp {
+  will-change: transform, opacity;
+}
+
+.app-orb__wisp--a {
+  animation: app-orb-wisp-a 19s linear infinite;
+}
+
+.app-orb__wisp--b {
+  animation: app-orb-wisp-b 26s linear infinite;
+}
+
+.app-orb__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  animation: app-orb-spark 6.2s ease-in-out infinite;
+}
+
+@keyframes app-orb-breath {
+  0%,
+  100% {
+    transform: scale(0.972);
+  }
+  50% {
+    transform: scale(1.028);
+  }
+}
+
+@keyframes app-orb-corona {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.99);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes app-orb-aura {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1.14);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes app-orb-ring {
+  0%,
+  100% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes app-orb-core {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes app-orb-wisp-a {
+  from {
+    transform: translate(22px, 0);
+    opacity: 0.55;
+  }
+  25% {
+    transform: translate(0, 22px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(-22px, 0);
+    opacity: 0.55;
+  }
+  75% {
+    transform: translate(0, -22px);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(22px, 0);
+    opacity: 0.55;
+  }
+}
+
+@keyframes app-orb-wisp-b {
+  from {
+    transform: translate(-32px, 0);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translate(0, -32px);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate(32px, 0);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(0, 32px);
+    opacity: 0.95;
+  }
+  to {
+    transform: translate(-32px, 0);
+    opacity: 0.5;
+  }
+}
+
+@keyframes app-orb-spark {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.08);
+  }
+}
+
+.app-orb--still .app-orb__body,
+.app-orb--still .app-orb__corona,
+.app-orb--still .app-orb__aura,
+.app-orb--still .app-orb__ring,
+.app-orb--still .app-orb__core,
+.app-orb--still .app-orb__wisp--a,
+.app-orb--still .app-orb__wisp--b,
+.app-orb--still .app-orb__spark {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-orb__body,
+  .app-orb__corona,
+  .app-orb__aura,
+  .app-orb__ring,
+  .app-orb__core,
+  .app-orb__wisp--a,
+  .app-orb__wisp--b,
+  .app-orb__spark {
+    animation: none !important;
+  }
+}

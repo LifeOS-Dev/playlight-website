@@ -69,39 +69,29 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
+    // Only the things every page shares. Titles, descriptions and share
+    // cards belong to the routes, via pageMeta.
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PlayLight — a tool to visualize and navigate your life" },
-      {
-        name: "description",
-        content: "PlayLight is a tool to visualize and navigate your life.",
-      },
       { name: "author", content: "Light Technologies" },
-      { property: "og:title", content: "PlayLight" },
-      {
-        property: "og:description",
-        content: "A tool to visualize and navigate your life.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://www.playlight.app" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "PlayLight" },
-      {
-        name: "twitter:description",
-        content: "A tool to visualize and navigate your life.",
-      },
+      { name: "theme-color", content: "#07060a" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Three families, because that is how many the site actually sets.
+      // Fraunces belongs to the story page and is requested there; Inter
+      // and Space Mono were only ever reached by the archived layout.
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,200..400;1,6..72,200..400&display=swap",
       },
     ],
   }),
