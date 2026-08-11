@@ -37,7 +37,7 @@ function Index() {
         </h1>
 
         <p className="mt-5 max-w-md text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
-          A tool to visualize and navigate your life.
+          A personalized OS to help you understand, organize, and play your life.
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
