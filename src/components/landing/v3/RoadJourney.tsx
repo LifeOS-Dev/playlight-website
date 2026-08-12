@@ -252,7 +252,14 @@ export function RoadJourney() {
       const philStart =
         PHASE.depart + (PHASE.stations * (FACE_COUNT - 1 + STATION.passFrom)) / FACE_COUNT;
       const ph = clamp01((p - philStart) / Math.max(0.08, 1 - philStart));
-      if (philRef.current) philRef.current.style.opacity = smooth(ph).toFixed(3);
+      if (philRef.current) {
+        const o = smooth(ph);
+        philRef.current.style.opacity = o.toFixed(3);
+        // Opacity alone leaves the faded-in button clickable on the way
+        // in, and clickable-but-invisible while the stations still own
+        // the stage. Visibility removes it from hit-testing.
+        philRef.current.style.visibility = o > 0.08 ? "visible" : "hidden";
+      }
 
       // Compass + rail: fade in as the first station arrives, fade out as
       // the road opens, so they never snap and never sit on the close.
@@ -314,10 +321,9 @@ export function RoadJourney() {
 
       // ── The light itself ─────────────────────────────────────────
       // The hero flies and the light rises into the vacated frame, settling
-      // on a cruise that holds for the rest of the road. A station is the
-      // only disturbance: the point of light, then the card, pull it down
-      // onto the near road so the middle stays readable. After it passes,
-      // the cruise returns.
+      // on a cruise that holds for the rest of the road. A problem/answer
+      // card is the only disturbance - it pulls the light down onto the near
+      // road so the middle stays readable. After it passes, the cruise returns.
       const near = smooth(clamp01(dep / 0.55));
       const gone = smooth(clamp01((dep - 0.42) / 0.58));
       let y = lerp(LIGHT.heroY, LIGHT.cruiseY, gone);
@@ -327,9 +333,10 @@ export function RoadJourney() {
       let horizon = lerp(LIGHT.heroHorizon, LIGHT.cruiseHorizon, gone);
 
       if (sp > 0) {
-        const give = Math.max(sigLevel, hold);
-        y = lerp(y, LIGHT.readY, give);
-        size = lerp(size, LIGHT.readSize, give);
+        // Only the card pulls the light off cruise. The point of light on
+        // the horizon is ahead of it, not a reason to hug the floor.
+        y = lerp(y, LIGHT.readY, hold);
+        size = lerp(size, LIGHT.readSize, hold);
         // Every answer is drawn by this light, so it swells as one lands.
         glow += bloom * 0.6;
         size += bloom * 0.12;
@@ -373,7 +380,10 @@ export function RoadJourney() {
           node.style.setProperty("--z", "0px");
         }
       });
-      if (philRef.current) philRef.current.style.opacity = "1";
+      if (philRef.current) {
+        philRef.current.style.opacity = "1";
+        philRef.current.style.visibility = "visible";
+      }
       if (ashRef.current) ashRef.current.style.opacity = "0";
       if (offerRef.current) offerRef.current.style.opacity = "0";
 
@@ -565,6 +575,7 @@ export function RoadJourney() {
         <div ref={philRef} className="pl3-road__phil">
           <p className="pl3-road__phil-line">Come into the light.</p>
           <p className="pl3-road__phil-sub">Not more noise. A calmer next step.</p>
+          <TryToday />
         </div>
 
         <a className="pl3-skip" href="#faq">

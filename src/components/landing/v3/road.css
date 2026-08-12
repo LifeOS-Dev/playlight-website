@@ -426,7 +426,13 @@
   transform: translate(-50%, -50%);
   text-align: center;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+}
+
+.pl3-road__phil .pl3-try {
+  pointer-events: auto;
+  margin-top: clamp(22px, 3.6vh, 38px);
 }
 
 .pl3-road__phil-line {
@@ -691,6 +697,7 @@
     top: auto;
     transform: none;
     opacity: 1 !important;
+    visibility: visible !important;
     margin: clamp(40px, 8vh, 90px) auto 0;
   }
 }

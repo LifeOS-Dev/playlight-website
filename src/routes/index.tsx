@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
  */
 const STOPS: OrbStop[] = [
   // Matches the pose the journey ends on, so the handover is invisible.
-  { y: 0.7, size: 0.92, i: 1.45, grid: 0.34, road: 7 }, // leaving the road
+  { y: 0.66, size: 0.92, i: 1.45, grid: 0.34, road: 7 }, // leaving the road
   // Just under the fold: the frames stand in its glow, and no caption
   // has to be read through it.
   { y: 1.08, size: 0.72, i: 0.8, grid: 0.26, road: 8 }, // look inside

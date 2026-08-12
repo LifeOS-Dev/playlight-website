@@ -57,9 +57,9 @@ export const DEPART_TRAVEL = 1400;
  *
  * After the hero flies, it settles on a composed cruise - a little above
  * the old floor-hugging pose, still sitting on the grid. That cruise is
- * the path for the rest of the journey. A station (the point of light,
- * then the card) is the only thing that pulls it down onto the near road;
- * once the card has passed, it returns.
+ * the path for the rest of the journey. A problem/answer card is the only
+ * thing that pulls it down onto the near road; once the card has passed,
+ * it returns.
  */
 export const LIGHT = {
   heroY: 70,
