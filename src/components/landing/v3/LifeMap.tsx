@@ -308,6 +308,9 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
             nodes.current[i] = node;
           }}
           className="pl3-map__node"
+          // The word is right there in the button, but naming it explicitly
+          // survives the label ever becoming decorative.
+          aria-label={FACET_BY_ID[place.id].label}
           data-side={place.ux >= 0 ? "right" : "left"}
           data-lit={active === place.id ? "" : undefined}
           style={

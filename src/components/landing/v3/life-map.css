@@ -5,8 +5,12 @@
 .pl3-map {
   /* The ring, in screen terms. Capped at both ends: below the floor two
      facets on the same side start touching, above the ceiling the ring
-     stops reading as one object. */
-  --ring-rx: clamp(190px, 34vw, 470px);
+     stops reading as one object.
+     The `50vw - 175px` term is the label guard - a side facet's word runs
+     outward from its port, and PERSONALITY needs about that much room, so
+     between roughly 820 and 1000px the ring gives way to the word rather
+     than pushing it off the edge. */
+  --ring-rx: clamp(190px, min(34vw, 50vw - 175px), 470px);
   --ring-ry: clamp(126px, 21vh, 232px);
   --port: 30px;
 }
@@ -265,7 +269,9 @@
 
 @media (max-width: 820px) {
   .pl3-map {
-    --ring-rx: clamp(118px, 37vw, 220px);
+    /* Same guard, halved: the word is centred under its port here, so only
+       half of it hangs outboard. */
+    --ring-rx: clamp(112px, min(37vw, 50vw - 62px), 220px);
     --ring-ry: clamp(118px, 19vh, 200px);
     --port: 26px;
   }
