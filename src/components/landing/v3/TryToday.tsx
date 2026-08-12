@@ -67,7 +67,7 @@ function WaitlistForm() {
   if (state === "done") {
     return (
       <p className="pl3-get__done">
-        You're on the list. We'll write once — the day it opens.
+        You're on the list. We'll write once - the day it opens.
         {WAITLIST_ENDPOINT ? null : (
           <span className="pl3-get__hint">
             If your mail app didn't open, send a note to {NOTIFY_EMAIL}.
@@ -111,7 +111,7 @@ function WaitlistForm() {
 
 /**
  * Mounted once per page. Uses a native <dialog>, so focus trapping, Esc to
- * dismiss and the inert backdrop come from the platform — and the top layer
+ * dismiss and the inert backdrop come from the platform - and the top layer
  * escapes the 3D scene's transforms entirely.
  */
 export function GetPlaylightPanel() {

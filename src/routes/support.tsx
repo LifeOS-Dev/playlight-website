@@ -7,7 +7,7 @@ export const Route = createFileRoute("/support")({
   head: () => ({
     meta: pageMeta({
       path: "/support",
-      title: "Playlight — Support",
+      title: "Playlight - Support",
       description: "Need help with Playlight? Reach the team at hello@playlight.app.",
     }),
   }),
@@ -45,7 +45,7 @@ function SupportPage() {
               hello@playlight.app from your account address (or use the form on that page). We
               acknowledge requests within about 2 business days. Deletion begins as an account
               soft-delete, then we purge or anonymise user-owned records under our deletion
-              workflow — see the <Link to="/privacy">Privacy Policy</Link>.
+              workflow - see the <Link to="/privacy">Privacy Policy</Link>.
             </p>
           </div>
 

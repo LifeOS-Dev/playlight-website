@@ -1,7 +1,7 @@
 import { AppOrb } from "@/components/landing/orb/AppOrb";
 
 /**
- * The light — fixed to the viewport, driven by --orb-* scroll tokens.
+ * The light - fixed to the viewport, driven by --orb-* scroll tokens.
  * Visual DNA matches the in-app ShowcaseOrb (white essence + amber field).
  */
 export function LightOrb() {

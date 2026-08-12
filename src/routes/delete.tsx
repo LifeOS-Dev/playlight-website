@@ -7,7 +7,7 @@ export const Route = createFileRoute("/delete")({
   head: () => ({
     meta: pageMeta({
       path: "/delete",
-      title: "Playlight — Delete Account or Data",
+      title: "Playlight - Delete Account or Data",
       description:
         "Request deletion of your Playlight account or associated data. Steps for Light Technologies users.",
     }),
@@ -91,7 +91,7 @@ function DeleteRequestForm() {
 
       <div>
         <label htmlFor="reason" className="block text-sm text-muted-foreground">
-          Reason (optional — helps us improve)
+          Reason (optional - helps us improve)
         </label>
         <textarea
           id="reason"

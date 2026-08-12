@@ -2,7 +2,7 @@
  * Everything search and social see.
  *
  * One place, because the name had drifted into four spellings across the
- * routes — Playlight, PlayLight, Play Light and playlight — and because a
+ * routes - Playlight, PlayLight, Play Light and playlight - and because a
  * share card that renders blank is a first impression too.
  */
 export const SITE = {

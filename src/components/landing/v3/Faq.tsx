@@ -1,7 +1,7 @@
 import { FAQS } from "./faces";
 
 /**
- * Native details/summary — keyboard and screen-reader correct without a
+ * Native details/summary - keyboard and screen-reader correct without a
  * component library, and it degrades to plain readable text with no JS.
  */
 export function Faq() {

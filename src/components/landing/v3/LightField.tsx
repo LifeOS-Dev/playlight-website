@@ -1,6 +1,6 @@
 import * as React from "react";
 
-/** One tile of the floor grid, in px — must match background-size in pl3.css. */
+/** One tile of the floor grid, in px - must match background-size in pl3.css. */
 const TILE = 72;
 
 /**
@@ -9,7 +9,7 @@ const TILE = 72;
  * Position is integrated frame by frame from the current pace instead of
  * being handed to a CSS animation, because the pace changes constantly and
  * re-timing a running animation makes the whole floor jump. Both inputs are
- * read off the root's inline style — a CSSOM read that costs nothing, and
+ * read off the root's inline style - a CSSOM read that costs nothing, and
  * keeps the road's scroll handler as the only writer.
  */
 function useFloorDrift(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
@@ -82,7 +82,7 @@ export function LightField({ still = false }: { still?: boolean }) {
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       aria-hidden="true"
     >
-      {/* Clip and perspective must be separate — overflow on the
+      {/* Clip and perspective must be separate - overflow on the
           perspective parent flattens rotateX into a flat graph. */}
       <div className="pl3-grid">
         <div className="pl3-grid__persp">
@@ -90,7 +90,7 @@ export function LightField({ still = false }: { still?: boolean }) {
         </div>
       </div>
 
-      {/* horizon haze — where the floor meets the dark */}
+      {/* horizon haze - where the floor meets the dark */}
       <div className="pl3-horizon" />
 
       {/* the orb warms whatever it is near */}

@@ -12,7 +12,7 @@ export type OrbStop = {
   i: number;
   /** How present the perspective grid is behind everything */
   grid: number;
-  /** Seconds for the floor grid to travel one tile — higher is slower */
+  /** Seconds for the floor grid to travel one tile - higher is slower */
   road: number;
 };
 
@@ -24,7 +24,7 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
  *
  * Each section registers an anchor element and the orb state it wants. On
  * scroll we find which pair of anchors the viewport centre falls between and
- * write the interpolated result to CSS custom properties on `root` — so the
+ * write the interpolated result to CSS custom properties on `root` - so the
  * orb, the grid and the lightfall all move without React re-rendering.
  */
 export function useLightScroll(
@@ -77,7 +77,7 @@ export function useLightScroll(
       const b = stops[idx + 1] ?? stops[idx];
 
       // The road owns the light while its stage is pinned. One writer at a
-      // time — two systems setting --orb-* in the same frame is what made
+      // time - two systems setting --orb-* in the same frame is what made
       // this fragile before.
       if (el.hasAttribute("data-road")) return;
 

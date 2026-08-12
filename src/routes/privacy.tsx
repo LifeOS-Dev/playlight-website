@@ -6,9 +6,9 @@ export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: pageMeta({
       path: "/privacy",
-      title: "Playlight — Privacy Policy",
+      title: "Playlight - Privacy Policy",
       description:
-        "Privacy Policy for Playlight by Light Technologies — what we collect, how we use it, and your rights.",
+        "Privacy Policy for Playlight by Light Technologies - what we collect, how we use it, and your rights.",
     }),
   }),
   component: PrivacyPage,
@@ -52,7 +52,7 @@ function PrivacyPage() {
         <p>
           Application: Playlight
           <br />
-          Version: Phase 1 — MVP Release (Backend-aligned patch)
+          Version: Phase 1 - MVP Release (Backend-aligned patch)
         </p>
       }
     >
@@ -113,26 +113,26 @@ function PrivacyPage() {
           <p>Collected when you register or update your profile:</p>
           <ul className="ml-5 list-disc space-y-2">
             <li>
-              <span className="font-medium text-foreground">Email address</span> — account identity,
+              <span className="font-medium text-foreground">Email address</span> - account identity,
               login, and essential service messages.
             </li>
             <li>
               <span className="font-medium text-foreground">
                 Full name, username, and phone number
               </span>{" "}
-              — profile and account personalisation (where you provide them).
+              - profile and account personalisation (where you provide them).
             </li>
             <li>
-              <span className="font-medium text-foreground">Date of birth</span> — age eligibility
+              <span className="font-medium text-foreground">Date of birth</span> - age eligibility
               and account records.
             </li>
             <li>
-              <span className="font-medium text-foreground">Password and security flags</span> —
+              <span className="font-medium text-foreground">Password and security flags</span> -
               password is stored as a secure hash; we also store verification timestamps, MFA
               status, password-change time, login counters, lockout state, and account status.
             </li>
             <li>
-              <span className="font-medium text-foreground">Sign-in provider records</span> — if you
+              <span className="font-medium text-foreground">Sign-in provider records</span> - if you
               use Google (or Apple when enabled), we store the provider identity, provider user ID,
               email/claims needed to link the account, and related linking metadata.
             </li>
@@ -379,8 +379,8 @@ function PrivacyPage() {
             jurisdiction.
           </p>
           <p>
-            Where required by applicable law — including the GDPR for users in the European Economic
-            Area — we rely on appropriate safeguards such as data processing agreements and, where
+            Where required by applicable law - including the GDPR for users in the European Economic
+            Area - we rely on appropriate safeguards such as data processing agreements and, where
             applicable, Standard Contractual Clauses (SCCs) approved by the European Commission.
           </p>
         </Section>
@@ -643,7 +643,7 @@ function PrivacyPage() {
         Playlight © 2026 Light Technologies. All rights reserved.
         <br />
         <span className="italic normal-case tracking-normal">
-          Phase 1 (MVP) — Version 1.1 — Last updated August 10, 2026
+          Phase 1 (MVP) - Version 1.1 - Last updated August 10, 2026
         </span>
       </div>
     </DocPage>

@@ -3,16 +3,16 @@ import type { FacetId } from "./faces";
 export type JourneyBeat = {
   id: FacetId;
   side: "left" | "right";
-  /** Short line under the label — felt, not feature jargon */
+  /** Short line under the label - felt, not feature jargon */
   line: string;
-  /** Orb horizontal rest (0–1 of viewport) while this beat owns the stage */
+  /** Orb horizontal rest (0-1 of viewport) while this beat owns the stage */
   orbX: number;
   /** Orb vertical rest while this beat owns the stage */
   orbY: number;
 };
 
 /**
- * The light walks the grid. Facets appear left / right as it passes —
+ * The light walks the grid. Facets appear left / right as it passes -
  * a literal reading of “visualize and navigate your life.”
  */
 export const JOURNEY: JourneyBeat[] = [
@@ -26,7 +26,7 @@ export const JOURNEY: JourneyBeat[] = [
   {
     id: "work",
     side: "right",
-    line: "Projects stacked in time — what you’re building now.",
+    line: "Projects stacked in time - what you’re building now.",
     orbX: 0.4,
     orbY: 0.5,
   },
@@ -47,7 +47,7 @@ export const JOURNEY: JourneyBeat[] = [
   {
     id: "habits",
     side: "left",
-    line: "Practice rings — most days, not every day.",
+    line: "Practice rings - most days, not every day.",
     orbX: 0.62,
     orbY: 0.48,
   },

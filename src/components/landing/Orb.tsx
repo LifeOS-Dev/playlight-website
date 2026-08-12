@@ -3,14 +3,14 @@ import { AppOrb } from "@/components/landing/orb/AppOrb";
 interface OrbProps {
   size?: number;
   className?: string;
-  /** Kept for call-site compat — maps loosely to accent strength. */
+  /** Kept for call-site compat - maps loosely to accent strength. */
   intensity?: number;
-  /** Kept for call-site compat — night dims; others stay lit. */
+  /** Kept for call-site compat - night dims; others stay lit. */
   mood?: "rest" | "focus" | "think" | "night" | "bloom";
 }
 
 /**
- * Shared marketing orb — same object as the Playlight app.
+ * Shared marketing orb - same object as the Playlight app.
  * White essence never tints; amber lives outside as ring / aura / corona.
  */
 export function Orb({

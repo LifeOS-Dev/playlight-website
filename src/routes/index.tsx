@@ -15,7 +15,7 @@ import { pageMeta } from "@/seo";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: pageMeta({
-      title: "Playlight — your personalized OS for life",
+      title: "Playlight - your personalized OS for life",
       description: "Your personalized OS to help you understand, organize, and play life.",
     }),
   }),
@@ -36,7 +36,7 @@ const STOPS: OrbStop[] = [
   // Off to the side while you read: centred, even small and dim, it sat
   // right on top of the questions.
   { x: 0.87, y: 0.3, size: 0.34, i: 0.55, grid: 0.16, road: 9 }, // faq
-  { y: 0.84, size: 0.46, i: 1.1, grid: 0.3, road: 7.5 }, // footer — settles, blooms
+  { y: 0.84, size: 0.46, i: 1.1, grid: 0.3, road: 7.5 }, // footer - settles, blooms
 ];
 
 function HomePage() {

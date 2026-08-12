@@ -17,7 +17,7 @@ const stopList = (stops: Stop[]) =>
   stops.map(([o, c]) => `${c} ${(o * 100).toFixed(1)}%`).join(",");
 
 /**
- * One orb layer, centred — ported from scripts/store-assets/lib/orb.mjs.
+ * One orb layer, centred - ported from scripts/store-assets/lib/orb.mjs.
  * Box is padded by the cy offset so a raised gradient centre never clips
  * into a hard arc (the app lesson for icon-size orbs).
  */
@@ -51,7 +51,7 @@ const essenceStops = (): Stop[] => [
   [1, "rgba(232,236,244,0)"],
 ];
 
-/** Accent RING: 0–34% clear so the white heart is never tinted. */
+/** Accent RING: 0-34% clear so the white heart is never tinted. */
 const ringStops = (r: AccentRamp): Stop[] => [
   [0, rgba(r.base, 0)],
   [0.34, rgba(r.base, 0)],
@@ -92,7 +92,7 @@ const wispStops = (hex: string, peak: number): Stop[] => [
   [1, rgba(hex, 0)],
 ];
 
-/** Golden-angle spark pool — same radii band as the app TASK_SPARK_POOL. */
+/** Golden-angle spark pool - same radii band as the app TASK_SPARK_POOL. */
 const SPARKS: Array<[deg: number, rad: number, size: number]> = [
   [0, 92, 11],
   [137.5, 118, 9],
@@ -108,7 +108,7 @@ export type AppOrbProps = {
   size?: number;
   /** false = pure white soul (no protocol yet). Marketing default: lit. */
   accent?: boolean;
-  /** How many task sparks to light (0–7 shown). */
+  /** How many task sparks to light (0-7 shown). */
   sparks?: number;
   /** Extra CSS class on the outer box. */
   className?: string;
@@ -117,12 +117,12 @@ export type AppOrbProps = {
 };
 
 /**
- * Playlight app orb — web port of ShowcaseOrb / store-assets orb.mjs.
+ * Playlight app orb - web port of ShowcaseOrb / store-assets orb.mjs.
  *
  * Identity rules (do not break):
  * 1. White living essence never tints.
  * 2. Accent lives OUTSIDE the white heart (ring → aura → corona).
- * 3. Soft dissolve only — no hard disc edge.
+ * 3. Soft dissolve only - no hard disc edge.
  */
 export function AppOrb({
   size = ORB_BOX,
@@ -180,7 +180,7 @@ export function AppOrb({
           {/* white heart */}
           <div style={layerStyle(ESSENCE, 0.44, essenceStops())} />
 
-          {/* accent ring — outside the resting white heart */}
+          {/* accent ring - outside the resting white heart */}
           {accent ? (
             <div
               className="app-orb__ring"

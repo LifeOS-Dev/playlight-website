@@ -54,15 +54,15 @@ export function SpotlightBackground() {
       aria-hidden
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      {/* subtle grid lines — architectural structure of the wall */}
+      {/* subtle grid lines - architectural structure of the wall */}
       <GridLines />
 
-      {/* periodic surge — all icons briefly light up in sync with the orb */}
+      {/* periodic surge - all icons briefly light up in sync with the orb */}
       <div className="absolute inset-0 animate-icons-surge">
         <IconLayer colored />
       </div>
 
-      {/* revealed layer — same icons, brighter, masked by a narrow band */}
+      {/* revealed layer - same icons, brighter, masked by a narrow band */}
       <div
         className="absolute inset-0 animate-spotlight-sweep"
         style={{
@@ -79,7 +79,7 @@ export function SpotlightBackground() {
         <IconLayer colored />
       </div>
 
-      {/* the warm light itself — same mask so it traces the band */}
+      {/* the warm light itself - same mask so it traces the band */}
       <div
         className="absolute inset-0 animate-spotlight-sweep"
         style={{

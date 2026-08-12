@@ -1,5 +1,5 @@
 /**
- * Amber accent ramp — verbatim from los_client AMBER_RAMP / store-assets theme.
+ * Amber accent ramp - verbatim from los_client AMBER_RAMP / store-assets theme.
  * White essence stays untinted; accent lives outside as ring + aura + corona.
  */
 export const AMBER_RAMP = {

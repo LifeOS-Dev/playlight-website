@@ -1,9 +1,9 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-/* Playlight v3 preview surface — fully scoped under .pl3 */
+/* Playlight v3 preview surface - fully scoped under .pl3 */
 @import "./styles/pl3.css";
-/* Brand orb — app DNA (ShowcaseOrb / store-assets orb.mjs) */
+/* Brand orb - app DNA (ShowcaseOrb / store-assets orb.mjs) */
 @import "./components/landing/orb/app-orb.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -69,7 +69,7 @@
   --radius: 0.25rem;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  /* Brand display / body (story + future surfaces) */
+  /* Brand display / body (archived surfaces; live pages use Newsreader) */
   --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-body: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-numeral: "Space Mono", ui-monospace, monospace;
@@ -93,7 +93,7 @@
   --border: oklch(0.88 0.008 75);
   --input: oklch(0.88 0.008 75);
   --ring: oklch(0.72 0.13 65);
-  /* module palette — soft, soothing, distinct */
+  /* module palette - soft, soothing, distinct */
   --module-work: oklch(0.62 0.13 250);      /* calm blue */
   --module-health: oklch(0.7 0.14 150);     /* sage green */
   --module-wealth: oklch(0.78 0.14 80);     /* warm gold */
@@ -270,89 +270,8 @@
   animation: icons-surge 7s ease-in-out infinite;
 }
 
-/* ── Playlight story page (/about) ─────────────────────────── */
-.story-page {
-  --story-canvas: #100e0c;
-  --story-ink: #f2eee9;
-  --story-ink-dim: #bab3aa;
-  --story-ink-ghost: rgba(186, 179, 170, 0.35);
-  background-color: var(--story-canvas);
-  color: var(--story-ink);
-  font-family: var(--font-body);
-}
-
-.story-page::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  opacity: 0.35;
-  background:
-    radial-gradient(ellipse 100% 80% at 50% 0%, transparent 40%, #100e0c 100%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  background-blend-mode: multiply, overlay;
-}
-
-.story-motes {
-  background-image:
-    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255, 213, 140, 0.45), transparent),
-    radial-gradient(1px 1px at 70% 40%, rgba(255, 245, 136, 0.35), transparent),
-    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255, 163, 43, 0.3), transparent),
-    radial-gradient(1px 1px at 85% 60%, rgba(255, 213, 140, 0.4), transparent),
-    radial-gradient(1px 1px at 55% 20%, rgba(255, 255, 255, 0.25), transparent);
-  background-size: 100% 100%;
-  animation: story-mote-drift 18s ease-in-out infinite;
-  opacity: 0.55;
-}
-
-@keyframes story-mote-drift {
-  0%,
-  100% {
-    transform: translate(0, 0);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translate(0, -12px);
-    opacity: 0.7;
-  }
-}
-
-@keyframes story-jitter {
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-  50% {
-    transform: scaleY(0.55);
-  }
-}
-
-.story-scroll-cue {
-  animation: story-scroll-pulse 2.2s ease-in-out infinite;
-}
-
-@keyframes story-scroll-pulse {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scaleY(0.85);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .story-motes,
-  .story-scroll-cue {
-    animation: none;
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════
-   Playlight v2 (/v2) — Endel-adjacent night field, traveling light
+   Playlight v2 (/v2) - Endel-adjacent night field, traveling light
    ═══════════════════════════════════════════════════════════════ */
 
 .pl2 {

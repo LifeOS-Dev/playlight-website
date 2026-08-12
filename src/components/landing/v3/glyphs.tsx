@@ -1,7 +1,7 @@
 import type { FacetId } from "./faces";
 
 /**
- * Facet glyphs — hairline instrument diagrams, not icon-library pictograms.
+ * Facet glyphs - hairline instrument diagrams, not icon-library pictograms.
  * Each is 24×24, stroke-only, so the light decides how bright it reads.
  */
 
@@ -22,7 +22,7 @@ function Frame({ children }: { children: React.ReactNode }) {
 }
 
 const GLYPHS: Record<FacetId, React.ReactNode> = {
-  // a breath — rise, hold, fall
+  // a breath - rise, hold, fall
   health: (
     <Frame>
       <path {...S} d="M2 15c3 0 3.4-7 6-7s2.8 10 5.4 10S16.6 9 19 9h3" />
@@ -49,7 +49,7 @@ const GLYPHS: Record<FacetId, React.ReactNode> = {
       <circle {...S} cx="15" cy="12" r="6" />
     </Frame>
   ),
-  // a practice ring — most days, not every day
+  // a practice ring - most days, not every day
   habits: (
     <Frame>
       <circle {...S} cx="12" cy="12" r="8" strokeDasharray="1.6 3.2" />

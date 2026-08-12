@@ -13,7 +13,6 @@ import { Route as V3RouteImport } from './routes/v3'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DeleteRouteImport } from './routes/delete'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
 const V3Route = V3RouteImport.update({
@@ -36,11 +35,6 @@ const DeleteRoute = DeleteRouteImport.update({
   path: '/delete',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,7 +43,6 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
@@ -57,7 +50,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
@@ -66,7 +58,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
@@ -74,15 +65,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
+  fullPaths: '/' | '/delete' | '/privacy' | '/support' | '/v3'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
-  id: '__root__' | '/' | '/about' | '/delete' | '/privacy' | '/support' | '/v3'
+  to: '/' | '/delete' | '/privacy' | '/support' | '/v3'
+  id: '__root__' | '/' | '/delete' | '/privacy' | '/support' | '/v3'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
   DeleteRoute: typeof DeleteRoute
   PrivacyRoute: typeof PrivacyRoute
   SupportRoute: typeof SupportRoute
@@ -119,13 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeleteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -138,7 +121,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
   DeleteRoute: DeleteRoute,
   PrivacyRoute: PrivacyRoute,
   SupportRoute: SupportRoute,

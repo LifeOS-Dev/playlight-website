@@ -3,7 +3,7 @@ import "./facet-scene.css";
 
 /**
  * Mini animated scenes inside each journey card.
- * Instrument diagrams that move — not icon stickers.
+ * Instrument diagrams that move - not icon stickers.
  */
 export function FacetScene({ id, active }: { id: FacetId; active: boolean }) {
   return (

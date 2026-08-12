@@ -1,9 +1,9 @@
-/* Facet mini-scenes — instrument diagrams that draw themselves in.
+/* Facet mini-scenes - instrument diagrams that draw themselves in.
    Imported by FacetScene.tsx.
 
    These rules previously lived in journey.css. Without them every shape
    falls back to SVG's default black fill, which is invisible on this
-   canvas — the reason Work / People / Habits rendered as black blobs. */
+   canvas - the reason Work / People / Habits rendered as black blobs. */
 
 .pl3-scene {
   color: rgba(255, 174, 71, 0.55);
@@ -20,7 +20,7 @@
   height: 100%;
 }
 
-/* Wealth — bars rise, trend draws */
+/* Wealth - bars rise, trend draws */
 .pl3-scene__bar {
   fill: currentColor;
   opacity: 0.35;
@@ -83,7 +83,7 @@
   animation: pl3-dot-in 0.4s 1s ease forwards;
 }
 
-/* Health — pulse travels */
+/* Health - pulse travels */
 .pl3-scene__pulse {
   stroke-dasharray: 220;
   stroke-dashoffset: 220;
@@ -97,7 +97,7 @@
   animation: pl3-dot-in 0.35s 0.7s ease forwards, pl3-beat 1.2s 1s ease-in-out infinite;
 }
 
-/* Work — blocks slide in */
+/* Work - blocks slide in */
 .pl3-scene__block {
   fill: none;
   stroke: currentColor;
@@ -119,7 +119,7 @@
   animation: pl3-fade 0.4s 0.5s ease forwards;
 }
 
-/* People — nodes bloom */
+/* People - nodes bloom */
 .pl3-scene__node {
   fill: none;
   stroke: currentColor;
@@ -140,7 +140,7 @@
   animation-delay: 0.26s;
 }
 
-/* Habits — ring fills */
+/* Habits - ring fills */
 .pl3-scene__ring {
   stroke-dashoffset: 176;
 }
@@ -148,7 +148,7 @@
   animation: pl3-ring 1.4s cubic-bezier(0.16, 0.8, 0.24, 1) forwards;
 }
 
-/* Mind — arcs draw */
+/* Mind - arcs draw */
 .pl3-scene__arc {
   stroke-dasharray: 80;
   stroke-dashoffset: 80;
@@ -163,7 +163,7 @@
   animation: pl3-draw 1s 0.22s ease forwards;
 }
 
-/* Time — wedge grows */
+/* Time - wedge grows */
 .pl3-scene__wedge {
   opacity: 0.55;
   transform-origin: 80px 44px;
@@ -173,7 +173,7 @@
   animation: pl3-wedge 0.9s cubic-bezier(0.16, 0.8, 0.24, 1) forwards;
 }
 
-/* Notes — lines draw */
+/* Notes - lines draw */
 .pl3-scene__line {
   fill: none;
   stroke: currentColor;

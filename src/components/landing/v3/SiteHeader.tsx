@@ -13,7 +13,6 @@ export function SiteHeader() {
         playlight
       </Link>
       <nav className="pl3-nav__links" aria-label="Main">
-        <Link to="/about">Story</Link>
         <Link to="/support">Support</Link>
         <Link to="/privacy">Privacy</Link>
         <TryToday variant="quiet" />

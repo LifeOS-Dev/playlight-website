@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   Playlight v3 — "the light is the only colour"
+   Playlight v3 - "the light is the only colour"
 
    Everything on this page is dim bronze wireframe. The orb is the
    sole source of warmth, and what it reaches becomes legible.
@@ -11,7 +11,7 @@
   --ember: #ffae47;
   --filament: #fff4e2;
   --ash: #a1978a; /* 7.4:1 on --void */
-  --ash-dim: #827a6f; /* 4.77:1 — the quietest this can go and stay AA */
+  --ash-dim: #827a6f; /* 4.77:1 - the quietest this can go and stay AA */
   --line: rgba(222, 176, 112, 0.42);
   --line-soft: rgba(222, 176, 112, 0.16);
   --horizon: 70%;
@@ -63,7 +63,7 @@
   opacity: var(--grid-o);
 }
 
-/* Perspective lives here — NOT on the overflow:hidden ancestor */
+/* Perspective lives here - NOT on the overflow:hidden ancestor */
 .pl3-grid__persp {
   position: absolute;
   inset: 0;
@@ -74,7 +74,7 @@
 
 .pl3-grid__plane {
   position: absolute;
-  /* Scroll depth via top — keeps rotateX under perspective only */
+  /* Scroll depth via top - keeps rotateX under perspective only */
   top: calc(var(--horizon) + var(--path-depth, 0) * 180px);
   left: -80%;
   width: 260%;
@@ -83,7 +83,7 @@
   /* Steeper tilt + parent perspective = converging road, not graph paper.
      The floor never stops: --grid-y is integrated frame by frame so the pace
      can change without the position ever jumping. A CSS animation cannot do
-     that — changing its duration mid-flight re-maps the elapsed time and the
+     that - changing its duration mid-flight re-maps the elapsed time and the
      whole floor snaps, which is what used to read as stutter. */
   transform: rotateX(72deg) translate3d(0, var(--grid-y, 0px), 0);
   background-image:
@@ -91,7 +91,7 @@
     linear-gradient(to bottom, var(--line) 1px, transparent 1px);
   background-size: 72px 72px;
   background-position: 0 0;
-  /* Do NOT set will-change: transform — it can flatten parent perspective */
+  /* Do NOT set will-change: transform - it can flatten parent perspective */
   backface-visibility: hidden;
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -103,7 +103,7 @@
   mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 42%, transparent 72%);
 }
 
-/* A thin band of warmth exactly on the horizon line — enough to say the floor
+/* A thin band of warmth exactly on the horizon line - enough to say the floor
    is lit, not enough to fog the page or stretch the orb into a horizontal wash. */
 .pl3-horizon {
   position: absolute;
@@ -152,7 +152,7 @@
     transparent 32%
   );
   mix-blend-mode: screen;
-  /* Keep the orb a sphere — never let the wash read as fog */
+  /* Keep the orb a sphere - never let the wash read as fog */
   opacity: calc(0.12 + var(--orb-i) * 0.18);
 }
 
@@ -190,8 +190,8 @@
     top 0.05s linear;
 }
 
-/* Travel smear. The sphere itself stays sharp — blurring the orb is what
-   turned it into fog before — so the motion lives in a ghost behind it that
+/* Travel smear. The sphere itself stays sharp - blurring the orb is what
+   turned it into fog before - so the motion lives in a ghost behind it that
    swells and softens with the pace. */
 .pl3-orb::before {
   content: "";
@@ -211,7 +211,7 @@
   pointer-events: none;
 }
 
-/* Subtle under-glow only — never a streak that replaces the sphere */
+/* Subtle under-glow only - never a streak that replaces the sphere */
 .pl3-orb::after {
   content: "";
   position: absolute;
@@ -640,7 +640,7 @@
   border-radius: 14px;
   padding: 26px 22px;
   /* On small screens the cards sit right where the orb is, so they need a
-     real backdrop — otherwise the light bleeds through and eats the motif. */
+     real backdrop - otherwise the light bleeds through and eats the motif. */
   background: linear-gradient(158deg, rgba(20, 16, 14, 0.72), rgba(9, 7, 11, 0.82));
   backdrop-filter: blur(7px);
   -webkit-backdrop-filter: blur(7px);
@@ -1069,11 +1069,11 @@
 /* ── Written pages ─────────────────────────────────────────────
    Support, privacy and account deletion. Their markup uses the design
    system's semantic tokens, so re-pointing those tokens at the night
-   palette carries every paragraph, rule and link across at once — no
+   palette carries every paragraph, rule and link across at once - no
    need to touch thirty pages of legal copy to change a theme. */
 
 .pl3-doc {
-  /* The floor is scenery here, not the subject — it must not compete with
+  /* The floor is scenery here, not the subject - it must not compete with
      a paragraph of legal text laid over it. */
   --grid-o: 0.34;
   --orb-i: 0.35;
@@ -1258,7 +1258,7 @@
 
 /* ── Skip affordances ──────────────────────────────────────────
    The intro holds the viewport for a couple of screens. Nobody
-   should be forced to sit through it — by keyboard or by mouse. */
+   should be forced to sit through it - by keyboard or by mouse. */
 .pl3-skiplink {
   position: fixed;
   top: 12px;
@@ -1603,7 +1603,7 @@
     position: fixed !important;
   }
 
-  /* Unpin the intro — no sticky stage, no fly-through, no zoom. */
+  /* Unpin the intro - no sticky stage, no fly-through, no zoom. */
   .pl3-intro {
     height: auto !important;
   }

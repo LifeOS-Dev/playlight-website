@@ -16,7 +16,6 @@ export function V3Footer() {
         <nav className="pl3-footer__nav" aria-label="Footer">
           <Link to="/privacy">Privacy</Link>
           <Link to="/support">Support</Link>
-          <Link to="/about">Story</Link>
           <Link to="/delete">Delete account or data</Link>
         </nav>
 

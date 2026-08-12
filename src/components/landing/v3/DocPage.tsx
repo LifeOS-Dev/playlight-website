@@ -11,7 +11,7 @@ import { GetPlaylightPanel } from "./TryToday";
  *
  * These pages were the old cream-paper theme with their own nav, so following
  * a footer link felt like landing on a different company's site. They now sit
- * in the same night, with the same header and footer — the floor holds still,
+ * in the same night, with the same header and footer - the floor holds still,
  * because you came here to read.
  */
 export function DocPage({

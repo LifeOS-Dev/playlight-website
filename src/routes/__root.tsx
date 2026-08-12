@@ -86,9 +86,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      // Three families, because that is how many the site actually sets.
-      // Fraunces belongs to the story page and is requested there; Inter
-      // and Space Mono were only ever reached by the archived layout.
+      // Three families for the live site. Inter and Space Mono were only
+      // ever reached by the archived layout.
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,200..400;1,6..72,200..400&display=swap",
