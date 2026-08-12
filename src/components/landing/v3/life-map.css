@@ -264,24 +264,32 @@
 /* ── Phones ────────────────────────────────────────────────────
    All eight stay. Cards had to stand down at this width; a glyph and a
    word do not, and dropping half the ring would undo the one claim the
-   composition exists to make. The label moves under its port so two
-   facets can sit either side of the light without colliding. */
+   composition exists to make. The word stacks with its port instead of
+   sitting beside it - always on the outboard side, away from the light,
+   so the top pair never crowds the line the orb speaks and the bottom
+   pair never runs into the page's own chrome. */
 
 @media (max-width: 820px) {
   .pl3-map {
-    /* Same guard, halved: the word is centred under its port here, so only
-       half of it hangs outboard. */
+    /* Same guard, halved: the word is centred on its port here, so only
+       half of it hangs outboard.
+       The vertical radius is a percentage, not vh, and that is the whole
+       point: "Skip ahead" and the journey's rail are anchored to the stage
+       (100svh), while vh ignores the browser's own chrome. Sized in vh the
+       ring cleared them on one phone and sat under them on the next. */
     --ring-rx: clamp(112px, min(37vw, 50vw - 62px), 220px);
-    --ring-ry: clamp(118px, 19vh, 200px);
+    --ring-ry: clamp(112px, 18%, 180px);
     --port: 26px;
   }
 
+  /* Every word above its glyph. The bottom of the frame belongs to the
+     page's own chrome, so the ring cannot spend it on labels. */
   .pl3-map__node,
   .pl3-map__node[data-side="left"],
   .pl3-map__node[data-side="right"] {
     --tx: -50%;
-    --ty: calc(var(--port) / -2);
-    flex-direction: column;
+    --ty: calc(var(--port) / 2 - 100%);
+    flex-direction: column-reverse;
     gap: 6px;
   }
 
@@ -295,6 +303,27 @@
   .pl3-map__label {
     font-size: 8px;
     letter-spacing: 0.14em;
+  }
+}
+
+/* A short phone (an SE, or any phone in landscape-ish chrome) is the one
+   case where the ring is squeezed from both ends at once: the light's
+   spoken line above it, "Skip ahead" and the rail below. The band that
+   satisfies both is only a few pixels wide, so the ports shrink to widen
+   it and the ring is centred inside what is left. */
+@media (max-width: 820px) and (max-height: 700px) {
+  .pl3-map {
+    --ring-ry: clamp(104px, 17.7%, 140px);
+    --port: 20px;
+  }
+
+  .pl3-map__label {
+    font-size: 8px;
+    letter-spacing: 0.14em;
+  }
+
+  .pl3-map__node {
+    gap: 5px;
   }
 }
 
