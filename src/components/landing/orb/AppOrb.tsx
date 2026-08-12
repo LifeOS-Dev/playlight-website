@@ -138,7 +138,7 @@ export function AppOrb({
   return (
     <div
       className={`app-orb${motion} ${className}`.trim()}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, colorScheme: "only dark" }}
       aria-hidden
     >
       <div
@@ -178,7 +178,10 @@ export function AppOrb({
           ) : null}
 
           {/* white heart */}
-          <div style={layerStyle(ESSENCE, 0.44, essenceStops())} />
+          <div
+            className="app-orb__essence"
+            style={layerStyle(ESSENCE, 0.44, essenceStops())}
+          />
 
           {/* accent ring - outside the resting white heart */}
           {accent ? (

@@ -7,6 +7,13 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+  isolation: isolate;
+  /* Brand DNA: white heart + amber field. UA dark-forcing and contrast
+     themes must not remap the whites into a black disc. */
+  color-scheme: only dark;
+  forced-color-adjust: none;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 .app-orb__stage {
@@ -32,6 +39,11 @@
 
 .app-orb__ring {
   animation: app-orb-ring 5.2s ease-in-out infinite;
+}
+
+.app-orb__essence,
+.app-orb__core {
+  forced-color-adjust: none;
 }
 
 .app-orb__core {

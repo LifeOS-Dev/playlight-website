@@ -76,6 +76,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Light Technologies" },
       { name: "theme-color", content: "#07060a" },
+      // The live site is already night. Without this, Chrome/Edge "dark dark"
+      // (Auto Dark Mode) inverts the white orb heart into a black disc.
+      { name: "color-scheme", content: "dark" },
     ],
     links: [
       {
@@ -102,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: "dark" }}>
       <head>
         <HeadContent />
       </head>

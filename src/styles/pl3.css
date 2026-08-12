@@ -7,6 +7,7 @@
    ══════════════════════════════════════════════════════════════ */
 
 .pl3 {
+  color-scheme: dark;
   --void: #07060a;
   --ember: #ffae47;
   --filament: #fff4e2;
@@ -21,6 +22,7 @@
   --orb-x: 50vw;
   --orb-scale: 0.82;
   --orb-i: 1;
+  --speech-o: 1;
   --grid-o: 1;
   --path-depth: 0;
   --path-rush: 0;
@@ -182,9 +184,16 @@
   margin-left: calc(var(--orb-base) / -2);
   margin-top: calc(var(--orb-base) / -2);
   transform: scale(var(--orb-scale));
-  opacity: calc(0.72 + var(--orb-i) * 0.28);
+  /* The sphere itself never dims. --orb-i only warms the field around it;
+     fading this node is what left a hollow amber ring (the eclipse). */
+  opacity: 1;
   pointer-events: none;
   overflow: visible;
+  isolation: isolate;
+  color-scheme: only dark;
+  forced-color-adjust: none;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
   transition:
     left 0.05s linear,
     top 0.05s linear;
@@ -237,6 +246,9 @@
   opacity: 1 !important;
   transform: none;
   filter: none;
+  isolation: isolate;
+  color-scheme: only dark;
+  forced-color-adjust: none;
 }
 
 /* AppOrb is authored at 200px; scale it to fill the scroll-driven shell. */
@@ -245,6 +257,86 @@
   height: 200px;
   transform: scale(calc(var(--orb-base) / 200px));
   transform-origin: 50% 50%;
+}
+
+/* ── The light speaking ───────────────────────────────────────
+   Sibling of the orb, same origin, lifted into the upper corona.
+   No box: a panel would turn the companion into a chatbot. */
+
+.pl3-say {
+  position: fixed;
+  left: var(--orb-x, 50vw);
+  top: var(--orb-y, 70vh);
+  z-index: 5;
+  width: min(22rem, 88vw);
+  margin: 0;
+  transform: translate(
+    -50%,
+    calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 1.6rem)
+  );
+  text-align: center;
+  pointer-events: none;
+  opacity: var(--speech-o, 1);
+  transition:
+    opacity 0.45s ease,
+    left 0.05s linear,
+    top 0.05s linear;
+}
+
+.pl3-say__line {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.7vw, 1.2rem);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--filament);
+  text-shadow: 0 0 22px oklch(0.78 0.14 62 / 0.42);
+  text-wrap: balance;
+}
+
+.pl3-say__ch {
+  display: inline-block;
+  opacity: 0;
+  animation: pl3-say-in 0.58s cubic-bezier(0.16, 0.8, 0.24, 1) both;
+}
+
+.pl3-say__line.is-out {
+  animation: pl3-say-out 0.7s ease both;
+}
+
+@keyframes pl3-say-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.45em);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes pl3-say-out {
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(0.55em);
+  }
+}
+
+@media (max-width: 420px) {
+  .pl3-say {
+    width: min(18rem, 84vw);
+  }
+
+  .pl3-say__line {
+    white-space: normal;
+  }
 }
 
 @keyframes pl3-ignite {
@@ -1064,6 +1156,7 @@
 :root:has(.pl3),
 :root:has(.pl3) body {
   background-color: #07060a;
+  color-scheme: dark;
 }
 
 /* ── Written pages ─────────────────────────────────────────────
@@ -1601,6 +1694,17 @@
 
   .pl3-orb {
     position: fixed !important;
+  }
+
+  .pl3-say__ch,
+  .pl3-say__line.is-out {
+    animation: none !important;
+  }
+
+  .pl3-say__ch {
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 
   /* Unpin the intro - no sticky stage, no fly-through, no zoom. */
