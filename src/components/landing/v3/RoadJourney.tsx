@@ -1,13 +1,14 @@
 import * as React from "react";
 import { TryToday } from "./TryToday";
 import { FacetScene } from "./FacetScene";
-import { FACES, FACETS, type FacetId } from "./faces";
+import { FACES, FACETS, FACE_COUNT, type FacetId } from "./faces";
 import { JOURNEY } from "./journey";
 import { Motif } from "./motifs";
 import {
   CAMERA_Z,
   DEPART_TRAVEL,
   FACET_PLACES,
+  LIGHT,
   PHASE,
   STAGE_SCREENS,
   STATION,
@@ -20,6 +21,8 @@ const LABEL: Record<FacetId, string> = Object.fromEntries(
 ) as Record<FacetId, string>;
 
 const LINE: Record<string, string> = Object.fromEntries(JOURNEY.map((b) => [b.id, b.line]));
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
@@ -39,14 +42,17 @@ function depthOpacity(z: number) {
 /**
  * The road: one continuous forward journey.
  *
- * At rest the eight life facets are composed around the light — the whole of a
+ * At rest the eight life facets are composed around the light - the whole of a
  * life visible in one frame. Scrolling drives the camera forward: the facets
  * rush past, then the road ahead is empty except for a point of light above
- * the orb. Each point grows into a problem, the light sweeps across it and it
- * becomes the answer, and it flies past. Four of those, then the road opens.
+ * the orb. Each point grows into a numbered problem, the light sweeps across
+ * it and it becomes the answer, and it flies past. Six of those, then the
+ * road opens.
  *
- * All of it is written straight to the DOM from one scroll handler — React
- * never re-renders while you travel.
+ * A compass at the top of the stage (03 / 06 · name) stays put the whole
+ * way, so a loaded mind always knows where it is. All motion is written
+ * straight to the DOM from one scroll handler - React never re-renders
+ * while you travel.
  */
 export function RoadJourney() {
   const section = React.useRef<HTMLElement | null>(null);
@@ -57,6 +63,14 @@ export function RoadJourney() {
   const signalRef = React.useRef<HTMLDivElement | null>(null);
   const philRef = React.useRef<HTMLDivElement | null>(null);
   const railRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
+  const stopRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
+  const hudRef = React.useRef<HTMLDivElement | null>(null);
+  const hudNumRef = React.useRef<HTMLSpanElement | null>(null);
+  const hudNameRef = React.useRef<HTMLSpanElement | null>(null);
+  const railBarRef = React.useRef<HTMLDivElement | null>(null);
+  const ashRef = React.useRef<HTMLDivElement | null>(null);
+  const offerRef = React.useRef<HTMLDivElement | null>(null);
+  const activeRef = React.useRef(-1);
 
   React.useEffect(() => {
     const el = section.current;
@@ -70,6 +84,36 @@ export function RoadJourney() {
     const place = (node: HTMLElement, z: number) => {
       node.style.setProperty("--z", `${z.toFixed(1)}px`);
       node.style.opacity = depthOpacity(z).toFixed(3);
+    };
+
+    const setCompass = (i: number) => {
+      if (i === activeRef.current) return;
+      activeRef.current = i;
+      if (i < 0 || i >= FACE_COUNT) {
+        stopRefs.current.forEach((node) => {
+          if (!node) return;
+          node.removeAttribute("data-on");
+          node.removeAttribute("data-done");
+        });
+        return;
+      }
+      const face = FACES[i];
+      if (hudNumRef.current) hudNumRef.current.textContent = pad(face.n);
+      if (hudNameRef.current) hudNameRef.current.textContent = face.name;
+      if (railBarRef.current) {
+        railBarRef.current.setAttribute("aria-valuenow", String(face.n));
+        railBarRef.current.setAttribute(
+          "aria-valuetext",
+          `${face.n} of ${FACE_COUNT}: ${face.name}`,
+        );
+      }
+      stopRefs.current.forEach((node, s) => {
+        if (!node) return;
+        if (s === i) node.setAttribute("data-on", "");
+        else node.removeAttribute("data-on");
+        if (s < i) node.setAttribute("data-done", "");
+        else node.removeAttribute("data-done");
+      });
     };
 
     const apply = () => {
@@ -111,14 +155,17 @@ export function RoadJourney() {
       // station's local time is already negative-and-rising, which is what
       // puts its point of light out on the road before you arrive.
       const sp = (p - PHASE.depart) / PHASE.stations;
-      const per = 1 / FACES.length;
+      const per = 1 / FACE_COUNT;
 
       let sigLevel = 0;
       let sigGrow = 0;
-      /** How far the current answer has been drawn — the light blooms with it. */
+      /** How far the current answer has been drawn - the light blooms with it. */
       let bloom = 0;
       /** 1 while the road is covering ground, 0 while there is something to read. */
       let moving = 0;
+      /** 1 while a card owns the middle - the light yields to the near road. */
+      let hold = 0;
+      let active = -1;
 
       FACES.forEach((_face, i) => {
         const q = (sp - i * per) / per;
@@ -127,6 +174,20 @@ export function RoadJourney() {
         // rather than an unknowable one.
         const seg = railRefs.current[i];
         if (seg) seg.style.transform = `scaleX(${clamp01(q).toFixed(3)})`;
+
+        if (q >= 0 && q < 1) active = i;
+
+        if (q > 0 && q < 1) {
+          const enter = smooth(
+            clamp01((q - STATION.arrive * 0.4) / (STATION.arrive * 0.6)),
+          );
+          const leave =
+            1 -
+            smooth(
+              clamp01((q - STATION.passFrom) / Math.max(0.04, 1 - STATION.passFrom)),
+            );
+          hold = Math.max(hold, enter * leave);
+        }
 
         // The point of light, before there is anything to read.
         if (q > STATION.sigIn && q < STATION.sigOut) {
@@ -153,10 +214,10 @@ export function RoadJourney() {
         const inT = smooth(clamp01(q / STATION.arrive));
         const passT = smooth(clamp01((q - STATION.passFrom) / (1 - STATION.passFrom)));
         // Out of the vanishing point at a steady rate, then past the camera.
-        const z = passT > 0 ? lerp(0, 720, passT) : zForScale(lerp(STATION.bornScale, 1, inT));
+        const z = passT > 0 ? lerp(0, 520, passT) : zForScale(lerp(STATION.bornScale, 1, inT));
 
         // The turn: the light crosses the card and the problem becomes
-        // the answer. Quantised — a wipe repaints, and 1/100th of a card
+        // the answer. Quantised - a wipe repaints, and 1/100th of a card
         // is under the sweep glow anyway.
         const turn = step(
           smooth(clamp01((q - STATION.turnFrom) / (STATION.turnTo - STATION.turnFrom))),
@@ -167,12 +228,17 @@ export function RoadJourney() {
         node.style.setProperty("--turn", turn.toFixed(2));
         // Falls away quicker than it arrived: what is behind you should not
         // compete with the next point of light coming up the road.
-        const fade = (1 - passT) ** 1.7;
+        const fade = (1 - passT) ** 2.4;
         node.style.opacity = (clamp01(q / (STATION.arrive * 0.5)) * fade).toFixed(3);
 
         bloom = Math.max(bloom, turn * (1 - passT));
         // The journey has a pulse: cover ground, then slow down to read.
-        moving = Math.max(moving, clamp01(Math.max(1 - q / STATION.arrive, (q - 0.84) / 0.16)));
+        moving = Math.max(
+          moving,
+          clamp01(
+            Math.max(1 - q / STATION.arrive, (q - STATION.passFrom) / (1 - STATION.passFrom)),
+          ),
+        );
       });
 
       if (signalRef.current) {
@@ -181,35 +247,89 @@ export function RoadJourney() {
       }
 
       // ── Phase 3: the road opens out ──────────────────────────────
-      // Overlaps the tail of the last station so the screen is never empty.
-      const philStart = PHASE.depart + PHASE.stations - 0.04;
-      const ph = clamp01((p - philStart) / (PHASE.philosophy + 0.04));
+      // Starts as the last card begins to pass, so the close never
+      // writes itself across a station that is still being read.
+      const philStart =
+        PHASE.depart + (PHASE.stations * (FACE_COUNT - 1 + STATION.passFrom)) / FACE_COUNT;
+      const ph = clamp01((p - philStart) / Math.max(0.08, 1 - philStart));
       if (philRef.current) philRef.current.style.opacity = smooth(ph).toFixed(3);
 
-      // Road pace: hard acceleration away from the hero, then a pulse —
+      // Compass + rail: fade in as the first station arrives, fade out as
+      // the road opens, so they never snap and never sit on the close.
+      const compass =
+        (pinned ? 1 : 0) * smooth(clamp01(sp / 0.045)) * (1 - smooth(clamp01(ph / 0.18)));
+      if (hudRef.current) {
+        hudRef.current.style.opacity = compass.toFixed(3);
+        hudRef.current.toggleAttribute("aria-hidden", compass < 0.12);
+      }
+      if (railBarRef.current) railBarRef.current.style.opacity = compass.toFixed(3);
+
+      // Sky line: after the hero has left and the orb is on the road,
+      // before the first problem card arrives.
+      let offer = 0;
+      if (pinned) {
+        const offerIn = smooth(clamp01((dep - 0.46) / 0.16));
+        const offerOut = 1 - smooth(clamp01((sp + 0.02) / 0.08));
+        offer = offerIn * offerOut;
+      }
+      if (offerRef.current) {
+        offerRef.current.style.opacity = offer.toFixed(3);
+        offerRef.current.toggleAttribute("aria-hidden", offer < 0.12);
+      }
+
+      if (active < 0 && sp > 0) active = FACE_COUNT - 1;
+      if (sp <= 0) setCompass(-1);
+      else setCompass(active);
+
+      // Ash joins on the last station, as the answer is drawn, and stays
+      // quietly beside the light when the road opens.
+      const ashQ = (sp - (FACE_COUNT - 1) * per) / per;
+      let ash = smooth(clamp01((ashQ - STATION.turnFrom) / (STATION.turnTo - STATION.turnFrom)));
+      if (ph > 0) ash = lerp(ash, 0.7, smooth(ph));
+      if (ashRef.current) ashRef.current.style.opacity = ash.toFixed(3);
+
+      // Road pace: hard acceleration away from the hero, then a pulse -
       // covering ground between stations, easing down to a crawl whenever
-      // there is something in front of you to read — and finally a stop as
+      // there is something in front of you to read - and finally a stop as
       // the road opens out.
       let rush = smooth(dep);
       if (sp > 0) rush = lerp(1, lerp(0.12, 0.72, moving), smooth(clamp01(sp / 0.08)));
       rush *= 1 - smooth(ph);
       root.style.setProperty("--road-rush", step(past ? 0 : rush, 0.02).toFixed(2));
 
-      if (!pinned) return;
+      if (!pinned) {
+        root.style.setProperty("--speech-o", "0");
+        root.removeAttribute("data-speech");
+        return;
+      }
+
+      // First real scroll: the orb has not visibly leaned yet. Hold the
+      // line through that lean, then dissolve as the hero starts to fly.
+      if (dep > 0.012) root.setAttribute("data-speech", "go");
+      else root.removeAttribute("data-speech");
+      root.style.setProperty(
+        "--speech-o",
+        (1 - smooth(clamp01((dep - 0.16) / 0.28))).toFixed(3),
+      );
 
       // ── The light itself ─────────────────────────────────────────
-      // We accelerate into it, so it looms and drops toward us — and then
-      // it outruns us, shrinking away down the road. By the time the first
-      // station is due it is a distant lamp with the horizon clear above
-      // it, which is the only way the point of light out there can read.
+      // The hero flies and the light rises into the vacated frame, settling
+      // on a cruise that holds for the rest of the road. A station is the
+      // only disturbance: the point of light, then the card, pull it down
+      // onto the near road so the middle stays readable. After it passes,
+      // the cruise returns.
       const near = smooth(clamp01(dep / 0.55));
-      const gone = smooth(clamp01((dep - 0.5) / 0.5));
-      let y = lerp(lerp(70, 79, near), 80, gone);
-      let size = lerp(lerp(0.84, 1.28, near), 0.5, gone);
-      let glow = lerp(lerp(1.05, 1.55, near), 0.92, gone);
-      let grid = lerp(1, 0.72, gone);
+      const gone = smooth(clamp01((dep - 0.42) / 0.58));
+      let y = lerp(LIGHT.heroY, LIGHT.cruiseY, gone);
+      let size = lerp(lerp(LIGHT.heroSize, 1.08, near), LIGHT.cruiseSize, gone);
+      let glow = lerp(lerp(1.05, 1.35, near), 1.05, gone);
+      let grid = lerp(1, 0.78, gone);
+      let horizon = lerp(LIGHT.heroHorizon, LIGHT.cruiseHorizon, gone);
 
       if (sp > 0) {
+        const give = Math.max(sigLevel, hold);
+        y = lerp(y, LIGHT.readY, give);
+        size = lerp(size, LIGHT.readSize, give);
         // Every answer is drawn by this light, so it swells as one lands.
         glow += bloom * 0.6;
         size += bloom * 0.12;
@@ -217,10 +337,10 @@ export function RoadJourney() {
       }
 
       if (ph > 0) {
-        // Arrival: the road opens out and the light comes up under the
-        // closing line rather than sitting behind it.
+        // Arrival: the road opens out and the light comes back to cruise
+        // under the closing line rather than sitting behind it.
         const e = smooth(ph);
-        y = lerp(y, 70, e);
+        y = lerp(y, LIGHT.cruiseY, e);
         size = lerp(size, 0.92, e);
         glow = lerp(glow, 1.45, e);
         grid = lerp(grid, 0.34, e);
@@ -231,13 +351,14 @@ export function RoadJourney() {
       root.style.setProperty("--orb-scale", size.toFixed(3));
       root.style.setProperty("--orb-i", glow.toFixed(3));
       root.style.setProperty("--grid-o", grid.toFixed(3));
+      root.style.setProperty("--horizon", `${horizon.toFixed(2)}%`);
       root.style.setProperty("--road-speed", lerp(2.2, 7, smooth(ph)).toFixed(2));
     };
 
     if (reduced) {
       // Nothing flies, but the page keeps its identity: facets laid out plainly,
       // stations readable in order, the light still holding the middle.
-      // Each facet keeps its own resting depth — flattening them all to z:0
+      // Each facet keeps its own resting depth - flattening them all to z:0
       // is what collapsed the composition into a pile, which is why this
       // path had to fall back to a grid before.
       facetRefs.current.forEach((node, i) => {
@@ -253,6 +374,8 @@ export function RoadJourney() {
         }
       });
       if (philRef.current) philRef.current.style.opacity = "1";
+      if (ashRef.current) ashRef.current.style.opacity = "0";
+      if (offerRef.current) offerRef.current.style.opacity = "0";
 
       // Park the light inside the composition rather than letting the page-wide
       // stops drag it up over the hero. Released once the road scrolls away so
@@ -268,8 +391,11 @@ export function RoadJourney() {
           root.style.setProperty("--orb-scale", "0.7");
           root.style.setProperty("--orb-i", "1");
           root.style.setProperty("--grid-o", "0.8");
+          root.style.setProperty("--horizon", "70%");
+          root.style.setProperty("--speech-o", "1");
         } else {
           root.removeAttribute("data-road");
+          root.style.setProperty("--speech-o", "0");
         }
       };
       hold();
@@ -284,6 +410,8 @@ export function RoadJourney() {
         window.removeEventListener("scroll", onQuiet);
         window.removeEventListener("resize", onQuiet);
         root.removeAttribute("data-road");
+        root.removeAttribute("data-speech");
+        root.style.removeProperty("--speech-o");
       };
     }
 
@@ -299,7 +427,9 @@ export function RoadJourney() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       root.removeAttribute("data-road");
+      root.removeAttribute("data-speech");
       root.style.removeProperty("--road-rush");
+      root.style.removeProperty("--speech-o");
     };
   }, []);
 
@@ -308,7 +438,7 @@ export function RoadJourney() {
       ref={section}
       className="pl3-road"
       style={{ height: `${(1 + STAGE_SCREENS) * 100}vh` }}
-      aria-label="Playlight — a forward journey"
+      aria-label="Playlight - a forward journey of six problems"
     >
       <div className="pl3-road__stage">
         <div ref={sceneRef} className="pl3-road__scene">
@@ -349,7 +479,40 @@ export function RoadJourney() {
           <span className="pl3-road__signal-ring" />
         </div>
 
-        {/* Stations along the road — their own layer so that with motion
+        {/* Ash joins on the last station - a second light on the same road. */}
+        <div ref={ashRef} className="pl3-road__ash" aria-hidden="true">
+          <span className="pl3-road__ash-core" />
+          <span className="pl3-road__ash-ring" />
+        </div>
+
+        {/* Spoken into the vacated sky, while the road is still empty. */}
+        <div ref={offerRef} className="pl3-road__offer" aria-hidden="true">
+          <p className="pl3-road__offer-line">
+            Here's how I can help you throughout your life's journey
+          </p>
+        </div>
+
+        {/* Stays put while the cards fly. You always know which stop this is. */}
+        <div
+          ref={hudRef}
+          className="pl3-road__hud"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-hidden="true"
+        >
+          <p className="pl3-road__hud-line">
+            <span ref={hudNumRef}>01</span>
+            <span className="pl3-road__hud-of"> / {pad(FACE_COUNT)}</span>
+            <span className="pl3-road__hud-dot" aria-hidden="true">
+              ·
+            </span>
+            <span ref={hudNameRef} className="pl3-road__hud-name">
+              Invisible life
+            </span>
+          </p>
+        </div>
+
+        {/* Stations along the road - their own layer so that with motion
             reduced they can reflow into a plain column instead of being
             trapped inside the facet composition. */}
         <div className="pl3-road__stations">
@@ -362,31 +525,25 @@ export function RoadJourney() {
               className="pl3-plate"
             >
               <div className="pl3-plate__panel">
+                <p className="pl3-plate__where">
+                  <span className="pl3-plate__n">{pad(face.n)}</span>
+                  <span className="pl3-plate__name">{face.name}</span>
+                </p>
                 {/* Both states occupy the same cell. The sweep wipes one
                     into the other, so the answer is visibly made out of
                     the problem rather than replacing it. */}
                 <div className="pl3-plate__face" data-side="problem">
-                  <p className="pl3-plate__eyebrow">{face.name}</p>
                   <div className="pl3-plate__motif" data-side="problem">
                     <Motif kind={face.motif} side="problem" />
                   </div>
                   <blockquote className="pl3-plate__quote">“{face.quote}”</blockquote>
-                  <p className="pl3-plate__root">{face.root}</p>
                 </div>
 
                 <div className="pl3-plate__face" data-side="solution">
-                  <p className="pl3-plate__eyebrow">The light</p>
                   <div className="pl3-plate__motif" data-side="solution">
                     <Motif kind={face.motif} side="solution" />
                   </div>
                   <p className="pl3-plate__answer">{face.answer}</p>
-                  <p className="pl3-plate__shift">
-                    <span>{face.from}</span>
-                    <span className="pl3-plate__arrow" aria-hidden="true">
-                      →
-                    </span>
-                    <span className="pl3-plate__to">{face.to}</span>
-                  </p>
                 </div>
 
                 <span className="pl3-plate__sweep" aria-hidden="true" />
@@ -406,10 +563,8 @@ export function RoadJourney() {
         </div>
 
         <div ref={philRef} className="pl3-road__phil">
-          <p className="pl3-road__phil-line">One thing at a time.</p>
-          <p className="pl3-road__phil-sub">
-            Built for a loaded mind. Visual first, and forgiving of the days you miss.
-          </p>
+          <p className="pl3-road__phil-line">Come into the light.</p>
+          <p className="pl3-road__phil-sub">Not more noise. A calmer next step.</p>
         </div>
 
         <a className="pl3-skip" href="#faq">
@@ -417,20 +572,31 @@ export function RoadJourney() {
         </a>
 
         <div
+          ref={railBarRef}
           className="pl3-road__rail"
           role="progressbar"
           aria-label="Journey progress"
-          aria-valuemin={0}
-          aria-valuemax={FACES.length}
+          aria-valuemin={1}
+          aria-valuemax={FACE_COUNT}
+          aria-valuenow={1}
         >
           {FACES.map((face, i) => (
-            <span key={face.id} className="pl3-road__rail-seg">
-              <span
-                ref={(node) => {
-                  railRefs.current[i] = node;
-                }}
-                className="pl3-road__rail-fill"
-              />
+            <span
+              key={face.id}
+              ref={(node) => {
+                stopRefs.current[i] = node;
+              }}
+              className="pl3-road__stop"
+            >
+              <span className="pl3-road__stop-n">{face.n}</span>
+              <span className="pl3-road__rail-seg">
+                <span
+                  ref={(node) => {
+                    railRefs.current[i] = node;
+                  }}
+                  className="pl3-road__rail-fill"
+                />
+              </span>
             </span>
           ))}
         </div>

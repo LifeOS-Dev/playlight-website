@@ -1,4 +1,4 @@
-/* The road — one continuous forward journey. Imported by RoadJourney.tsx */
+/* The road - one continuous forward journey. Imported by RoadJourney.tsx */
 
 .pl3-road {
   position: relative;
@@ -18,7 +18,7 @@
   position: absolute;
   inset: 0;
   perspective: 900px;
-  perspective-origin: 50% 62%;
+  perspective-origin: 50% var(--horizon);
   transform-style: preserve-3d;
   pointer-events: none;
 }
@@ -72,13 +72,13 @@
 
 /* ── The next problem, still only a point of light ───────────
    It sits at the vanishing point the stations grow out of, above the orb
-   and well below the reading position, so the road is never empty — there
+   and well below the reading position, so the road is never empty - there
    is always something out there coming toward you. */
 
 .pl3-road__signal {
   position: absolute;
   left: 50%;
-  top: 66%;
+  top: calc(var(--horizon) + 4%);
   z-index: 9;
   width: 15px;
   height: 15px;
@@ -126,33 +126,147 @@
   position: absolute;
   inset: 0;
   perspective: 900px;
-  perspective-origin: 50% 66%;
+  perspective-origin: 50% calc(var(--horizon) + 4%);
   transform-style: preserve-3d;
   pointer-events: none;
-  z-index: 10;
+  z-index: 11;
+}
+
+/* ── Compass: you are here ───────────────────────────────────
+   Parked on the stage, not on the flying card. A loaded mind can
+   always find 03 / 06 and the name of this stop, even while the
+   card is still a point of light down the road. */
+
+.pl3-road__hud {
+  position: absolute;
+  top: clamp(92px, 13vh, 124px);
+  left: 50%;
+  z-index: 13;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  max-width: min(92vw, 36rem);
+}
+
+.pl3-road__hud-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.2rem 0.45rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 1.7vw, 1.15rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--ember);
+}
+
+.pl3-road__hud-of {
+  color: var(--ash-dim);
+  letter-spacing: 0.1em;
+}
+
+.pl3-road__hud-dot {
+  color: var(--ash-dim);
+  padding: 0 0.15rem;
+}
+
+.pl3-road__hud-name {
+  font-family: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.95rem, 1.7vw, 1.15rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--filament);
+}
+
+/* ── Offer: the vacated sky, before the first problem ─────────
+   Same voice as the orb, larger, sitting in the top third once
+   the hero has flown and the road ahead is still empty. */
+
+.pl3-road__offer {
+  position: absolute;
+  left: 50%;
+  top: 22vh;
+  z-index: 12;
+  width: min(28rem, 86vw);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pl3-road__offer-line {
+  margin: 0;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--filament);
+  text-wrap: balance;
+  text-shadow: 0 0 28px oklch(0.78 0.14 62 / 0.35);
+}
+
+/* Ash - a second light on the road, born when station 6 turns. */
+.pl3-road__ash {
+  position: absolute;
+  left: 57%;
+  top: calc(var(--orb-y) + 4vh);
+  z-index: 8;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pl3-road__ash-core,
+.pl3-road__ash-ring {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.pl3-road__ash-core {
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #fff6e6 0%, var(--ember) 42%, transparent 74%);
+  box-shadow: 0 0 18px 4px rgba(255, 174, 71, 0.45);
+}
+
+.pl3-road__ash-ring {
+  inset: -10px;
+  border: 1px solid rgba(255, 174, 71, 0.45);
+  animation: pl3-signal-ring 2.8s ease-out infinite;
 }
 
 /* ── Stations: one card, and the light turns it over ─────────
    The problem and its answer are the same card. `--turn` runs 0 → 1 and
    the light wipes across: the problem is clipped away from the left as
-   the answer is uncovered behind it. Not a swap — a change of state. */
+   the answer is uncovered behind it. Not a swap - a change of state. */
 
 .pl3-plate {
   position: absolute;
   left: 50%;
-  top: 45%;
-  width: min(52vw, 600px);
+  top: 51%;
+  width: min(58vw, 640px);
   opacity: 0;
   transform: translate3d(-50%, -50%, var(--z, -6000px));
   transform-style: preserve-3d;
   will-change: transform, opacity;
 }
 
+/* Number + name live on the card only when motion is reduced (no HUD). */
+.pl3-plate__where {
+  display: none;
+}
+
 .pl3-plate__panel {
   position: relative;
   display: grid;
   overflow: hidden;
-  padding: 1.5rem 1.6rem 1.7rem;
+  padding: 1.6rem 1.8rem 1.8rem;
   border: 1px solid rgba(222, 176, 112, calc(0.22 + var(--turn, 0) * 0.3));
   border-radius: 16px;
   background: linear-gradient(155deg, rgba(20, 16, 14, 0.9), rgba(9, 7, 11, 0.94));
@@ -160,6 +274,7 @@
     0 30px 70px rgba(0, 0, 0, 0.6),
     0 0 calc(var(--turn, 0) * 70px) rgba(255, 174, 71, calc(var(--turn, 0) * 0.16));
   backface-visibility: hidden;
+  text-align: center;
 }
 
 .pl3-plate__face {
@@ -197,26 +312,14 @@
   pointer-events: none;
 }
 
-.pl3-plate__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--ash-dim);
-}
-
-.pl3-plate__face[data-side="solution"] .pl3-plate__eyebrow {
-  color: var(--ember);
-}
-
-/* The diagram carries the claim — it gets real room, never a smudge. */
+/* The diagram carries the claim - it gets real room, never a smudge. */
 .pl3-plate__motif {
-  height: clamp(130px, 17vh, 190px);
-  margin: 1rem 0 1.1rem;
+  height: clamp(140px, 20vh, 210px);
+  margin: 0 0 1.15rem;
 }
 
 .pl3-plate__motif[data-side="problem"] {
-  color: rgba(216, 196, 170, 0.5);
+  color: rgba(216, 196, 170, 0.55);
 }
 
 .pl3-plate__motif[data-side="solution"] {
@@ -225,51 +328,27 @@
 }
 
 .pl3-plate__quote {
+  margin: 0;
+  min-height: 2.56em;
   font-family: "Newsreader", ui-serif, Georgia, serif;
-  font-style: italic;
+  font-style: normal;
   font-weight: 300;
-  font-size: clamp(1.1rem, 1.9vw, 1.5rem);
-  line-height: 1.3;
-  color: rgba(255, 244, 226, 0.88);
-  text-wrap: balance;
-}
-
-.pl3-plate__root {
-  margin-top: 0.7rem;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: var(--ash-dim);
-}
-
-.pl3-plate__answer {
-  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.45rem, 3.1vw, 2.25rem);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
   color: var(--filament);
   text-wrap: balance;
 }
 
-.pl3-plate__shift {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 9px;
-  margin-top: 0.9rem;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ash-dim);
-}
-
-.pl3-plate__arrow {
-  color: var(--ember);
-  opacity: 0.7;
-}
-
-.pl3-plate__to {
-  color: var(--ember);
+.pl3-plate__answer {
+  margin: 0;
+  min-height: 2.56em;
+  font-size: clamp(1.35rem, 2.8vw, 2.05rem);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--filament);
+  text-wrap: balance;
 }
 
 /* ── Hero, riding at the front of the camera ────────────────── */
@@ -282,7 +361,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  /* Only the copy scales — never a viewport-sized layer. */
+  /* Only the copy scales - never a viewport-sized layer. */
   transform: scale(var(--hero-scale, 1));
   transform-origin: 50% 30%;
   filter: blur(var(--hero-blur, 0));
@@ -342,7 +421,7 @@
   position: absolute;
   left: 50%;
   top: 40%;
-  z-index: 11;
+  z-index: 9;
   width: min(34rem, 88%);
   transform: translate(-50%, -50%);
   text-align: center;
@@ -369,22 +448,50 @@
 
 /* ── Progress + escape ──────────────────────────────────────── */
 
-/* Four segments, not one bar: the road should tell you how many stops
-   are left, not just that there is more of it. */
+/* Six numbered stops, not one bar: the road should tell you how many
+   are left, which one you are on, and that the length is finite. */
 .pl3-road__rail {
   position: absolute;
   left: 50%;
-  bottom: clamp(22px, 4vh, 40px);
+  bottom: clamp(16px, 3.2vh, 32px);
   display: flex;
-  gap: 7px;
-  width: min(260px, 40vw);
+  gap: 10px;
+  width: min(420px, 78vw);
   transform: translateX(-50%);
   z-index: 14;
+  opacity: 0;
+}
+
+.pl3-road__stop {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pl3-road__stop-n {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--ash-dim);
+  line-height: 1;
+}
+
+.pl3-road__stop[data-on] .pl3-road__stop-n {
+  color: var(--ember);
+}
+
+.pl3-road__stop[data-done] .pl3-road__stop-n {
+  color: var(--ash);
 }
 
 .pl3-road__rail-seg {
-  flex: 1;
-  height: 2px;
+  display: block;
+  width: 100%;
+  height: 3px;
   overflow: hidden;
   border-radius: 2px;
   background: var(--line-soft);
@@ -399,7 +506,9 @@
   transform-origin: 0 50%;
 }
 
-/* ── Narrow screens: one column, plates stacked ─────────────── */
+.pl3-road .pl3-skip {
+  bottom: clamp(52px, 7.2vh, 72px);
+}
 
 @media (max-width: 820px) {
   /* Only the four with a phone placement survive; the others would have to
@@ -422,9 +531,22 @@
     font-size: 0.72rem;
   }
 
+  .pl3-road__hud {
+    top: clamp(84px, 12vh, 108px);
+  }
+
+  .pl3-road__offer {
+    top: 20vh;
+    width: min(22rem, 88vw);
+  }
+
+  .pl3-road__offer-line {
+    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+  }
+
   .pl3-plate {
-    width: min(88vw, 430px);
-    top: 44%;
+    width: min(90vw, 460px);
+    top: 52%;
   }
 
   .pl3-plate__sweep {
@@ -432,38 +554,38 @@
   }
 
   .pl3-plate__motif {
-    height: clamp(74px, 10vh, 104px);
-    margin: 0.7rem 0 0.8rem;
+    height: clamp(96px, 16vh, 140px);
+    margin: 0 0 0.85rem;
   }
 
   .pl3-plate__panel {
-    padding: 0.95rem 1.05rem 1.05rem;
+    padding: 1.1rem 1.15rem 1.2rem;
   }
 
   .pl3-plate__quote {
-    font-size: 1.05rem;
+    font-size: clamp(1.25rem, 5.4vw, 1.55rem);
   }
 
   .pl3-plate__answer {
-    font-size: 1rem;
+    font-size: clamp(1.15rem, 5vw, 1.4rem);
   }
 
-  .pl3-plate__root {
-    font-size: 0.78rem;
+  .pl3-road__rail {
+    width: min(340px, 88vw);
+    gap: 7px;
+  }
+
+  .pl3-road__ash {
+    left: 58%;
+    width: 16px;
+    height: 16px;
   }
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────
-   Stop the travel, keep the picture. The composition around the light
-   is the concept — a fallback must never replace it with something else.
-   The stations become a plain readable column beneath it. */
-
-/* ── Reduced motion ─────────────────────────────────────────────
-   Stop the travel, keep the design. An earlier version swapped the 3D
-   composition for a flat grid — which meant anyone with the OS setting on
-   never saw the actual page. Motion preference is about movement, not
-   layout: the first frame here is identical to the moving version at rest,
-   it simply never departs. The stations then read as a plain column. */
+   Stop the travel, keep the design. Motion preference is about movement,
+   not layout: the first frame here is identical to the moving version at
+   rest, it simply never departs. The stations then read as a plain column. */
 
 @media (prefers-reduced-motion: reduce) {
   .pl3-road {
@@ -499,6 +621,9 @@
   .pl3-road__cue,
   .pl3-road__rail,
   .pl3-road__signal,
+  .pl3-road__hud,
+  .pl3-road__offer,
+  .pl3-road__ash,
   .pl3-plate__sweep,
   .pl3-skip {
     display: none;
@@ -518,9 +643,33 @@
     left: auto !important;
     top: auto !important;
     width: min(560px, 92%);
-    margin: 0 auto clamp(20px, 4vh, 40px);
+    margin: 0 auto clamp(28px, 5vh, 48px);
     transform: none !important;
     opacity: 1 !important;
+  }
+
+  .pl3-plate__where {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.7rem;
+    margin: 0 0 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .pl3-plate__n {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ember);
+  }
+
+  .pl3-plate__name {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--filament);
   }
 
   /* Nothing wipes, so the two states stop sharing a cell and become two

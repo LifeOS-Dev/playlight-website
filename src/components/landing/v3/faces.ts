@@ -1,73 +1,86 @@
 /**
- * The Core Four — the four pressures Playlight can actually demonstrate today.
- * Source: docs/website-builder-problems-solutions-brief.md §2 + §4 (priority order).
+ * Six pressures on the road. Numbered, in the order a visitor meets them
+ * after the life-facets fly past.
  *
- * Rule from the brief: each face = one felt problem + one product answer +
- * one emotion shift. Quotes stay in the user's language, never product jargon.
+ * Each face = one felt problem (their words) + one Playlight answer.
+ * No jargon, no extra root-cause paragraph - the visual carries that.
  */
 
-export type MotifKey = "fog" | "trajectory" | "balance" | "memory";
+export type MotifKey =
+  | "trajectory"
+  | "balance"
+  | "fog"
+  | "scatter"
+  | "load"
+  | "companion";
 
 export type Face = {
   id: string;
-  /** Short anchor name — secondary label, never the headline */
+  /** 1-6, shown as 01-06. This is a sequence; the number is the map. */
+  n: number;
+  /** Short name for the compass - where you are, not a feature label */
   name: string;
-  /** The felt problem, in the user's own words */
+  /** The felt problem, in the user's own words. This is the heading. */
   quote: string;
-  /** One line of root cause, kept quiet */
-  root: string;
-  /** The Playlight answer — what the product does, plainly */
+  /** The Playlight answer - one line, after the light crosses */
   answer: string;
-  /** Emotion shift, shown only on the solution side */
-  from: string;
-  to: string;
   motif: MotifKey;
 };
 
 export const FACES: Face[] = [
   {
-    id: "fog-of-now",
-    name: "Fog of Now",
-    quote: "I don't know what matters today.",
-    root: "Nothing compresses the whole mess into a clear present.",
-    answer: "One clear now. Not another plan to maintain.",
-    from: "anxiety",
-    to: "oriented calm",
-    motif: "fog",
-  },
-  {
     id: "invisible-life",
-    name: "Invisible Life",
-    quote: "I can't see if I'm getting anywhere.",
-    root: "Activity gets tracked. Trajectory doesn't.",
-    answer: "A view of your whole life — progress you can actually see.",
-    from: "aimlessness",
-    to: "orientation",
+    n: 1,
+    name: "Invisible life",
+    quote: "I can't see where anything is going.",
+    answer: "Your lifespan, arcs, goals, and projects - in one view.",
     motif: "trajectory",
   },
   {
     id: "broken-balance",
-    name: "Broken Balance",
-    quote: "I fix one area and break another.",
-    root: "Life runs in silos, so trade-offs stay invisible until damage.",
-    answer: "See every pillar together, before something snaps.",
-    from: "spread thin",
-    to: "sustainable",
+    n: 2,
+    name: "Broken balance",
+    quote: "I fix one part of life and another snaps.",
+    answer: "See every domain together, before something snaps.",
     motif: "balance",
   },
   {
-    id: "forgotten-lessons",
-    name: "Forgotten Lessons",
-    quote: "I don't learn from what I do.",
-    root: "No loop between what you did and what it cost.",
-    answer: "Your own evidence, back when it matters. Ask why.",
-    from: "self-doubt",
-    to: "self-trust",
-    motif: "memory",
+    id: "fog-of-now",
+    n: 3,
+    name: "What matters now",
+    quote: "I don't know what matters today.",
+    answer: "One clear next step. Not another plan to maintain.",
+    motif: "fog",
+  },
+  {
+    id: "scattered-life",
+    n: 4,
+    name: "Scattered life",
+    quote: "My notes, health, tasks, money - all in different apps.",
+    answer: "One place where your life makes sense together.",
+    motif: "scatter",
+  },
+  {
+    id: "heavy-tools",
+    n: 5,
+    name: "Heavy tools",
+    quote: "Apps are walls of text. I open them and close them.",
+    answer: "Visual first. One step at a time.",
+    motif: "load",
+  },
+  {
+    id: "walking-alone",
+    n: 6,
+    name: "Walking alone",
+    quote: "This is a long road to walk alone.",
+    answer: "Ash walks with you. You still steer.",
+    motif: "companion",
   },
 ];
 
-/** Eight facets of a life — what the tiles around the orb hold. */
+export const FACE_COUNT = FACES.length;
+
+/** Eight facets of a life - what the tiles around the orb hold. */
 export const FACETS = [
   { id: "health", label: "Health" },
   { id: "wealth", label: "Wealth" },
@@ -84,15 +97,15 @@ export type FacetId = (typeof FACETS)[number]["id"];
 export const FAQS = [
   {
     q: "Is this another productivity app?",
-    a: "No. Productivity apps ask you to maintain them. Playlight holds your life model and gives you one honest next move — you can open it for ten seconds and leave with something.",
+    a: "No. Productivity apps ask you to maintain them. Playlight holds your life model and gives you one honest next move - you can open it for ten seconds and leave with something.",
   },
   {
     q: "Does it sync with my other apps?",
-    a: "Not today. Playlight is one place where the things you put in it — tasks, habits, goals, wealth, notes — share a single model, so the dots connect without you doing the mental glue. Third-party sync is direction, not a promise.",
+    a: "Not today. Playlight is one place where the things you put in it - tasks, habits, goals, wealth, notes - share a single model, so the dots connect without you doing the mental glue. Third-party sync is direction, not a promise.",
   },
   {
     q: "What does the AI actually do?",
-    a: "It reads the life data you've already given it and surfaces what's relevant now — a focus, a pattern, a memory you'd have forgotten. It suggests. You decide. Every insight can be asked why.",
+    a: "Ash reads the life data you've already given it and surfaces what's relevant now - a focus, a pattern, a memory you'd have forgotten. It suggests. You decide. Every insight can be asked why.",
   },
   {
     q: "I've bounced off tools like this before.",
@@ -100,7 +113,7 @@ export const FAQS = [
   },
   {
     q: "Who is it for?",
-    a: "People building something across several parts of life at once — work, health, money, relationships — who are tired of holding all of it in their head.",
+    a: "People building something across several parts of life at once - work, health, money, relationships - who are tired of holding all of it in their head.",
   },
   {
     q: "What happens to my data?",
