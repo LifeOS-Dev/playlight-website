@@ -49,11 +49,13 @@ const GLYPHS: Record<FacetId, React.ReactNode> = {
       <circle {...S} cx="15" cy="12" r="6" />
     </Frame>
   ),
-  // a practice ring - most days, not every day
-  habits: (
+  // the same shape at every scale - a print, not a portrait
+  personality: (
     <Frame>
-      <circle {...S} cx="12" cy="12" r="8" strokeDasharray="1.6 3.2" />
-      <circle cx="12" cy="4" r="1.6" fill="currentColor" />
+      <path {...S} d="M19.4 4.6A10.5 10.5 0 1 0 19.4 19.4" opacity={0.45} />
+      <path {...S} d="M17 7.1A7 7 0 1 0 17 16.9" opacity={0.7} />
+      <path {...S} d="M14.5 9.5A3.6 3.6 0 1 0 14.5 14.5" />
+      <circle cx="12" cy="12" r="0.9" fill="currentColor" />
     </Frame>
   ),
   // an allocation, not a clock face
@@ -63,10 +65,13 @@ const GLYPHS: Record<FacetId, React.ReactNode> = {
       <path {...S} d="M12 3.5A8.5 8.5 0 0 1 20.5 12H12z" />
     </Frame>
   ),
-  // lines of thought, uneven
-  notes: (
+  // a bearing, and the thing you are steering toward
+  goals: (
     <Frame>
-      <path {...S} d="M4 7h16M4 12h11M4 17h14" />
+      <circle {...S} cx="12" cy="12" r="8.5" opacity={0.5} />
+      <circle {...S} cx="12" cy="12" r="4" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <path {...S} d="M4.5 19.5 9.2 14.8" opacity={0.8} />
     </Frame>
   ),
   // attention radiating from a centre

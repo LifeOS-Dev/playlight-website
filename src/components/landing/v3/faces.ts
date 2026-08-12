@@ -6,13 +6,7 @@
  * No jargon, no extra root-cause paragraph - the visual carries that.
  */
 
-export type MotifKey =
-  | "trajectory"
-  | "balance"
-  | "fog"
-  | "scatter"
-  | "load"
-  | "companion";
+export type MotifKey = "trajectory" | "balance" | "fog" | "scatter" | "load" | "companion";
 
 export type Face = {
   id: string;
@@ -80,28 +74,42 @@ export const FACES: Face[] = [
 
 export const FACE_COUNT = FACES.length;
 
-/** Eight facets of a life - what the tiles around the orb hold. */
+/**
+ * Eight facets of a life - the departments that ring the light.
+ *
+ * Around the orb they carry a word and a glyph, nothing else: a caption on
+ * each one turns the composition into a feature list, and the claim here is
+ * that these are one thing, not eight.
+ *
+ * `says` is what the light answers when you touch that facet - one line, in
+ * the second person, drawn only from data Playlight actually holds. No
+ * invented integrations, and short enough to sit on one line above the orb.
+ */
 export const FACETS = [
-  { id: "health", label: "Health" },
-  { id: "wealth", label: "Wealth" },
-  { id: "work", label: "Work" },
-  { id: "people", label: "People" },
-  { id: "habits", label: "Habits" },
-  { id: "time", label: "Time" },
-  { id: "notes", label: "Notes" },
-  { id: "mind", label: "Mind" },
+  { id: "health", label: "Health", says: "Sleep is the one slipping." },
+  { id: "wealth", label: "Wealth", says: "You're ahead of your own number." },
+  { id: "work", label: "Work", says: "One project is waiting on you." },
+  { id: "people", label: "People", says: "Three weeks since you saw Sam." },
+  { id: "personality", label: "Personality", says: "You commit fast, then renegotiate." },
+  { id: "time", label: "Time", says: "Tuesday went to meetings." },
+  { id: "goals", label: "Goals", says: "One goal carried the other four." },
+  { id: "mind", label: "Mind", says: "Your focus is best before eleven." },
 ] as const;
 
 export type FacetId = (typeof FACETS)[number]["id"];
 
+export const FACET_BY_ID: Record<FacetId, (typeof FACETS)[number]> = Object.fromEntries(
+  FACETS.map((f) => [f.id, f]),
+) as Record<FacetId, (typeof FACETS)[number]>;
+
 export const FAQS = [
   {
     q: "Is this another productivity app?",
-    a: "No. Productivity apps ask you to maintain them. Playlight holds your life model and gives you one honest next move - you can open it for ten seconds and leave with something.",
+    a: "No. Productivity apps exist to get more out of you. Playlight is a life alignment product - it looks after how you're actually doing across health, work, money and the people around you, and acts as an assistant for your life rather than another queue to clear.",
   },
   {
     q: "Does it sync with my other apps?",
-    a: "Not today. Playlight is one place where the things you put in it - tasks, habits, goals, wealth, notes - share a single model, so the dots connect without you doing the mental glue. Third-party sync is direction, not a promise.",
+    a: "Yes - and those connections are being built as we speak. In the meantime everything you need is already here: put your tasks, habits, goals, wealth and notes in one place and you get a comprehensive view of your life without waiting on anything else.",
   },
   {
     q: "What does the AI actually do?",

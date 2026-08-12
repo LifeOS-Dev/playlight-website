@@ -3,49 +3,71 @@ import type { FacetId } from "./faces";
 /**
  * Where each life facet sits around the light at rest.
  *
- * This is the first viewport: everything about you, visible at once, arranged
- * around the orb on the road - the composition from the design brief's sketch.
- * They are NOT revealed one at a time; a queue would argue against the very
- * claim the page is making. The reveal is the journey, not the arrangement.
+ * This is the first viewport: everything about you, visible at once, ringed
+ * around the orb on the road. They are NOT revealed one at a time; a queue
+ * would argue against the very claim the page is making. The reveal is the
+ * journey, not the arrangement.
  *
- * x / y are percentages of the stage. z is depth in px - negative is further
- * down the road. Scrolling adds to z, which is what flies them past the camera.
+ * The ring is described by a bearing in degrees, clockwise from twelve
+ * o'clock. Two seats are deliberately empty: the top, where the light's own
+ * line is spoken, and the bottom, where the road carries on. So the eight sit
+ * at 30/72/108/150 and their mirrors - a ring with its lid open, not a clock
+ * face.
+ *
+ * Reading down the left: mind, personality, health - the inner life. Down the
+ * right: goals, work, wealth - what you are building. Time and people take the
+ * base, because everything else runs through them.
  */
+const RING: Array<{ id: FacetId; deg: number }> = [
+  { id: "goals", deg: 30 },
+  { id: "work", deg: 72 },
+  { id: "wealth", deg: 108 },
+  { id: "time", deg: 150 },
+  { id: "people", deg: 210 },
+  { id: "health", deg: 252 },
+  { id: "personality", deg: 288 },
+  { id: "mind", deg: 330 },
+];
+
+/**
+ * How far the ring's top edge leans away down the road, in px of depth. The
+ * ring is not a decal on the glass: its base is nearer the camera than its
+ * crown, which is what gives the near facets their extra weight and staggers
+ * the order they fly past in.
+ */
+const RING_TILT = 90;
+
 export type FacetPlace = {
   id: FacetId;
-  x: number;
-  y: number;
+  /** Unit offsets on the ring: multiplied by --ring-rx / --ring-ry in CSS. */
+  ux: number;
+  uy: number;
+  /** Depth in px - negative is further down the road. */
   z: number;
-  /** Yaw, so each card hinges to face the road rather than lying flat */
-  ry: number;
-  rx: number;
   /**
-   * Where this card sits on a phone. Eight cards cannot ring an orb inside
-   * 375px without colliding, so only four make the cut - the rest stand down
-   * rather than being shrunk past legibility.
+   * Perspective undo. A facet at depth z is projected toward the vanishing
+   * point by persp / (persp - z), so its laid-out offset is pre-divided by
+   * that to land back on a true ellipse. The ring centre and the perspective
+   * origin are the same point - the orb - which is what makes this a plain
+   * radial scale rather than a shear.
    */
-  mobile?: { x: number; y: number };
+  k: number;
 };
 
-export const FACET_PLACES: FacetPlace[] = [
-  // Spacing rule: neighbours on the same side must clear each other either
-  // vertically (more than a card's height apart) or horizontally (more than a
-  // card's width). Depth alone does not separate them - perspective barely
-  // shrinks a card over this range, so overlaps have to be solved in x/y.
+/** Perspective depth of the road's 3D layers - must match road.css. */
+export const PERSP = 900;
 
-  // far pair - smallest, tucked either side of the wordmark
-  { id: "notes", x: 30, y: 45, z: -300, ry: 40, rx: 7 },
-  { id: "mind", x: 70, y: 46, z: -320, ry: -40, rx: 7 },
-  // mid pair - pushed to the outer edges
-  { id: "health", x: 12, y: 52, z: -150, ry: 34, rx: 6, mobile: { x: 27, y: 45 } },
-  { id: "wealth", x: 88, y: 50, z: -160, ry: -34, rx: 6, mobile: { x: 73, y: 44 } },
-  // near pair - still outboard, a clear drop below the mid pair
-  { id: "work", x: 11, y: 74, z: -40, ry: 28, rx: 4, mobile: { x: 27, y: 76 } },
-  { id: "people", x: 89, y: 72, z: -50, ry: -28, rx: 4, mobile: { x: 73, y: 75 } },
-  // closest pair - swung inward and low, flanking the light on the road
-  { id: "habits", x: 34, y: 84, z: 40, ry: 22, rx: 2 },
-  { id: "time", x: 66, y: 83, z: 30, ry: -22, rx: 2 },
-];
+export const FACET_PLACES: FacetPlace[] = RING.map(({ id, deg }) => {
+  const a = (deg * Math.PI) / 180;
+  const z = -RING_TILT * Math.cos(a);
+  return {
+    id,
+    ux: Number(Math.sin(a).toFixed(4)),
+    uy: Number((-Math.cos(a)).toFixed(4)),
+    z: Number(z.toFixed(1)),
+    k: Number(((PERSP - z) / PERSP).toFixed(4)),
+  };
+});
 
 /** Depth at which a card has passed the camera and should be gone. */
 export const CAMERA_Z = 620;
@@ -73,9 +95,6 @@ export const LIGHT = {
   readY: 78,
   readSize: 0.56,
 } as const;
-
-/** Perspective depth of the road's 3D layers - must match road.css. */
-export const PERSP = 900;
 
 /**
  * The depth at which something renders at `s` times its natural size.

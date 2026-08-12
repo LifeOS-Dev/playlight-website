@@ -1,26 +1,10 @@
 import * as React from "react";
 import { TryToday } from "./TryToday";
-import { FacetScene } from "./FacetScene";
-import { FACES, FACETS, FACE_COUNT, type FacetId } from "./faces";
-import { JOURNEY } from "./journey";
+import { LifeMap, type LifeMapHandle } from "./LifeMap";
+import { FACES, FACE_COUNT } from "./faces";
 import { Motif } from "./motifs";
-import {
-  CAMERA_Z,
-  DEPART_TRAVEL,
-  FACET_PLACES,
-  LIGHT,
-  PHASE,
-  STAGE_SCREENS,
-  STATION,
-  zForScale,
-} from "./roadPlan";
+import { DEPART_TRAVEL, LIGHT, PHASE, STAGE_SCREENS, STATION, zForScale } from "./roadPlan";
 import "./road.css";
-
-const LABEL: Record<FacetId, string> = Object.fromEntries(
-  FACETS.map((f) => [f.id, f.label]),
-) as Record<FacetId, string>;
-
-const LINE: Record<string, string> = Object.fromEntries(JOURNEY.map((b) => [b.id, b.line]));
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -31,23 +15,15 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
  *  for a change nobody can see. */
 const step = (n: number, s: number) => Math.round(n / s) * s;
 
-/** Fade a card as it reaches, then passes, the camera. */
-function depthOpacity(z: number) {
-  if (z > CAMERA_Z) return 0;
-  if (z > CAMERA_Z - 260) return 1 - (z - (CAMERA_Z - 260)) / 260;
-  if (z < -520) return clamp01((z + 760) / 240);
-  return 1;
-}
-
 /**
  * The road: one continuous forward journey.
  *
- * At rest the eight life facets are composed around the light - the whole of a
- * life visible in one frame. Scrolling drives the camera forward: the facets
- * rush past, then the road ahead is empty except for a point of light above
- * the orb. Each point grows into a numbered problem, the light sweeps across
- * it and it becomes the answer, and it flies past. Six of those, then the
- * road opens.
+ * At rest the eight life facets ring the light and are wired into it - the
+ * whole of a life visible in one frame, and visibly one system. Scrolling
+ * drives the camera forward: the ring rushes past, then the road ahead is
+ * empty except for a point of light above the orb. Each point grows into a
+ * numbered problem, the light sweeps across it and it becomes the answer, and
+ * it flies past. Six of those, then the road opens.
  *
  * A compass at the top of the stage (03 / 06 · name) stays put the whole
  * way, so a loaded mind always knows where it is. All motion is written
@@ -56,9 +32,8 @@ function depthOpacity(z: number) {
  */
 export function RoadJourney() {
   const section = React.useRef<HTMLElement | null>(null);
-  const sceneRef = React.useRef<HTMLDivElement | null>(null);
+  const mapRef = React.useRef<LifeMapHandle | null>(null);
   const heroRef = React.useRef<HTMLDivElement | null>(null);
-  const facetRefs = React.useRef<Array<HTMLElement | null>>([]);
   const plateRefs = React.useRef<Array<HTMLElement | null>>([]);
   const signalRef = React.useRef<HTMLDivElement | null>(null);
   const philRef = React.useRef<HTMLDivElement | null>(null);
@@ -80,11 +55,6 @@ export function RoadJourney() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
-
-    const place = (node: HTMLElement, z: number) => {
-      node.style.setProperty("--z", `${z.toFixed(1)}px`);
-      node.style.opacity = depthOpacity(z).toFixed(3);
-    };
 
     const setCompass = (i: number) => {
       if (i === activeRef.current) return;
@@ -130,14 +100,11 @@ export function RoadJourney() {
 
       const p = clamp01(-rect.top / travel);
 
-      // ── Phase 1: the camera leaves, facets fly past ──────────────
+      // ── Phase 1: the camera leaves, the ring flies past ──────────
       const dep = clamp01(p / PHASE.depart);
       const camera = smooth(dep) * DEPART_TRAVEL;
 
-      facetRefs.current.forEach((node, i) => {
-        if (!node) return;
-        place(node, FACET_PLACES[i].z + camera);
-      });
+      mapRef.current?.travel(camera, dep);
 
       if (heroRef.current) {
         const e = smooth(clamp01(dep / 0.75));
@@ -178,14 +145,9 @@ export function RoadJourney() {
         if (q >= 0 && q < 1) active = i;
 
         if (q > 0 && q < 1) {
-          const enter = smooth(
-            clamp01((q - STATION.arrive * 0.4) / (STATION.arrive * 0.6)),
-          );
+          const enter = smooth(clamp01((q - STATION.arrive * 0.4) / (STATION.arrive * 0.6)));
           const leave =
-            1 -
-            smooth(
-              clamp01((q - STATION.passFrom) / Math.max(0.04, 1 - STATION.passFrom)),
-            );
+            1 - smooth(clamp01((q - STATION.passFrom) / Math.max(0.04, 1 - STATION.passFrom)));
           hold = Math.max(hold, enter * leave);
         }
 
@@ -314,10 +276,7 @@ export function RoadJourney() {
       // line through that lean, then dissolve as the hero starts to fly.
       if (dep > 0.012) root.setAttribute("data-speech", "go");
       else root.removeAttribute("data-speech");
-      root.style.setProperty(
-        "--speech-o",
-        (1 - smooth(clamp01((dep - 0.16) / 0.28))).toFixed(3),
-      );
+      root.style.setProperty("--speech-o", (1 - smooth(clamp01((dep - 0.16) / 0.28))).toFixed(3));
 
       // ── The light itself ─────────────────────────────────────────
       // The hero flies and the light rises into the vacated frame, settling
@@ -330,7 +289,7 @@ export function RoadJourney() {
       let size = lerp(lerp(LIGHT.heroSize, 1.08, near), LIGHT.cruiseSize, gone);
       let glow = lerp(lerp(1.05, 1.35, near), 1.05, gone);
       let grid = lerp(1, 0.78, gone);
-      let horizon = lerp(LIGHT.heroHorizon, LIGHT.cruiseHorizon, gone);
+      const horizon = lerp(LIGHT.heroHorizon, LIGHT.cruiseHorizon, gone);
 
       if (sp > 0) {
         // Only the card pulls the light off cruise. The point of light on
@@ -363,17 +322,10 @@ export function RoadJourney() {
     };
 
     if (reduced) {
-      // Nothing flies, but the page keeps its identity: facets laid out plainly,
-      // stations readable in order, the light still holding the middle.
-      // Each facet keeps its own resting depth - flattening them all to z:0
-      // is what collapsed the composition into a pile, which is why this
-      // path had to fall back to a grid before.
-      facetRefs.current.forEach((node, i) => {
-        if (node) {
-          node.style.opacity = "1";
-          node.style.setProperty("--z", `${FACET_PLACES[i].z}px`);
-        }
-      });
+      // Nothing flies, but the page keeps its identity: the ring composed
+      // around the light exactly as it is at rest with motion on, stations
+      // readable in order. Reduce the motion, keep the picture.
+      mapRef.current?.travel(0, 0);
       plateRefs.current.forEach((node) => {
         if (node) {
           node.style.opacity = "1";
@@ -395,13 +347,16 @@ export function RoadJourney() {
         const r = el.getBoundingClientRect();
         const own = r.top < window.innerHeight * 0.5 && r.bottom > window.innerHeight * 0.5;
         if (own) {
+          // The same pose the moving version rests in - the ring is laid out
+          // around the vanishing point, so parking the light anywhere else
+          // leaves the filaments converging on nothing.
           root.setAttribute("data-road", "");
-          root.style.setProperty("--orb-y", "62vh");
+          root.style.setProperty("--orb-y", `${LIGHT.heroY}vh`);
           root.style.setProperty("--orb-x", "50vw");
-          root.style.setProperty("--orb-scale", "0.7");
+          root.style.setProperty("--orb-scale", String(LIGHT.heroSize));
           root.style.setProperty("--orb-i", "1");
           root.style.setProperty("--grid-o", "0.8");
-          root.style.setProperty("--horizon", "70%");
+          root.style.setProperty("--horizon", `${LIGHT.heroHorizon}%`);
           root.style.setProperty("--speech-o", "1");
         } else {
           root.removeAttribute("data-road");
@@ -451,37 +406,9 @@ export function RoadJourney() {
       aria-label="Playlight - a forward journey of six problems"
     >
       <div className="pl3-road__stage">
-        <div ref={sceneRef} className="pl3-road__scene">
-          {/* Composed around the light: the whole of a life, at once */}
-          {FACET_PLACES.map((place, i) => (
-            <article
-              key={place.id}
-              ref={(n) => {
-                facetRefs.current[i] = n;
-              }}
-              className="pl3-facet"
-              data-lit
-              data-phone={place.mobile ? "" : undefined}
-              style={
-                {
-                  "--fx": `${place.x}%`,
-                  "--fy": `${place.y}%`,
-                  "--mfx": `${place.mobile?.x ?? place.x}%`,
-                  "--mfy": `${place.mobile?.y ?? place.y}%`,
-                  "--ry": `${place.ry}deg`,
-                  "--rx": `${place.rx}deg`,
-                  "--z": `${place.z}px`,
-                } as React.CSSProperties
-              }
-            >
-              <div className="pl3-facet__panel">
-                <p className="pl3-facet__tag">{LABEL[place.id]}</p>
-                <FacetScene id={place.id} active />
-                <p className="pl3-facet__line">{LINE[place.id]}</p>
-              </div>
-            </article>
-          ))}
-        </div>
+        {/* Ringed around the light and wired into it: the whole of a life,
+            at once, and visibly one system rather than eight apps. */}
+        <LifeMap ref={mapRef} />
 
         {/* The next problem, still only a point of light on the road */}
         <div ref={signalRef} className="pl3-road__signal" aria-hidden="true">
