@@ -189,6 +189,12 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
       raf = requestAnimationFrame(measure);
     };
 
+    // Belt to the frame's braces. The synchronous pass above can land before
+    // the stylesheet does (dev serves CSS through JS), and the frame that
+    // would fix that never comes in a tab nobody is looking at. A timer fires
+    // either way, so the map is never left unwired.
+    const settle = window.setTimeout(measure, 120);
+
     const ro = new ResizeObserver(again);
     ro.observe(el);
     window.addEventListener("resize", again);
@@ -196,6 +202,7 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
 
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(settle);
       ro.disconnect();
       window.removeEventListener("resize", again);
     };
