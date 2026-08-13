@@ -77,23 +77,44 @@ export const DEPART_TRAVEL = 1400;
 /**
  * Where the light sits on the road, in vh (y) and % (horizon).
  *
- * After the hero flies, it settles on a composed cruise - a little above
- * the old floor-hugging pose, still sitting on the grid. That cruise is
- * the path for the rest of the journey. A problem/answer card is the only
- * thing that pulls it down onto the near road; once the card has passed,
- * it returns.
+ * After the hero flies, the light settles onto the road - down and slightly
+ * smaller, the far end of the journey opening above it. That cruise is the
+ * path for the rest of the way. A problem/answer card is the only thing that
+ * moves it off that path: it leans back onto the near road to give the card
+ * the middle, and returns once the card has passed.
+ *
+ * The three poses are deliberately close together. A 12vh plunge every time a
+ * card arrived, six times over, was the single most restless thing on the page.
  */
 export const LIGHT = {
   heroY: 70,
   heroSize: 0.84,
   heroHorizon: 70,
-  /** Empty-road frame: lower third, horizon raised so the orb stays on the floor. */
-  cruiseY: 66,
-  cruiseSize: 0.82,
+  /**
+   * Empty-road frame, and the pose the whole journey is measured from.
+   *
+   * The orb has to sit BELOW the skyline. At 66/0.82 its crown reached y=488
+   * in a 900px frame while the horizon was at 522 - the light broke the
+   * horizon line, so it read as hanging in the sky rather than travelling on
+   * the floor, and everything born at the vanishing point (the point of light,
+   * the bottom edge of an arriving card) was drawn straight across its face.
+   * Dropping it to 72/0.80 puts the crown at 544, under the horizon and under
+   * the lowest edge a card ever reaches. The composition stops overlapping
+   * before any of the motion is asked to fix it.
+   */
+  cruiseY: 72,
+  cruiseSize: 0.8,
   cruiseHorizon: 58,
-  /** While a problem/answer owns the middle, the light yields to the near road. */
+  /**
+   * While a problem/answer owns the middle, the light drops onto the near road
+   * to give the card the frame. It leans back; it does not shrink away. Taking
+   * this to 0.56 is what turned the protagonist into a bead pinched between the
+   * card's lower edge and the rail - depth here is read from the gap above the
+   * orb, not from how small the orb gets. The card's resting height (--plate-y
+   * in road.css) is set against this pose: the two must never touch.
+   */
   readY: 78,
-  readSize: 0.56,
+  readSize: 0.7,
 } as const;
 
 /**
@@ -128,6 +149,15 @@ export const STATION = {
   bornScale: 0.12,
   /** card grows out of the vanishing point into reading position */
   arrive: 0.22,
+  /**
+   * By here the light has finished yielding - well before the card is solid
+   * enough to argue with it. The yield used to run 0.088 → 0.22, which is
+   * behind the card's own fade-in (complete by 0.11): the light was still
+   * getting out of the way of something already fully drawn on top of it.
+   * Leading rather than trailing is the whole difference between a light that
+   * makes room and a light that gets shoved.
+   */
+  yieldBy: 0.11,
   /** the sweep: problem renders into answer */
   turnFrom: 0.5,
   turnTo: 0.68,

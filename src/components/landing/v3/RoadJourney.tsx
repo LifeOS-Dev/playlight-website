@@ -68,7 +68,9 @@ export function RoadJourney() {
         return;
       }
       const face = FACES[i];
-      if (hudNumRef.current) hudNumRef.current.textContent = pad(face.n);
+      // Plain "3", not the card's "03" - this string is only ever spoken, and
+      // a zero-padded number is read out as "oh three".
+      if (hudNumRef.current) hudNumRef.current.textContent = String(face.n);
       if (hudNameRef.current) hudNameRef.current.textContent = face.name;
       if (railBarRef.current) {
         railBarRef.current.setAttribute("aria-valuenow", String(face.n));
@@ -145,7 +147,8 @@ export function RoadJourney() {
         if (q >= 0 && q < 1) active = i;
 
         if (q > 0 && q < 1) {
-          const enter = smooth(clamp01((q - STATION.arrive * 0.4) / (STATION.arrive * 0.6)));
+          // Leads the card in, rather than chasing it - see STATION.yieldBy.
+          const enter = smooth(clamp01(q / STATION.yieldBy));
           const leave =
             1 - smooth(clamp01((q - STATION.passFrom) / Math.max(0.04, 1 - STATION.passFrom)));
           hold = Math.max(hold, enter * leave);
@@ -223,14 +226,13 @@ export function RoadJourney() {
         philRef.current.style.visibility = o > 0.08 ? "visible" : "hidden";
       }
 
-      // Compass + rail: fade in as the first station arrives, fade out as
-      // the road opens, so they never snap and never sit on the close.
+      // Rail: fades in as the first station arrives, out as the road opens, so
+      // it never snaps and never sits on the close. The compass is a live
+      // region now, with nothing to fade - the same window just decides
+      // whether it is allowed to speak.
       const compass =
         (pinned ? 1 : 0) * smooth(clamp01(sp / 0.045)) * (1 - smooth(clamp01(ph / 0.18)));
-      if (hudRef.current) {
-        hudRef.current.style.opacity = compass.toFixed(3);
-        hudRef.current.toggleAttribute("aria-hidden", compass < 0.12);
-      }
+      if (hudRef.current) hudRef.current.toggleAttribute("aria-hidden", compass < 0.12);
       if (railBarRef.current) railBarRef.current.style.opacity = compass.toFixed(3);
 
       // Sky line: after the hero has left and the orb is on the road,
@@ -279,10 +281,10 @@ export function RoadJourney() {
       root.style.setProperty("--speech-o", (1 - smooth(clamp01((dep - 0.16) / 0.28))).toFixed(3));
 
       // ── The light itself ─────────────────────────────────────────
-      // The hero flies and the light rises into the vacated frame, settling
-      // on a cruise that holds for the rest of the road. A problem/answer
-      // card is the only disturbance - it pulls the light down onto the near
-      // road so the middle stays readable. After it passes, the cruise returns.
+      // The hero flies and the light settles onto the road below the horizon,
+      // on a cruise that holds for the rest of the way. A problem/answer card
+      // is the only disturbance - the light leans back onto the near road so
+      // the middle stays readable, and returns once the card has passed.
       const near = smooth(clamp01(dep / 0.55));
       const gone = smooth(clamp01((dep - 0.42) / 0.58));
       let y = lerp(LIGHT.heroY, LIGHT.cruiseY, gone);
@@ -429,7 +431,10 @@ export function RoadJourney() {
           </p>
         </div>
 
-        {/* Stays put while the cards fly. You always know which stop this is. */}
+        {/* The card names itself and the rail carries progress, so there is
+            nothing left for a third mark to say on screen. This is that same
+            fact for anyone listening instead: announced on arrival at each
+            stop, and taking no room in the frame. */}
         <div
           ref={hudRef}
           className="pl3-road__hud"
@@ -437,15 +442,9 @@ export function RoadJourney() {
           aria-atomic="true"
           aria-hidden="true"
         >
-          <p className="pl3-road__hud-line">
-            <span ref={hudNumRef}>01</span>
-            <span className="pl3-road__hud-of"> / {pad(FACE_COUNT)}</span>
-            <span className="pl3-road__hud-dot" aria-hidden="true">
-              ·
-            </span>
-            <span ref={hudNameRef} className="pl3-road__hud-name">
-              Invisible life
-            </span>
+          <p>
+            Stop <span ref={hudNumRef}>1</span> of {FACE_COUNT}:{" "}
+            <span ref={hudNameRef}>Invisible life</span>
           </p>
         </div>
 
