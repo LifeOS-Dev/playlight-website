@@ -66,9 +66,10 @@
 }
 
 :root {
-  /* Night product. Stops the UA from force-darkening an already-dark page
-     (white orb heart → black eclipse, cream tokens remapped). */
-  color-scheme: dark;
+  /* Night product. `only` is load-bearing: plain `dark` just advertises dark
+     support and leaves UA force-darkening switched on, which is what turned
+     the white orb heart into a black eclipse. */
+  color-scheme: only dark;
   --radius: 0.25rem;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -163,7 +164,7 @@
   }
 
   html {
-    color-scheme: dark;
+    color-scheme: only dark;
     background-color: #07060a;
   }
 

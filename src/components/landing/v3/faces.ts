@@ -117,14 +117,14 @@ export const FAQS = [
   },
   {
     q: "I've bounced off tools like this before.",
-    a: "Most of them are built for people whose attention never wavers. Playlight shows one thing at a time, leans on visuals over text, and doesn't punish a broken streak. Missing three days costs you nothing.",
+    a: "Because a tool this holistic hasn't existed - you've been handed one slice of your life at a time and asked to glue the rest together yourself. Playlight is designed around the experience of using it, not the feature list, so what you get back is actual value on an ordinary day.",
   },
   {
     q: "Who is it for?",
-    a: "People building something across several parts of life at once - work, health, money, relationships - who are tired of holding all of it in their head.",
+    a: "People who want to live a meaningful life and excel at it without getting lost in the countless distractions of an ordinary day. If you're an A player who wants their whole life to move, not just their inbox - this is for you.",
   },
   {
     q: "What happens to my data?",
-    a: "It's yours. You can export it or delete your account and everything in it at any time, from inside the app or from this site.",
+    a: "It stays completely safe. Playlight is privacy-first: we will never sell your data, to anyone, for any reason. It's yours - export it, or delete your account and everything in it at any time, from inside the app or from this site.",
   },
 ];

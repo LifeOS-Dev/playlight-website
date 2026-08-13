@@ -76,9 +76,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Light Technologies" },
       { name: "theme-color", content: "#07060a" },
-      // The live site is already night. Without this, Chrome/Edge "dark dark"
-      // (Auto Dark Mode) inverts the white orb heart into a black disc.
-      { name: "color-scheme", content: "dark" },
+      // The live site is already night, so there is nothing a dark-mode filter
+      // can add - it can only take the orb away. `only dark` (not plain `dark`)
+      // is the keyword that forbids UA force-darkening: `dark` merely says the
+      // page *supports* dark, and Chrome/Edge Auto Dark Mode still runs, which
+      // repaints the orb's white heart as a black disc. The opt-out is decided
+      // at document level, so the `only dark` on the orb's own layers is dead
+      // weight unless the root says it too.
+      { name: "color-scheme", content: "only dark" },
+      // Same intent for extension-based dark mode (Dark Reader et al), which
+      // ignores color-scheme entirely and inverts light gradients on sight.
+      { name: "darkreader-lock", content: "" },
     ],
     links: [
       {
@@ -105,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={{ colorScheme: "dark" }}>
+    <html lang="en" style={{ colorScheme: "only dark" }}>
       <head>
         <HeadContent />
       </head>
