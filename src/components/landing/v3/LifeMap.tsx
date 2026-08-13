@@ -288,7 +288,18 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
                 className="pl3-map__branch"
                 data-lit={active === wire.id ? "" : undefined}
                 style={{ "--i": i } as React.CSSProperties}
+                onPointerEnter={(e) => {
+                  if (e.pointerType !== "touch") hold(wire.id);
+                }}
+                onPointerLeave={(e) => {
+                  if (e.pointerType !== "touch") release();
+                }}
+                onClick={() => hold(wire.id)}
               >
+                {/* A hairline is not a target. The whole run of light from the
+                    facet to the orb answers to the pointer, not just the glyph
+                    at the end of it. */}
+                <path className="pl3-map__hit" d={wire.d} />
                 <path className="pl3-map__line" d={wire.d} pathLength={1} />
                 <path className="pl3-map__flow" d={wire.d} pathLength={1} />
                 {wire.beads.map(([x, y], b) => (

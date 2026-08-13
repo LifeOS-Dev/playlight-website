@@ -10,9 +10,9 @@
      outward from its port, and PERSONALITY needs about that much room, so
      between roughly 820 and 1000px the ring gives way to the word rather
      than pushing it off the edge. */
-  --ring-rx: clamp(190px, min(34vw, 50vw - 175px), 470px);
+  --ring-rx: clamp(190px, min(34vw, 50vw - 190px), 470px);
   --ring-ry: clamp(126px, 21vh, 232px);
-  --port: 30px;
+  --port: 34px;
 }
 
 /* ── The filaments ─────────────────────────────────────────────
@@ -32,6 +32,22 @@
 
 .pl3-map__web[data-ready] {
   opacity: var(--web-o, 1);
+}
+
+/* The target the pointer actually meets: the filament's whole run, widened
+   to something a hand can find. Invisible, and only ever a target while the
+   ring is at rest. */
+.pl3-map__hit {
+  stroke: transparent;
+  stroke-width: 18;
+  stroke-linecap: round;
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.pl3-map:not([data-live]) .pl3-map__hit {
+  pointer-events: none;
 }
 
 .pl3-map__line {
@@ -117,7 +133,7 @@
   top: calc(var(--horizon) + var(--uy) * var(--ring-ry) * var(--k));
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   /* --fade is written by the road as the ring flies past; --dim is the
      stylesheet's business. Two owners, one opacity, no fighting. */
   opacity: calc(var(--fade, 1) * var(--dim, 1));
@@ -179,7 +195,7 @@
 
 .pl3-map__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -277,9 +293,9 @@
        point: "Skip ahead" and the journey's rail are anchored to the stage
        (100svh), while vh ignores the browser's own chrome. Sized in vh the
        ring cleared them on one phone and sat under them on the next. */
-    --ring-rx: clamp(112px, min(37vw, 50vw - 62px), 220px);
+    --ring-rx: clamp(112px, min(37vw, 50vw - 70px), 220px);
     --ring-ry: clamp(112px, 18%, 180px);
-    --port: 26px;
+    --port: 29px;
   }
 
   /* Every word above its glyph. The bottom of the frame belongs to the
@@ -294,14 +310,14 @@
   }
 
   .pl3-map__label {
-    font-size: 8.5px;
+    font-size: 9.5px;
     letter-spacing: 0.18em;
   }
 }
 
 @media (max-width: 380px) {
   .pl3-map__label {
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: 0.14em;
   }
 }
@@ -314,11 +330,11 @@
 @media (max-width: 820px) and (max-height: 700px) {
   .pl3-map {
     --ring-ry: clamp(104px, 17.7%, 140px);
-    --port: 20px;
+    --port: 22px;
   }
 
   .pl3-map__label {
-    font-size: 8px;
+    font-size: 8.5px;
     letter-spacing: 0.14em;
   }
 

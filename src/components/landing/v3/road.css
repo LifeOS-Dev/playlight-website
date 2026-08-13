@@ -341,13 +341,21 @@
   color: var(--filament);
 }
 
+/* One line, wherever one line fits.
+   Held to 30rem this broke as "Your personalized OS to help you /
+   understand, organize, and play life." - a hanging second line under a
+   very large wordmark, which read as two thoughts rather than one
+   sentence. At 52rem the whole claim lands in a single measure of about
+   sixty-eight characters, comfortably inside a readable line length, and
+   only folds - balanced - on a phone. */
 .pl3-road__line {
-  margin-top: clamp(10px, 1.8vh, 18px);
-  max-width: 30rem;
+  margin-top: clamp(12px, 2.2vh, 24px);
+  max-width: min(52rem, 92vw);
   font-family: "Newsreader", ui-serif, Georgia, serif;
-  font-weight: 300;
-  font-size: clamp(1rem, 1.9vw, 1.35rem);
-  line-height: 1.4;
+  font-weight: 350;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  line-height: 1.35;
+  letter-spacing: 0.005em;
   color: var(--filament);
   text-wrap: balance;
 }
