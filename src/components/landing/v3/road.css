@@ -521,10 +521,6 @@
 }
 
 @media (max-width: 820px) {
-  .pl3-road__hud {
-    top: clamp(84px, 12vh, 108px);
-  }
-
   .pl3-road__offer {
     top: 20vh;
     width: min(22rem, 88vw);
