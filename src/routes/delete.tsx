@@ -15,33 +15,45 @@ export const Route = createFileRoute("/delete")({
   component: DeletePage,
 });
 
+type State = "idle" | "sending" | "done" | "error";
+
 function DeleteRequestForm() {
   const [email, setEmail] = useState("");
   const [reason, setReason] = useState("");
   const [mode, setMode] = useState<"account" | "data">("account");
-  const [submitted, setSubmitted] = useState(false);
+  const [state, setState] = useState<State>("idle");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) return;
-
+  // The request is sent from here. The mail client is only offered if that
+  // fails, and then as a link - never as a window opening on its own.
+  function mailtoFallback() {
     const subject =
-      mode === "account"
-        ? "Playlight account deletion request"
-        : "Playlight data deletion request";
-
+      mode === "account" ? "Playlight account deletion request" : "Playlight data deletion request";
     const body = [
       `Request type: ${mode === "account" ? "Delete account and associated data" : "Delete data only (keep account)"}`,
-      `Account email: ${trimmedEmail}`,
+      `Account email: ${email.trim()}`,
       reason.trim() ? `Reason: ${reason.trim()}` : "Reason: (not provided)",
       "",
       "Please process this Playlight deletion request from Light Technologies.",
     ].join("\n");
+    return `mailto:hello@playlight.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 
-    const mailto = `mailto:hello@playlight.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    setSubmitted(true);
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || state === "sending") return;
+
+    setState("sending");
+    try {
+      const res = await fetch("/api/deletion-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ email: trimmedEmail, mode, reason: reason.trim() }),
+      });
+      setState(res.ok ? "done" : "error");
+    } catch {
+      setState("error");
+    }
   }
 
   return (
@@ -105,22 +117,26 @@ function DeleteRequestForm() {
 
       <button
         type="submit"
-        className="w-full rounded-lg bg-accent px-5 py-3.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
+        disabled={state === "sending"}
+        className="w-full rounded-lg bg-accent px-5 py-3.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
       >
-        Request deletion
+        {state === "sending" ? "Sending" : "Request deletion"}
       </button>
 
-      {submitted ? (
-        <p className="text-sm text-muted-foreground">
-          Your email app should open with the request filled in. Send it to complete the request. If
-          nothing opens, email{" "}
-          <a
-            href="mailto:hello@playlight.app"
-            className="text-accent underline-offset-4 hover:underline"
-          >
-            hello@playlight.app
+      {state === "done" ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          Request received. We'll acknowledge it within about 2 business days, and we may write back
+          to confirm the address before anything is deleted.
+        </p>
+      ) : null}
+
+      {state === "error" ? (
+        <p className="text-sm text-muted-foreground" role="alert">
+          That didn't send.{" "}
+          <a href={mailtoFallback()} className="text-accent underline-offset-4 hover:underline">
+            Send it to hello@playlight.app
           </a>{" "}
-          directly.
+          instead and we'll process it by hand.
         </p>
       ) : null}
     </form>
@@ -143,72 +159,71 @@ function DeletePage() {
     >
       <DeleteRequestForm />
 
-        <p className="mt-8 text-sm leading-relaxed text-muted-foreground">
-          After processing, we remove or anonymise account profile data and user-owned product
-          content (tasks, projects, habits, notes, wealth records, AI chats/memories/insights where
-          applicable, and related preferences). Security events, audit records, backups, and data
-          required by law may be retained as described in our{" "}
-          <Link to="/privacy" className="text-accent underline-offset-4 hover:underline">
-            privacy policy
-          </Link>
-          .
-        </p>
+      <p className="mt-8 text-sm leading-relaxed text-muted-foreground">
+        After processing, we remove or anonymise account profile data and user-owned product content
+        (tasks, projects, habits, notes, wealth records, AI chats/memories/insights where
+        applicable, and related preferences). Security events, audit records, backups, and data
+        required by law may be retained as described in our{" "}
+        <Link to="/privacy" className="text-accent underline-offset-4 hover:underline">
+          privacy policy
+        </Link>
+        .
+      </p>
 
-        <div>
-          <h2>How to request deletion</h2>
+      <div>
+        <h2>How to request deletion</h2>
 
-          <section className="mt-10">
-            <h3 className="text-lg font-medium text-foreground">By email</h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              Use the form above, or email{" "}
-              <a
-                href="mailto:hello@playlight.app?subject=Play%20Light%20account%20deletion%20request"
-                className="text-accent underline-offset-4 hover:underline"
-              >
-                hello@playlight.app
-              </a>{" "}
-              from your account email with the subject “Playlight account deletion request” and
-              your account email address.
-            </p>
-          </section>
-
-          <section className="mt-10">
-            <h3 className="text-lg font-medium text-foreground">
-              Delete data without deleting your account
-            </h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              Choose “Delete some or all of my data, but keep my account” in the form above, or
-              email{" "}
-              <a
-                href="mailto:hello@playlight.app?subject=Play%20Light%20data%20deletion%20request"
-                className="text-accent underline-offset-4 hover:underline"
-              >
-                hello@playlight.app
-              </a>{" "}
-              and specify what to remove. We process verifiable requests within 30 days.
-            </p>
-          </section>
-
-          <section className="mt-10">
-            <h3 className="text-lg font-medium text-foreground">What is deleted vs kept</h3>
-            <ul className="mt-3 ml-5 list-disc space-y-2 text-[15px] leading-relaxed text-muted-foreground">
-              <li>
-                <span className="font-medium text-foreground">Deleted or anonymised:</span> profile
-                fields, credentials, life-management content, AI user-owned records, devices, and
-                preferences (for full account deletion), subject to purge completion.
-              </li>
-              <li>
-                <span className="font-medium text-foreground">May be kept:</span> security/audit
-                events needed for abuse prevention, encrypted backups for a limited period,
-                operational logs, aggregated de-identified data, or data required by law.
-              </li>
-            </ul>
-          </section>
-
-          <p className="pl3-doc__note">
-            Response: within 2 business days · Purge: per deletion workflow (see Privacy Policy)
+        <section className="mt-10">
+          <h3 className="text-lg font-medium text-foreground">By email</h3>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+            Use the form above, or email{" "}
+            <a
+              href="mailto:hello@playlight.app?subject=Play%20Light%20account%20deletion%20request"
+              className="text-accent underline-offset-4 hover:underline"
+            >
+              hello@playlight.app
+            </a>{" "}
+            from your account email with the subject “Playlight account deletion request” and your
+            account email address.
           </p>
-        </div>
+        </section>
+
+        <section className="mt-10">
+          <h3 className="text-lg font-medium text-foreground">
+            Delete data without deleting your account
+          </h3>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+            Choose “Delete some or all of my data, but keep my account” in the form above, or email{" "}
+            <a
+              href="mailto:hello@playlight.app?subject=Play%20Light%20data%20deletion%20request"
+              className="text-accent underline-offset-4 hover:underline"
+            >
+              hello@playlight.app
+            </a>{" "}
+            and specify what to remove. We process verifiable requests within 30 days.
+          </p>
+        </section>
+
+        <section className="mt-10">
+          <h3 className="text-lg font-medium text-foreground">What is deleted vs kept</h3>
+          <ul className="mt-3 ml-5 list-disc space-y-2 text-[15px] leading-relaxed text-muted-foreground">
+            <li>
+              <span className="font-medium text-foreground">Deleted or anonymised:</span> profile
+              fields, credentials, life-management content, AI user-owned records, devices, and
+              preferences (for full account deletion), subject to purge completion.
+            </li>
+            <li>
+              <span className="font-medium text-foreground">May be kept:</span> security/audit
+              events needed for abuse prevention, encrypted backups for a limited period,
+              operational logs, aggregated de-identified data, or data required by law.
+            </li>
+          </ul>
+        </section>
+
+        <p className="pl3-doc__note">
+          Response: within 2 business days · Purge: per deletion workflow (see Privacy Policy)
+        </p>
+      </div>
     </DocPage>
   );
 }

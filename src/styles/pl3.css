@@ -270,10 +270,7 @@
   z-index: 5;
   width: min(22rem, 88vw);
   margin: 0;
-  transform: translate(
-    -50%,
-    calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 1.6rem)
-  );
+  transform: translate(-50%, calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 1.6rem));
   text-align: center;
   pointer-events: none;
   opacity: var(--speech-o, 1);
@@ -1665,6 +1662,12 @@
   border-top: 1px solid var(--line-soft);
   font-size: 12.5px;
   color: var(--ash);
+}
+
+.pl3-get__hint a {
+  color: var(--filament);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .pl3-get__foot a {

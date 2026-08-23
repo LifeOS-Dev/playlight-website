@@ -32,9 +32,10 @@ export function TryToday({
 type State = "idle" | "sending" | "done" | "error";
 
 /**
- * One field and one button. With no endpoint configured the address is
- * handed to the visitor's mail client, so the form is never a dead end
- * while the list is still being set up.
+ * One field and one button, and the submit is the whole errand: the address
+ * goes straight to the waitlist endpoint. Only if that fails does the mail
+ * client get offered, and then as a link the visitor can choose - never as a
+ * second window opening on its own.
  */
 function WaitlistForm() {
   const [email, setEmail] = React.useState("");
@@ -44,12 +45,6 @@ function WaitlistForm() {
     e.preventDefault();
     const address = email.trim();
     if (!address || state === "sending") return;
-
-    if (!WAITLIST_ENDPOINT) {
-      window.location.href = waitlistMailto(address);
-      setState("done");
-      return;
-    }
 
     setState("sending");
     try {
@@ -66,14 +61,7 @@ function WaitlistForm() {
 
   if (state === "done") {
     return (
-      <p className="pl3-get__done">
-        You're on the list. We'll write once - the day it opens.
-        {WAITLIST_ENDPOINT ? null : (
-          <span className="pl3-get__hint">
-            If your mail app didn't open, send a note to {NOTIFY_EMAIL}.
-          </span>
-        )}
-      </p>
+      <p className="pl3-get__done">You're on the list. We'll write once - the day it opens.</p>
     );
   }
 
@@ -100,7 +88,8 @@ function WaitlistForm() {
 
       {state === "error" ? (
         <p className="pl3-get__hint" role="alert">
-          That didn't send. Email {NOTIFY_EMAIL} and we'll add you by hand.
+          That didn't send. <a href={waitlistMailto(email.trim())}>Send it to {NOTIFY_EMAIL}</a> and
+          we'll add you by hand.
         </p>
       ) : (
         <p className="pl3-get__hint">One email, on the day it opens. Nothing else.</p>
