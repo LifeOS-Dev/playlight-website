@@ -573,7 +573,9 @@
   position: relative;
   z-index: 4;
   width: min(340px, 84vw);
-  height: 48px;
+  /* the only control on the device that gets this one, so it is sized
+     as a target first and a decoration second */
+  height: 56px;
   /* The gate is a flex column, so `height` here is only a hint and a
      short viewport squeezed the rail to nothing - a control with no
      height, which is worse than one that is merely cramped. */
@@ -624,6 +626,45 @@
     0 2px 8px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   /* no transition: it has to sit under the finger, not follow it */
+}
+
+/* ── the bloom ────────────────────────────────────────────────
+   What answers instead of the beam, where there is no beam.
+
+   One radial gradient on a pseudo-element: no mask, no filter, no
+   rotation, nothing to re-rasterise as the choice changes - only a
+   colour swap and an opacity. It is everything the torch could not be on
+   a phone, and it is enough: the orb visibly takes the light, which is
+   the whole job.
+
+   ::before rather than ::after so it paints behind the orb. In front, at
+   any alpha, it would tint the white heart - and the heart never tints. */
+.pl-gate[data-mode="track"] .pl-gate__hit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 132%;
+  height: 132%;
+  margin: -66% 0 0 -66%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgb(var(--pick-rgb, 255 255 255) / 26%) 0%,
+    rgb(var(--pick-rgb, 255 255 255) / 13%) 32%,
+    rgb(var(--pick-rgb, 255 255 255) / 4%) 56%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.pl-gate[data-mode="track"][data-picking="1"] .pl-gate__hit::before {
+  opacity: 1;
+}
+.pl-gate[data-mode="track"][data-taken="1"] .pl-gate__hit::before {
+  opacity: 0;
+  transition: opacity 0.28s ease;
 }
 
 /* ── room, and the right cursor ───────────────────────────────

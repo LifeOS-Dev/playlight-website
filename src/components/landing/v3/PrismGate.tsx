@@ -295,9 +295,10 @@ export function PrismGate({
   const slideTo = React.useCallback(
     (t: number) => {
       root.current?.style.setProperty("--thumb", t.toFixed(4));
-      point(angleForT(t));
+      // paint, not point: there is no beam here to aim (see the render)
+      paint(angleForT(t));
     },
-    [point],
+    [paint],
   );
 
   const trackT = (e: React.PointerEvent) => {
@@ -665,8 +666,15 @@ export function PrismGate({
       <div ref={hit} className="pl-gate__hit" {...(mode === "track" ? {} : slider)}>
         {/* Above the orb: underneath, the orb's own faint outer layers
             composite over the beam and dull it right at the rim. The
-            mask's inner hole is what keeps the white core clean. */}
-        <div className="pl-gate__torch" aria-hidden />
+            mask's inner hole is what keeps the white core clean.
+
+            Not rendered at all for the track, which is the mechanic a
+            phone gets. The beam is the single most expensive thing on
+            this screen - a masked, blurred, rotating conic - and it is
+            the half of the design a hand covers anyway. Where there is
+            no cursor to carry it, it is not worth its cost, so the orb
+            answers with a bloom instead (see prism-gate.css). */}
+        {mode === "track" ? null : <div className="pl-gate__torch" aria-hidden />}
         <AppOrb
           size={FIELD}
           accent

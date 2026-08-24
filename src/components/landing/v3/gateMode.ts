@@ -36,6 +36,29 @@ export const GATE_MODE_HINT: Record<GateMode, string> = {
   track: "(slide to choose)",
 };
 
+/**
+ * What a device gets when nobody has asked for anything in particular.
+ *
+ * The dial is a stream, not a value: what is chosen is only ever "where
+ * the finger is now", so any break in that stream - a pointer the
+ * browser cancels near a screen edge, a frame the compositor drops -
+ * destroys the selection outright, and the light goes out under a hand
+ * that has not moved off anything. On a phone that break happens often
+ * enough to be the normal experience rather than the exception.
+ *
+ * The track cannot fail that way. Its thumb holds a position, so an
+ * interrupted gesture leaves the choice exactly where it was. It is not
+ * a simpler mechanic chosen over a better one; it is the one whose
+ * correctness does not depend on events nobody can guarantee.
+ *
+ * So: a real cursor gets the orb and its beam. Everything else gets the
+ * bar. `?gate=` still overrides both, for trying one against the other.
+ */
+export function defaultModeFor(): GateMode {
+  if (typeof window === "undefined") return DEFAULT_GATE_MODE;
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches ? "dial" : "track";
+}
+
 const KEY = "playlight.gate-mode";
 
 const isMode = (v: unknown): v is GateMode =>

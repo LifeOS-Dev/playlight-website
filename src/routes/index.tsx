@@ -13,6 +13,7 @@ import { useLightScroll, type OrbStop } from "@/components/landing/v3/useLightSc
 import { PrismGate, gateCloseMs, gateExitMs } from "@/components/landing/v3/PrismGate";
 import {
   DEFAULT_GATE_MODE,
+  defaultModeFor,
   readGateMode,
   writeGateMode,
   type GateMode,
@@ -92,9 +93,19 @@ function HomePage() {
    */
   const [trying, setTrying] = React.useState<GateMode | null>(null);
 
+  /**
+   * Which mechanic is up. Settled after mount, never during render: it
+   * depends on the device, and the server has no device. Until then it
+   * is the desktop one, which is what the arrival's first second looks
+   * like on any of them - a white orb blooming, no controls yet - so
+   * the correction lands long before anything of it is on screen.
+   */
+  const [mode, setMode] = React.useState<GateMode>(DEFAULT_GATE_MODE);
+
   React.useEffect(() => {
     const test = readGateMode();
     if (test.testing) setTrying(test.mode);
+    setMode(test.testing ? test.mode : defaultModeFor());
 
     const saved = readVibe();
     if (saved) {
@@ -163,12 +174,13 @@ function HomePage() {
           current={vibe.id}
           onDismiss={keep}
           closing={phase === "closing"}
-          mode={trying ?? DEFAULT_GATE_MODE}
+          mode={mode}
           onMode={
             trying
               ? (m) => {
                   writeGateMode(m);
                   setTrying(m);
+                  setMode(m);
                 }
               : undefined
           }
