@@ -1,0 +1,306 @@
+/* ══════════════════════════════════════════════════════════════
+   The gate - one orb holding every colour, and the torch you pick with.
+   ══════════════════════════════════════════════════════════════ */
+
+.pl-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(24px, 5vw, 56px) clamp(18px, 4vw, 40px);
+  background: #000;
+  cursor: crosshair;
+  overflow: hidden;
+  transition: opacity 0.8s ease;
+}
+.pl-gate button {
+  cursor: pointer;
+}
+
+/* darkness closing in once the light runs out */
+.pl-gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(
+    56% 50% at 50% 46%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.5) 76%,
+    #000 100%
+  );
+}
+
+/* ── handover ─────────────────────────────────────────────────
+   The gate does not simply fade. Its ground, vignette and words go, and
+   the orb flies onto the site's own orb, which is already sitting behind
+   the gate wearing the colour that was just chosen. The gate unmounts as
+   the two coincide, so what looks like one light travelling into place is
+   a handoff between two.
+   Fading the whole gate here (opacity on the root) would have taken the
+   orb with it and there would be nothing left to watch. */
+.pl-gate[data-taken="1"] {
+  pointer-events: none;
+  background: transparent;
+}
+.pl-gate[data-taken="1"]::after {
+  opacity: 0;
+}
+.pl-gate[data-taken="1"] .pl-gate__lead,
+.pl-gate[data-taken="1"] .pl-gate__label,
+.pl-gate[data-taken="1"] .pl-gate__hint,
+.pl-gate[data-taken="1"] .pl-gate__torch {
+  opacity: 0;
+  transition: opacity 0.32s ease;
+}
+.pl-gate[data-taken="1"] .pl-gate__hit {
+  transform: translate(var(--fly-x, 0px), var(--fly-y, 0px)) scale(var(--fly-s, 1));
+}
+/* only at the end, once it has arrived on top of the real one */
+.pl-gate[data-taken="1"] .pl-gate__orb {
+  opacity: 0;
+  transition: opacity 0.28s ease 0.82s;
+}
+
+.pl-gate::after,
+.pl-gate {
+  transition:
+    background 0.5s ease,
+    opacity 0.5s ease;
+}
+.pl-gate__hit {
+  transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pl-gate__hit {
+  position: relative;
+  z-index: 4;
+  /* The vh term is load-bearing: the orb is square, so on a short or
+     landscape viewport a width-only cap pushes the lead off the top and
+     the hint off the bottom, and the gate's overflow:hidden clips both.
+     Roughly 130px of the height is copy, hence 48vh rather than half. */
+  width: min(420px, 70vw, 48vh);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  touch-action: manipulation;
+  --s: 1;
+}
+.pl-gate__hit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 12px;
+}
+.pl-gate__orb {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+/* AppOrb scales its 200px stage by size/200 inline; override so the
+   CORONA (400 units, the orb's true visual extent) spans exactly the hit
+   box. scale(--s) - NOT --s * 2, which drew the orb at twice the box and
+   left the torch, sized in the same 400-unit space, starting inside the
+   ring instead of on it. */
+.pl-gate__orb .app-orb__stage {
+  transform: scale(var(--s)) !important;
+}
+
+/* ── the torch ───────────────────────────────────────────────
+   Colour is sampled from the orb's own conic at the cursor's angle, so
+   the light leaving the rim is the hue of the rim it leaves from.
+   The conic confines it to a wedge, feathered hard at both edges so the
+   sides glow rather than cut; the radial mask gives it a start just
+   outside the core and a soft end, so it occupies a bounded area rather
+   than flooding the page. Sized in the orb's own 400-unit space and
+   scaled by --s, so its inner edge always sits on the rim. */
+.pl-gate__torch {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1800px;
+  height: 1800px;
+  margin: -900px 0 0 -900px;
+  pointer-events: none;
+  z-index: 2;
+  transform-origin: 50% 50%;
+  transform: scale(var(--s, 1)) rotate(var(--torch-deg, 0deg));
+  background: conic-gradient(
+    from -42deg at 50% 50%,
+    transparent 0deg,
+    color-mix(in srgb, var(--pick, #fff) 7%, transparent) 8deg,
+    color-mix(in srgb, var(--pick, #fff) 32%, transparent) 20deg,
+    color-mix(in srgb, var(--pick, #fff) 70%, transparent) 32deg,
+    color-mix(in srgb, var(--pick, #fff) 95%, transparent) 42deg,
+    color-mix(in srgb, var(--pick, #fff) 70%, transparent) 52deg,
+    color-mix(in srgb, var(--pick, #fff) 32%, transparent) 64deg,
+    color-mix(in srgb, var(--pick, #fff) 7%, transparent) 76deg,
+    transparent 84deg,
+    transparent 360deg
+  );
+  /* Lit by 86px - inside the ring's own band, which peaks at 49 and is
+     finished by 84. Past that the orb carries almost nothing (aura alpha
+     .07 -> .02), so a beam that only reached full strength out there
+     appeared to start out of blackness instead of out of the orb. */
+  --tm: radial-gradient(
+    circle 900px at 50% 50%,
+    transparent 0px,
+    transparent 40px,
+    rgba(0, 0, 0, 0.62) 62px,
+    rgba(0, 0, 0, 0.96) 86px,
+    #000 150px,
+    rgba(0, 0, 0, 0.88) 380px,
+    rgba(0, 0, 0, 0.54) 540px,
+    rgba(0, 0, 0, 0.2) 690px,
+    transparent 830px
+  );
+  -webkit-mask-image: var(--tm);
+  mask-image: var(--tm);
+  filter: blur(20px);
+  opacity: 0;
+  /* short and linear - the beam sits under the cursor, it doesn't chase it */
+  transition:
+    opacity 0.3s ease,
+    transform 0.1s linear;
+}
+.pl-gate[data-picking="1"] .pl-gate__torch {
+  opacity: 1;
+}
+
+/* ── copy ─────────────────────────────────────────────────────
+   The instruction is a quiet eyebrow, the same mono device the site uses
+   elsewhere ("HOVER A FACET"). Only one of the two texts should carry
+   weight, and it is the one that changes. */
+.pl-gate__lead,
+.pl-gate__label,
+.pl-gate__hint {
+  position: relative;
+  z-index: 4;
+}
+
+.pl-gate__lead {
+  font-family: var(--pl3-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.44);
+  margin: 0 0 clamp(12px, 3.2vh, 36px);
+}
+
+.pl-gate__label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 3.2rem;
+  margin-top: clamp(4px, 1.4vw, 16px);
+}
+.pl-gate__name {
+  font-size: clamp(1.9rem, 3.7vw, 2.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+  color: var(--pick, #fff);
+  transition:
+    color 0.3s ease,
+    opacity 0.35s ease;
+}
+.pl-gate[data-picking="0"] .pl-gate__name {
+  opacity: 0;
+}
+
+.pl-gate__hint {
+  font-family: var(--pl3-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.62);
+  margin: clamp(2px, 0.9vw, 8px) 0 0;
+}
+
+/* The torch sweeps under this text, and small dim type over a lit beam
+   loses its contrast. A soft scrim keeps it legible whichever way the
+   light points, without a visible box behind it. */
+.pl-gate__lead,
+.pl-gate__hint {
+  text-shadow:
+    0 1px 14px rgba(0, 0, 0, 0.65),
+    0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── arrival ──────────────────────────────────────────────────
+   White soul, then colour, then words.
+
+   A pure CSS timeline, on purpose. Driven from JS timeouts, an effect
+   cleanup during hydration could clear them and strand the intro
+   half-played - silently, with nothing in the console. Animations start
+   at first paint and no React lifecycle can cancel them.
+
+   Every one uses `backwards`, never `both`: the fill must be released
+   once the animation ends, or a finished bloom would keep forcing
+   --prism-a to 1 and the cross-fade into the chosen hue could never run
+   (animations outrank normal declarations). */
+
+@keyframes pl-gate-soul {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pl-gate-bloom {
+  from {
+    --prism-a: 0;
+  }
+  to {
+    --prism-a: 1;
+  }
+}
+@keyframes pl-gate-words {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pl-gate__orb {
+  animation: pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+/* hold the colour back until the soul has arrived */
+.pl-gate .app-orb {
+  animation: pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
+}
+
+.pl-gate__lead,
+.pl-gate__label,
+.pl-gate__hint {
+  animation: pl-gate-words 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.05s backwards;
+}
+.pl-gate__label {
+  animation-delay: 2.15s;
+}
+.pl-gate__hint {
+  animation-delay: 2.25s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-gate__orb,
+  .pl-gate .app-orb,
+  .pl-gate__lead,
+  .pl-gate__label,
+  .pl-gate__hint {
+    animation: none !important;
+  }
+  .pl-gate,
+  .pl-gate * {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -5,6 +5,8 @@
 @import "./styles/pl3.css";
 /* Brand orb - app DNA (ShowcaseOrb / store-assets orb.mjs) */
 @import "./components/landing/orb/app-orb.css";
+/* The colour gate that fronts the homepage */
+@import "./components/landing/v3/prism-gate.css";
 
 @custom-variant dark (&:is(.dark *));
 

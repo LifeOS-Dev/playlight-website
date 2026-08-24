@@ -60,12 +60,12 @@
   border: 1px solid color-mix(in srgb, var(--ember) 22%, var(--line));
   border-radius: 28px;
   background:
-    radial-gradient(120% 55% at 50% -8%, rgba(255, 174, 71, 0.16), transparent 58%),
+    radial-gradient(120% 55% at 50% -8%, rgb(var(--ember-rgb) / 0.16), transparent 58%),
     rgba(7, 6, 10, 0.98);
   box-shadow:
     0 28px 64px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 174, 71, 0.04),
-    inset 0 1px 0 rgba(255, 244, 226, 0.08);
+    0 0 0 1px rgb(var(--ember-rgb) / 0.04),
+    inset 0 1px 0 rgb(var(--paper-rgb) / 0.08);
   transition:
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 420ms ease,
@@ -86,8 +86,8 @@
   border-color: color-mix(in srgb, var(--ember) 42%, var(--line));
   box-shadow:
     0 36px 72px rgba(0, 0, 0, 0.55),
-    0 0 36px rgba(255, 174, 71, 0.08),
-    inset 0 1px 0 rgba(255, 244, 226, 0.1);
+    0 0 36px rgb(var(--ember-rgb) / 0.08),
+    inset 0 1px 0 rgb(var(--paper-rgb) / 0.1);
 }
 
 .pl3-look__shot {
@@ -97,6 +97,13 @@
   aspect-ratio: 390 / 844;
   object-fit: cover;
   object-position: top center;
+  /* These are real captures with amber baked in, so they cannot take a
+     custom property the way the rest of the page does - the pixels have
+     to be moved instead. hue-rotate leaves neutrals alone, so the orb's
+     white core and all the UI text in these shots are untouched; only
+     the amber swings onto the chosen light. */
+  filter: hue-rotate(var(--v-rotate, 0deg));
+  transition: filter 0.6s ease;
 }
 
 .pl3-look__caption {

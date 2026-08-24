@@ -9,12 +9,31 @@
 .pl3 {
   color-scheme: only dark;
   --void: #07060a;
-  --ember: #ffae47;
-  --filament: #fff4e2;
+
+  /* ── the vibe ──
+     The gate publishes --v-*-rgb on this element once a light is chosen.
+     Held as bare RGB triples rather than hex so every alpha below can be
+     written rgb(var(--x-rgb) / a) - including the ones whose alpha is a
+     calc() of --lit, which color-mix() cannot express.
+     The fallbacks are the original amber, so the page renders correctly
+     on the server and before any choice is made. */
+  /* oklch hue of the chosen light; the warm glows follow it. */
+  --glow-hue: var(--v-hue, 67);
+  --ember-rgb: var(--v-base-rgb, 255 174 71);
+  --paper-rgb: var(--v-paper-rgb, 255 244 226);
+  --edge-rgb: var(--v-edge-rgb, 222 176 112);
+
+  --ember: rgb(var(--ember-rgb));
+  /* The lit end of the ramp. Used where a filament brightens as it
+     reaches the orb - see the SVG stops in LifeMap. */
+  --ember-bright: var(--v-bright, #ffc95c);
+  --filament: rgb(var(--paper-rgb));
+  /* Neutral by design and carrying documented contrast - left untinted so
+     the ratios below stay true whatever light is chosen. */
   --ash: #a1978a; /* 7.4:1 on --void */
   --ash-dim: #827a6f; /* 4.77:1 - the quietest this can go and stay AA */
-  --line: rgba(222, 176, 112, 0.42);
-  --line-soft: rgba(222, 176, 112, 0.16);
+  --line: rgb(var(--edge-rgb) / 0.42);
+  --line-soft: rgb(var(--edge-rgb) / 0.16);
   --horizon: 70%;
   --orb-base: clamp(160px, 18vw, 280px);
   /* defaults until the scroll listener takes over */
@@ -46,7 +65,7 @@
 }
 
 .pl3 ::selection {
-  background: rgba(255, 174, 71, 0.25);
+  background: rgb(var(--ember-rgb) / 0.25);
   color: var(--filament);
 }
 
@@ -116,7 +135,7 @@
   transform: translate(-50%, -50%);
   background: radial-gradient(
     ellipse 50% 55% at 50% 50%,
-    oklch(0.78 0.14 62 / 0.07),
+    oklch(0.78 0.14 var(--glow-hue) / 0.07),
     transparent 72%
   );
   filter: blur(16px);
@@ -149,8 +168,8 @@
     top 0.05s linear;
   background: radial-gradient(
     circle at 50% 50%,
-    oklch(0.8 0.14 62 / 0.05) 0%,
-    oklch(0.7 0.13 55 / 0.018) 14%,
+    oklch(0.8 0.14 var(--glow-hue) / 0.05) 0%,
+    oklch(0.7 0.13 calc(var(--glow-hue) - 7) / 0.018) 14%,
     transparent 32%
   );
   mix-blend-mode: screen;
@@ -210,8 +229,8 @@
   border-radius: 50%;
   background: radial-gradient(
     circle at 50% 50%,
-    oklch(0.86 0.15 62 / 0.55),
-    oklch(0.78 0.14 60 / 0.2) 44%,
+    oklch(0.86 0.15 var(--glow-hue) / 0.55),
+    oklch(0.78 0.14 calc(var(--glow-hue) - 2) / 0.2) 44%,
     transparent 70%
   );
   transform: scale(calc(1 + var(--road-rush, 0) * 0.34)) scaleY(calc(1 + var(--road-rush, 0) * 0.4));
@@ -229,7 +248,7 @@
   width: 28%;
   height: 14%;
   transform: translate(-50%, 0);
-  background: radial-gradient(ellipse at 50% 0%, oklch(0.88 0.14 62 / 0.2), transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, oklch(0.88 0.14 var(--glow-hue) / 0.2), transparent 70%);
   filter: blur(8px);
   opacity: calc(var(--path-rush, 0) * 0.28);
   pointer-events: none;
@@ -291,7 +310,7 @@
   line-height: 1.35;
   letter-spacing: 0.01em;
   color: var(--filament);
-  text-shadow: 0 0 22px oklch(0.78 0.14 62 / 0.42);
+  text-shadow: 0 0 22px oklch(0.78 0.14 var(--glow-hue) / 0.42);
   text-wrap: balance;
 }
 
@@ -650,17 +669,17 @@
   width: clamp(94px, 12vw, 166px);
   height: clamp(66px, 8vw, 110px);
   padding: clamp(9px, 1vw, 15px);
-  border: 1px solid rgba(222, 176, 112, calc(0.19 + var(--lit) * 0.32));
+  border: 1px solid rgb(var(--edge-rgb) / calc(0.19 + var(--lit) * 0.32));
   border-radius: 10px;
   background: linear-gradient(
     155deg,
-    rgba(255, 240, 214, calc(0.03 + var(--lit) * 0.06)),
-    rgba(255, 240, 214, 0.008)
+    rgb(var(--paper-rgb) / calc(0.03 + var(--lit) * 0.06)),
+    rgb(var(--paper-rgb) / 0.008)
   );
-  color: rgba(255, 244, 226, calc(0.5 + var(--lit) * 0.45));
+  color: rgb(var(--paper-rgb) / calc(0.5 + var(--lit) * 0.45));
   box-shadow:
-    0 0 calc(var(--lit) * 40px) rgba(255, 174, 71, calc(var(--lit) * 0.1)),
-    inset 0 1px 0 rgba(255, 244, 226, calc(0.03 + var(--lit) * 0.06));
+    0 0 calc(var(--lit) * 40px) rgb(var(--ember-rgb) / calc(var(--lit) * 0.1)),
+    inset 0 1px 0 rgb(var(--paper-rgb) / calc(0.03 + var(--lit) * 0.06));
   transform: rotate(var(--rot)) scale(var(--depth));
   animation: pl3-float var(--float) ease-in-out infinite;
   animation-delay: var(--float-delay);
@@ -834,7 +853,7 @@
 
 .pl3-panel[data-side="solution"] .pl3-panel__motif {
   color: var(--ember);
-  filter: drop-shadow(0 0 14px rgba(255, 174, 71, 0.28));
+  filter: drop-shadow(0 0 14px rgb(var(--ember-rgb) / 0.28));
 }
 
 .pl3-panel__quote {
@@ -843,7 +862,7 @@
   font-weight: 300;
   font-size: clamp(1.375rem, 2.6vw, 2rem);
   line-height: 1.28;
-  color: rgba(255, 244, 226, 0.82);
+  color: rgb(var(--paper-rgb) / 0.82);
   text-wrap: balance;
 }
 
@@ -968,7 +987,7 @@
   cursor: pointer;
   list-style: none;
   font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
-  color: rgba(255, 244, 226, 0.86);
+  color: rgb(var(--paper-rgb) / 0.86);
   transition: color 0.3s;
 }
 
@@ -1065,7 +1084,7 @@
   font-weight: 300;
   font-size: 14px;
   letter-spacing: -0.01em;
-  color: rgba(255, 244, 226, 0.7);
+  color: rgb(var(--paper-rgb) / 0.7);
 }
 
 .pl3-footer__nav {
@@ -1107,10 +1126,10 @@
   gap: 11px;
   min-width: 11.5rem;
   padding: 11px 20px;
-  border: 1px solid rgba(255, 244, 226, 0.28);
+  border: 1px solid rgb(var(--paper-rgb) / 0.28);
   border-radius: 999px;
   color: var(--filament);
-  background: rgba(255, 244, 226, 0.06);
+  background: rgb(var(--paper-rgb) / 0.06);
   transition:
     border-color 0.35s,
     background 0.35s,
@@ -1120,22 +1139,22 @@
 
 .pl3-cta__btn:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 174, 71, 0.5);
+  border-color: rgb(var(--ember-rgb) / 0.5);
   color: var(--filament);
-  background: rgba(255, 174, 71, 0.1);
+  background: rgb(var(--ember-rgb) / 0.1);
 }
 
 .pl3-cta__btn--primary {
   /* Kept for archives; homepage buttons are matched. */
   color: var(--filament);
-  background: rgba(255, 244, 226, 0.06);
-  border-color: rgba(255, 244, 226, 0.28);
+  background: rgb(var(--paper-rgb) / 0.06);
+  border-color: rgb(var(--paper-rgb) / 0.28);
 }
 
 .pl3-cta__btn--primary:hover {
   color: var(--filament);
-  background: rgba(255, 174, 71, 0.1);
-  border-color: rgba(255, 174, 71, 0.5);
+  background: rgb(var(--ember-rgb) / 0.1);
+  border-color: rgb(var(--ember-rgb) / 0.5);
 }
 
 .pl3-cta__icon {
@@ -1197,13 +1216,13 @@
   --secondary-foreground: oklch(0.97 0.02 85);
   --muted: oklch(0.17 0.014 70);
   --muted-foreground: oklch(0.74 0.014 78);
-  --accent: oklch(0.8 0.14 62);
+  --accent: oklch(0.8 0.14 var(--glow-hue));
   --accent-foreground: oklch(0.06 0.012 290);
   --destructive: oklch(0.63 0.19 25);
   --destructive-foreground: oklch(0.97 0.02 85);
   --border: oklch(0.34 0.03 75);
   --input: oklch(0.34 0.03 75);
-  --ring: oklch(0.8 0.14 62);
+  --ring: oklch(0.8 0.14 var(--glow-hue));
 }
 
 .pl3-doc__inner {
@@ -1291,7 +1310,7 @@
 /* A field on a black page needs a surface, not just an outline. */
 .pl3-doc__inner input[type="email"],
 .pl3-doc__inner textarea {
-  background: rgba(255, 244, 226, 0.035);
+  background: rgb(var(--paper-rgb) / 0.035);
 }
 
 .pl3-doc__mail {
@@ -1302,7 +1321,7 @@
   padding: 12px 22px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 244, 226, 0.03);
+  background: rgb(var(--paper-rgb) / 0.03);
   transition:
     transform 0.35s cubic-bezier(0.16, 0.8, 0.24, 1),
     border-color 0.35s,
@@ -1311,8 +1330,8 @@
 
 .pl3-doc__mail:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 174, 71, 0.5);
-  background: rgba(255, 174, 71, 0.08);
+  border-color: rgb(var(--ember-rgb) / 0.5);
+  background: rgb(var(--ember-rgb) / 0.08);
 }
 
 .pl3-doc__mail svg {
@@ -1408,8 +1427,8 @@
 .pl3-skip:hover,
 .pl3-skip:focus-visible {
   color: var(--filament);
-  border-color: rgba(255, 174, 71, 0.55);
-  background: rgba(255, 174, 71, 0.08);
+  border-color: rgb(var(--ember-rgb) / 0.55);
+  background: rgb(var(--ember-rgb) / 0.08);
 }
 
 /* Anchor targets clear the fixed nav */
@@ -1452,14 +1471,14 @@
   background: var(--filament);
   border-color: var(--filament);
   color: var(--void);
-  box-shadow: 0 0 44px rgba(255, 174, 71, 0.16);
+  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.16);
 }
 
 .pl3-try[data-variant="solid"]:hover {
   transform: translateY(-2px);
   background: #ffffff;
   border-color: #ffffff;
-  box-shadow: 0 0 60px rgba(255, 174, 71, 0.3);
+  box-shadow: 0 0 60px rgb(var(--ember-rgb) / 0.3);
 }
 
 .pl3-try[data-variant="quiet"] {
@@ -1467,13 +1486,13 @@
   font-size: 12.5px;
   font-weight: 400;
   border-color: var(--line);
-  background: rgba(255, 244, 226, 0.03);
-  color: rgba(255, 244, 226, 0.9);
+  background: rgb(var(--paper-rgb) / 0.03);
+  color: rgb(var(--paper-rgb) / 0.9);
 }
 
 .pl3-try[data-variant="quiet"]:hover {
-  border-color: rgba(255, 174, 71, 0.5);
-  background: rgba(255, 174, 71, 0.08);
+  border-color: rgb(var(--ember-rgb) / 0.5);
+  background: rgb(var(--ember-rgb) / 0.08);
   color: var(--filament);
 }
 
@@ -1502,10 +1521,10 @@
 .pl3-get__panel {
   position: relative;
   padding: clamp(26px, 4vw, 38px) clamp(22px, 3.4vw, 34px) clamp(20px, 3vw, 28px);
-  border: 1px solid rgba(222, 176, 112, 0.3);
+  border: 1px solid rgb(var(--edge-rgb) / 0.3);
   border-radius: 20px;
   background:
-    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255, 174, 71, 0.1), transparent 70%),
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgb(var(--ember-rgb) / 0.1), transparent 70%),
     linear-gradient(160deg, rgba(22, 18, 15, 0.98), rgba(9, 7, 11, 0.99));
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
   text-align: center;
@@ -1529,7 +1548,7 @@
 
 .pl3-get__close:hover {
   color: var(--filament);
-  background: rgba(255, 244, 226, 0.06);
+  background: rgb(var(--paper-rgb) / 0.06);
 }
 
 .pl3-get__close svg {
@@ -1581,7 +1600,7 @@
   padding: 12px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 244, 226, 0.04);
+  background: rgb(var(--paper-rgb) / 0.04);
   color: var(--filament);
   font-size: 14px;
   text-align: center;
@@ -1596,8 +1615,8 @@
 }
 
 .pl3-get__input:focus-visible {
-  border-color: rgba(255, 174, 71, 0.55);
-  background: rgba(255, 174, 71, 0.06);
+  border-color: rgb(var(--ember-rgb) / 0.55);
+  background: rgb(var(--ember-rgb) / 0.06);
 }
 
 .pl3-get__submit {
@@ -1622,7 +1641,7 @@
 
 .pl3-get__submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(255, 174, 71, 0.22);
+  box-shadow: 0 14px 34px rgb(var(--ember-rgb) / 0.22);
 }
 
 .pl3-get__submit:disabled {

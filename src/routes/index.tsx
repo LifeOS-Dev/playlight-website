@@ -10,6 +10,9 @@ import { SiteHeader } from "@/components/landing/v3/SiteHeader";
 import { V3Footer } from "@/components/landing/v3/V3Footer";
 import { GetPlaylightPanel } from "@/components/landing/v3/TryToday";
 import { useLightScroll, type OrbStop } from "@/components/landing/v3/useLightScroll";
+import { PrismGate } from "@/components/landing/v3/PrismGate";
+import { applyVibe, defaultVibe, readVibe, writeVibe } from "@/components/landing/v3/vibe";
+import { vibeById, type Vibe } from "@/components/landing/orb/ramp";
 import { pageMeta } from "@/seo";
 
 export const Route = createFileRoute("/")({
@@ -50,10 +53,39 @@ function HomePage() {
 
   useLightScroll(root, anchors, STOPS);
 
+  /**
+   * The gate runs once. It renders on the server too, but its first stage
+   * is fully transparent - so a returning visitor whose choice we already
+   * know never sees it flash before the effect below dismisses it.
+   */
+  const [gated, setGated] = React.useState(true);
+  const [vibe, setVibe] = React.useState<Vibe>(defaultVibe);
+
+  React.useEffect(() => {
+    const saved = readVibe();
+    if (saved) {
+      const v = vibeById(saved);
+      setVibe(v);
+      applyVibe(root.current, v);
+      setGated(false);
+    } else {
+      applyVibe(root.current, defaultVibe());
+    }
+  }, []);
+
+  const choose = React.useCallback((chosen: Vibe) => {
+    setVibe(chosen);
+    applyVibe(root.current, chosen);
+    writeVibe(chosen.id);
+    // hold the gate until its orb has flown onto the site's own (1.05s)
+    window.setTimeout(() => setGated(false), 1150);
+  }, []);
+
   return (
     <div ref={root} className="pl3">
+      {gated ? <PrismGate onChoose={choose} /> : null}
       <LightField />
-      <LightOrb />
+      <LightOrb ramp={vibe.ramp} />
 
       <a className="pl3-skiplink" href="#faq">
         Skip to questions

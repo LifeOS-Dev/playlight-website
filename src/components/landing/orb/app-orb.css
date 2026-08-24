@@ -80,14 +80,63 @@
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Prism variant - the same orb showing every hue at once.
+
+   Each accent layer is rendered twice: once in a single ramp colour,
+   once as the spectrum. --grp cross-fades between them.
+
+   --grp is multiplied INSIDE the keyframes rather than set as a plain
+   `opacity` declaration, because a running CSS animation on opacity
+   always beats a normal declaration - the two layers would both render
+   at full strength and the amber would drown the spectrum.
+   ══════════════════════════════════════════════════════════════ */
+
+.app-orb {
+  --grp: 1;
+  --prism-a: 1;
+  --solid-a: 0;
+  transition:
+    --prism-a 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    --solid-a 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Only the gate sets data-mode; without it nothing below applies and the
+   orb behaves exactly as it always has. */
+.app-orb[data-mode="prism"] {
+  --prism-a: 1;
+  --solid-a: 0;
+}
+.app-orb[data-mode="solid"] {
+  --prism-a: 0;
+  --solid-a: 1;
+}
+.app-orb[data-mode] .app-orb__prism {
+  --grp: var(--prism-a);
+}
+.app-orb[data-mode] .app-orb__solid {
+  --grp: var(--solid-a);
+}
+
+@property --prism-a {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --solid-a {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 @keyframes app-orb-corona {
   0%,
   100% {
-    opacity: 0.6;
+    opacity: calc(0.6 * var(--grp));
     transform: scale(0.99);
   }
   50% {
-    opacity: 0.72;
+    opacity: calc(0.72 * var(--grp));
     transform: scale(1.03);
   }
 }
@@ -95,11 +144,11 @@
 @keyframes app-orb-aura {
   0%,
   100% {
-    opacity: 0.85;
+    opacity: calc(0.85 * var(--grp));
     transform: scale(1.14);
   }
   50% {
-    opacity: 1;
+    opacity: calc(1 * var(--grp));
     transform: scale(1.2);
   }
 }
@@ -107,10 +156,10 @@
 @keyframes app-orb-ring {
   0%,
   100% {
-    opacity: 0.86;
+    opacity: calc(0.86 * var(--grp));
   }
   50% {
-    opacity: 0.98;
+    opacity: calc(0.98 * var(--grp));
   }
 }
 
@@ -129,46 +178,46 @@
 @keyframes app-orb-wisp-a {
   from {
     transform: translate(22px, 0);
-    opacity: 0.55;
+    opacity: calc(0.55 * var(--grp));
   }
   25% {
     transform: translate(0, 22px);
-    opacity: 0.9;
+    opacity: calc(0.9 * var(--grp));
   }
   50% {
     transform: translate(-22px, 0);
-    opacity: 0.55;
+    opacity: calc(0.55 * var(--grp));
   }
   75% {
     transform: translate(0, -22px);
-    opacity: 0.9;
+    opacity: calc(0.9 * var(--grp));
   }
   to {
     transform: translate(22px, 0);
-    opacity: 0.55;
+    opacity: calc(0.55 * var(--grp));
   }
 }
 
 @keyframes app-orb-wisp-b {
   from {
     transform: translate(-32px, 0);
-    opacity: 0.5;
+    opacity: calc(0.5 * var(--grp));
   }
   25% {
     transform: translate(0, -32px);
-    opacity: 0.95;
+    opacity: calc(0.95 * var(--grp));
   }
   50% {
     transform: translate(32px, 0);
-    opacity: 0.5;
+    opacity: calc(0.5 * var(--grp));
   }
   75% {
     transform: translate(0, 32px);
-    opacity: 0.95;
+    opacity: calc(0.95 * var(--grp));
   }
   to {
     transform: translate(-32px, 0);
-    opacity: 0.5;
+    opacity: calc(0.5 * var(--grp));
   }
 }
 
@@ -206,4 +255,34 @@
   .app-orb__spark {
     animation: none !important;
   }
+}
+
+/* ── held still ───────────────────────────────────────────────
+   With the animations off, opacity falls back to 1 - which means BOTH
+   the prism and the solid twin would paint at full strength and the
+   cross-fade would do nothing. Each layer therefore needs the resting
+   value its animation used to hold, still multiplied by --grp.
+   Values are the mid-points of the keyframes above, so a still orb looks
+   like a paused one rather than a different orb. */
+.app-orb--still .app-orb__corona {
+  opacity: calc(0.66 * var(--grp));
+  transform: scale(1.01);
+}
+.app-orb--still .app-orb__aura {
+  opacity: calc(0.92 * var(--grp));
+  transform: scale(1.17);
+}
+.app-orb--still .app-orb__ring {
+  opacity: calc(0.94 * var(--grp));
+}
+.app-orb--still .app-orb__wisp--a {
+  opacity: calc(0.72 * var(--grp));
+  transform: translate(15px, 7px);
+}
+.app-orb--still .app-orb__wisp--b {
+  opacity: calc(0.7 * var(--grp));
+  transform: translate(-19px, -9px);
+}
+.app-orb--still .app-orb__core {
+  opacity: 0.9;
 }

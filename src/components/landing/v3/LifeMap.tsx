@@ -272,9 +272,13 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
                 cy={drawn.cy}
                 r={drawn.r}
               >
-                <stop offset="0" stopColor="#ffae47" stopOpacity="0" />
-                <stop offset="0.58" stopColor="#ffae47" stopOpacity="0" />
-                <stop offset="1" stopColor="#ffae47" stopOpacity="0.52" />
+                {/* stop-color via `style`, not the attribute: var() is a CSS
+                    feature and SVG presentation attributes do not resolve it,
+                    which is how these wires stayed amber while the rest of
+                    the page had already taken the chosen light. */}
+                <stop offset="0" style={{ stopColor: "var(--ember)" }} stopOpacity="0" />
+                <stop offset="0.58" style={{ stopColor: "var(--ember)" }} stopOpacity="0" />
+                <stop offset="1" style={{ stopColor: "var(--ember)" }} stopOpacity="0.52" />
               </radialGradient>
               <radialGradient
                 id="pl3-map-fall-lit"
@@ -283,9 +287,9 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
                 cy={drawn.cy}
                 r={drawn.r}
               >
-                <stop offset="0" stopColor="#fff4e2" stopOpacity="0" />
-                <stop offset="0.5" stopColor="#fff4e2" stopOpacity="0" />
-                <stop offset="1" stopColor="#ffc95c" stopOpacity="1" />
+                <stop offset="0" style={{ stopColor: "var(--filament)" }} stopOpacity="0" />
+                <stop offset="0.5" style={{ stopColor: "var(--filament)" }} stopOpacity="0" />
+                <stop offset="1" style={{ stopColor: "var(--ember-bright)" }} stopOpacity="1" />
               </radialGradient>
             </defs>
 
