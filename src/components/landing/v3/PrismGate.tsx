@@ -148,6 +148,16 @@ export function PrismGate({
   const [taken, setTaken] = React.useState<Vibe | null>(null);
 
   /**
+   * Whether a hand has touched the bar yet.
+   *
+   * Until it has, the orb holds every colour at once - that is what the
+   * arrival is for, and resolving it before anyone has asked would throw
+   * the promise away to answer a question nobody put. The first touch is
+   * what turns the spectrum into a choice.
+   */
+  const [engaged, setEngaged] = React.useState(false);
+
+  /**
    * The arrival is a pure CSS timeline - see prism-gate.css. Driving it
    * from a chain of setTimeouts meant an effect cleanup during hydration
    * could clear them and strand the intro half-played, with no error to
@@ -261,6 +271,24 @@ export function PrismGate({
     setActive(null);
   }, []);
 
+  /**
+   * Wear one of the five, rather than the hue standing at an angle.
+   *
+   * The dial samples the orb's own conic, so the light it shows is the
+   * one under the cursor even between two named colours. The track does
+   * not: what it is going to hand over is one of five, and the orb is
+   * about to BE that colour rather than merely point at it. A resolved
+   * orb showing a blend nobody can actually take would be a promise the
+   * handover then breaks.
+   */
+  const wear = React.useCallback((i: number) => {
+    const base = VIBES[i].ramp.base;
+    root.current?.style.setProperty("--pick", base);
+    root.current?.style.setProperty("--pick-rgb", tripleOf(base));
+    idx.current = i;
+    setActive(i);
+  }, []);
+
   /** Point at an angle: aim the beam there, and take the colour from it. */
   const point = React.useCallback(
     (deg: number) => {
@@ -295,10 +323,10 @@ export function PrismGate({
   const slideTo = React.useCallback(
     (t: number) => {
       root.current?.style.setProperty("--thumb", t.toFixed(4));
-      // paint, not point: there is no beam here to aim (see the render)
-      paint(angleForT(t));
+      // the thumb slides continuously; the colour it names does not
+      wear(nearestVibe(angleForT(t)));
     },
-    [paint],
+    [wear],
   );
 
   const trackT = (e: React.PointerEvent) => {
@@ -460,6 +488,7 @@ export function PrismGate({
 
   const onTrackDown = (e: React.PointerEvent) => {
     if (!ready()) return;
+    setEngaged(true);
     grab(e, "track");
     slideTo(trackT(e));
   };
@@ -680,7 +709,11 @@ export function PrismGate({
           accent
           sparks={0}
           reducedMotion
-          mode={taken ? "solid" : "prism"}
+          /* Resolved once a hand is on the bar: on a phone the orb IS
+             the feedback, so it stops holding every colour and starts
+             wearing the one being chosen. A cursor keeps the spectrum,
+             because it has a beam to answer with instead. */
+          mode={taken !== null || (mode === "track" && engaged) ? "solid" : "prism"}
           ramp={shown?.ramp}
           className="pl-gate__orb"
         />

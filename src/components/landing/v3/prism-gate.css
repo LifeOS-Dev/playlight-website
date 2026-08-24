@@ -625,17 +625,27 @@
     0 0 18px 4px color-mix(in srgb, var(--pick, #fff) 55%, transparent),
     0 2px 8px rgba(0, 0, 0, 0.6);
   pointer-events: none;
+  /* eases between the five with the bloom; its POSITION never eases,
+     because that has to stay under the finger */
+  transition: background-color 0.32s ease;
   /* no transition: it has to sit under the finger, not follow it */
 }
 
-/* ── the bloom ────────────────────────────────────────────────
-   What answers instead of the beam, where there is no beam.
+/* ── the orb takes the colour ─────────────────────────────────
+   On a phone the orb is the feedback, so it stops holding every colour
+   and wears the one being chosen (PrismGate flips it to `solid` on the
+   first touch). This is the cross-fade it does that on - quicker than
+   the handover's, because here it happens under a moving thumb and has
+   to keep up with it rather than be admired. */
+.pl-gate[data-mode="track"] .pl-gate__orb {
+  --orb-fade: 0.34s;
+}
 
-   One radial gradient on a pseudo-element: no mask, no filter, no
-   rotation, nothing to re-rasterise as the choice changes - only a
-   colour swap and an opacity. It is everything the torch could not be on
-   a phone, and it is enough: the orb visibly takes the light, which is
-   the whole job.
+/* ── the bloom ────────────────────────────────────────────────
+   The light the orb throws, now that it has one. One radial gradient on
+   a pseudo-element: no mask, no filter, no rotation, nothing to
+   re-rasterise as the choice changes - everything the torch could not be
+   on a phone.
 
    ::before rather than ::after so it paints behind the orb. In front, at
    any alpha, it would tint the white heart - and the heart never tints. */
@@ -649,22 +659,34 @@
   margin: -66% 0 0 -66%;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgb(var(--pick-rgb, 255 255 255) / 26%) 0%,
-    rgb(var(--pick-rgb, 255 255 255) / 13%) 32%,
-    rgb(var(--pick-rgb, 255 255 255) / 4%) 56%,
-    transparent 72%
-  );
+  /* The alpha lives on the element, not in the stops, so the gradient
+     carries one colour and that colour is a single custom property -
+     which is what lets it be transitioned at all (see @property below). */
+  background: radial-gradient(circle, var(--pick, #fff) 0%, transparent 64%);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    --pick 0.32s ease;
 }
 .pl-gate[data-mode="track"][data-picking="1"] .pl-gate__hit::before {
-  opacity: 1;
+  opacity: 0.32;
 }
 .pl-gate[data-mode="track"][data-taken="1"] .pl-gate__hit::before {
   opacity: 0;
   transition: opacity 0.28s ease;
+}
+
+/* A gradient is a background-IMAGE, and background-image does not
+   transition - so the five colours would land as hard cuts however
+   gently everything around them moved. Registering the property gives
+   the gradient a colour that can be interpolated, and the bloom eases
+   between lights instead of snapping between them. The orb's own body
+   still lands on each one cleanly, which is the part that should read as
+   a decision; only the light it throws eases. */
+@property --pick {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
 }
 
 /* ── room, and the right cursor ───────────────────────────────
