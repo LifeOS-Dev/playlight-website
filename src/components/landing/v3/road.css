@@ -58,7 +58,12 @@
 
 .pl3-road__signal-core {
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, #fff6e6 0%, var(--ember) 38%, transparent 74%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    oklch(0.976 0.023 var(--glow-hue)) 0%,
+    var(--ember) 38%,
+    transparent 74%
+  );
   box-shadow: 0 0 22px 5px rgb(var(--ember-rgb) / 0.4);
 }
 
@@ -174,7 +179,12 @@
 
 .pl3-road__ash-core {
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, #fff6e6 0%, var(--ember) 42%, transparent 74%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    oklch(0.976 0.023 var(--glow-hue)) 0%,
+    var(--ember) 42%,
+    transparent 74%
+  );
   box-shadow: 0 0 18px 4px rgb(var(--ember-rgb) / 0.45);
 }
 
@@ -259,7 +269,7 @@
      would buy nothing and cost six composited layers on a phone. */
   background:
     radial-gradient(118% 78% at 50% 116%, rgb(var(--ember-rgb) / 0.11), transparent 62%),
-    linear-gradient(163deg, rgba(26, 21, 18, 0.52), rgba(10, 8, 12, 0.66));
+    linear-gradient(163deg, oklch(0.201 0.01 var(--glow-hue) / 0.52), oklch(0.139 0.01 308 / 0.66));
   box-shadow:
     0 18px 44px rgba(0, 0, 0, 0.32),
     0 0 calc(var(--turn, 0) * 64px) rgb(var(--ember-rgb) / calc(var(--turn, 0) * 0.14)),
@@ -293,13 +303,17 @@
   width: 150px;
   /* Leaning, because the light doing this is down on the road below. */
   transform: translateX(-50%) skewX(-7deg);
+  /* The stops climb to a near-white crest and fall back into the light's
+     own colour. Written on --glow-hue: this is the orb's beam crossing the
+     card, so it has to be the orb's colour - baked amber here was the one
+     place a chosen aqua or iris still washed the card gold. */
   background: linear-gradient(
     to right,
     transparent,
-    rgba(255, 186, 96, 0.12) 34%,
-    rgba(255, 214, 150, 0.34) 47%,
-    rgba(255, 248, 232, 0.62) 51%,
-    rgba(255, 200, 120, 0.2) 60%,
+    oklch(0.836 0.133 var(--glow-hue) / 0.12) 34%,
+    oklch(0.897 0.093 var(--glow-hue) / 0.34) 47%,
+    oklch(0.98 0.022 var(--glow-hue) / 0.62) 51%,
+    oklch(0.865 0.116 var(--glow-hue) / 0.2) 60%,
     transparent
   );
   opacity: calc(var(--turn, 0) * (1 - var(--turn, 0)) * 4);
@@ -315,7 +329,7 @@
 }
 
 .pl3-plate__motif[data-side="problem"] {
-  color: rgba(216, 196, 170, 0.55);
+  color: oklch(0.83 0.042 var(--glow-hue) / 0.55);
 }
 
 .pl3-plate__motif[data-side="solution"] {

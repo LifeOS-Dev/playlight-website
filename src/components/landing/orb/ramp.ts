@@ -119,10 +119,49 @@ export const vibeById = (id: string | null | undefined): Vibe =>
 /**
  * Every hue at once, as one gradient. Stops sit at 0/20/40/60/80% to match
  * the VIBES angles above via phi = 90 - angle, starting from -20deg.
+ *
+ * `--prism-spin` turns the spectrum inside the orb without turning the orb.
+ * Only the gate's wheel sets it - everywhere else it resolves to 0deg and
+ * this is the same gradient it has always been.
  */
 export const PRISM_CONIC =
-  "conic-gradient(from -20deg at 50% 50%," +
+  "conic-gradient(from calc(-20deg + var(--prism-spin, 0deg)) at 50% 50%," +
   "#2FDCC4 0%,#4C8DFF 20%,#9B6BFF 40%,#F35BC8 60%,#FFA32B 80%,#2FDCC4 100%)";
+
+/**
+ * The same spectrum unrolled: aqua at the left edge, amber at the right,
+ * the other three evenly between. The conic runs a sixth further so it can
+ * close on itself; a straight bar has no seam to hide, so it stops at amber
+ * and the five stops land on clean quarters.
+ */
+export const PRISM_LINEAR =
+  "linear-gradient(90deg," + "#2FDCC4 0%,#4C8DFF 25%,#9B6BFF 50%,#F35BC8 75%,#FFA32B 100%)";
+
+/** How much of the circle the unrolled bar covers - four gaps of 72deg. */
+const SPREAD = 288;
+
+/** Position along the bar (0..1) -> the orb angle standing at it. */
+export const angleForT = (t: number) => 110 - SPREAD * t;
+
+/** And back, for putting the thumb on a colour rather than a colour on the thumb. */
+export function tForAngle(deg: number): number {
+  let d = (110 - deg) % 360;
+  if (d < 0) d += 360;
+  return Math.min(1, d / SPREAD);
+}
+
+/**
+ * The spin that brings `deg` to the top of the orb, chosen from the
+ * infinitely many that would (they differ by whole turns) as the one
+ * nearest `from` - so the wheel takes the short way round rather than
+ * unwinding three turns to reach the neighbour it is already beside.
+ */
+export function spinFor(deg: number, from = 0): number {
+  let s = deg - 90;
+  while (s - from > 180) s -= 360;
+  while (s - from < -180) s += 360;
+  return s;
+}
 
 /** RGB triples of the PRISM_CONIC stops, for sampling the hue at an angle. */
 const CONIC_STOPS: Array<[pos: number, rgb: [number, number, number]]> = [

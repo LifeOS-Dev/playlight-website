@@ -10,7 +10,13 @@ import { SiteHeader } from "@/components/landing/v3/SiteHeader";
 import { V3Footer } from "@/components/landing/v3/V3Footer";
 import { GetPlaylightPanel } from "@/components/landing/v3/TryToday";
 import { useLightScroll, type OrbStop } from "@/components/landing/v3/useLightScroll";
-import { PrismGate } from "@/components/landing/v3/PrismGate";
+import { PrismGate, gateCloseMs, gateExitMs } from "@/components/landing/v3/PrismGate";
+import {
+  DEFAULT_GATE_MODE,
+  readGateMode,
+  writeGateMode,
+  type GateMode,
+} from "@/components/landing/v3/gateMode";
 import { applyVibe, defaultVibe, readVibe, writeVibe } from "@/components/landing/v3/vibe";
 import { vibeById, type Vibe } from "@/components/landing/orb/ramp";
 import { pageMeta } from "@/seo";
@@ -54,36 +60,120 @@ function HomePage() {
   useLightScroll(root, anchors, STOPS);
 
   /**
-   * The gate runs once. It renders on the server too, but its first stage
-   * is fully transparent - so a returning visitor whose choice we already
-   * know never sees it flash before the effect below dismisses it.
+   * The gate has two lives.
+   *
+   * "arrival" is the one everybody meets, and it runs once ever: it
+   * renders on the server too, but its first stage is fully transparent -
+   * so a returning visitor whose choice we already know never sees it
+   * flash before the effect below dismisses it.
+   *
+   * "replay" is the same gate reopened from the dot in the header. The
+   * choice is remembered forever, but it was a one-way door until this
+   * existed: pick a light in the two seconds the gate is up and you wore
+   * it until you cleared site data. Remembering and being able to change
+   * your mind are not in tension - you just need both.
    */
-  const [gated, setGated] = React.useState(true);
+  const [gate, setGate] = React.useState<"arrival" | "replay" | null>("arrival");
+
+  /**
+   * Which beat the gate is on, because the page has to move with it: the
+   * site's own orb is held dark under an open gate and lit again on the
+   * way out, and prism-gate.css times that off this. "leaving" is a light
+   * being handed over; "closing" is a replay walked away from.
+   */
+  const [phase, setPhase] = React.useState<"open" | "leaving" | "closing">("open");
+
   const [vibe, setVibe] = React.useState<Vibe>(defaultVibe);
 
+  /**
+   * Which way of choosing is up, while three of them are being tried
+   * against each other on a real phone. `null` outside that - the site
+   * ships one mechanic and never asks. See gateMode.ts.
+   */
+  const [trying, setTrying] = React.useState<GateMode | null>(null);
+
   React.useEffect(() => {
+    const test = readGateMode();
+    if (test.testing) setTrying(test.mode);
+
     const saved = readVibe();
     if (saved) {
       const v = vibeById(saved);
       setVibe(v);
       applyVibe(root.current, v);
-      setGated(false);
+      // ...but a mechanic under test has to be meetable more than once,
+      // and a remembered choice would let it be met exactly one time.
+      if (!test.testing) setGate(null);
     } else {
       applyVibe(root.current, defaultVibe());
     }
   }, []);
 
-  const choose = React.useCallback((chosen: Vibe) => {
-    setVibe(chosen);
-    applyVibe(root.current, chosen);
-    writeVibe(chosen.id);
-    // hold the gate until its orb has flown onto the site's own (1.05s)
-    window.setTimeout(() => setGated(false), 1150);
+  /** Held, so a gate left early cannot fire its exit into a later one. */
+  const exit = React.useRef(0);
+  React.useEffect(() => () => window.clearTimeout(exit.current), []);
+
+  const close = React.useCallback((after: number) => {
+    window.clearTimeout(exit.current);
+    exit.current = window.setTimeout(() => {
+      setGate(null);
+      setPhase("open");
+    }, after);
   }, []);
 
+  const choose = React.useCallback(
+    (chosen: Vibe) => {
+      setVibe(chosen);
+      applyVibe(root.current, chosen);
+      writeVibe(chosen.id);
+      // the gate stays mounted for the whole handover - PrismGate owns its length
+      setPhase("leaving");
+      close(gateExitMs());
+    },
+    [close],
+  );
+
+  const reopen = React.useCallback(() => {
+    window.clearTimeout(exit.current);
+    setPhase("open");
+    setGate("replay");
+  }, []);
+
+  /** Left without choosing: no handover, just the black lifting. */
+  const keep = React.useCallback(() => {
+    setPhase("closing");
+    close(gateCloseMs());
+  }, [close]);
+
   return (
-    <div ref={root} className="pl3">
-      {gated ? <PrismGate onChoose={choose} /> : null}
+    <div
+      ref={root}
+      className="pl3"
+      /* The site's light waits in the dark under an open gate and is lit
+         again on the way out, so there are never two orbs on screen. A
+         gate being walked away from is not a handover, so it gets
+         neither state - the black simply lifts off what was always
+         underneath it. */
+      data-gate={gate && phase !== "closing" ? (phase === "leaving" ? "leaving" : "on") : undefined}
+    >
+      {gate ? (
+        <PrismGate
+          onChoose={choose}
+          replay={gate === "replay"}
+          current={vibe.id}
+          onDismiss={keep}
+          closing={phase === "closing"}
+          mode={trying ?? DEFAULT_GATE_MODE}
+          onMode={
+            trying
+              ? (m) => {
+                  writeGateMode(m);
+                  setTrying(m);
+                }
+              : undefined
+          }
+        />
+      ) : null}
       <LightField />
       <LightOrb ramp={vibe.ramp} />
 
@@ -91,7 +181,7 @@ function HomePage() {
         Skip to questions
       </a>
 
-      <SiteHeader />
+      <SiteHeader vibe={vibe} onChangeVibe={reopen} />
 
       <main className="pl3-main">
         <div ref={road as React.RefObject<HTMLDivElement>}>

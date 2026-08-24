@@ -15,7 +15,15 @@
   background: #000;
   cursor: crosshair;
   overflow: hidden;
-  transition: opacity 0.8s ease;
+  /* Every mechanic here is a drag, and the browser's own gestures - pan,
+     pinch, double-tap zoom, the overscroll at the top of the page - each
+     claim one mid-choice. There is nothing to scroll under a fixed,
+     full-screen gate, so nothing is given up by taking them. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: background 0.5s ease;
 }
 .pl-gate button {
   cursor: pointer;
@@ -37,44 +45,133 @@
 }
 
 /* ── handover ─────────────────────────────────────────────────
-   The gate does not simply fade. Its ground, vignette and words go, and
-   the orb flies onto the site's own orb, which is already sitting behind
-   the gate wearing the colour that was just chosen. The gate unmounts as
-   the two coincide, so what looks like one light travelling into place is
-   a handoff between two.
-   Fading the whole gate here (opacity on the root) would have taken the
-   orb with it and there would be nothing left to watch. */
+   Two beats, never one.
+
+   FIRST the spectrum gathers. The orb stays exactly where it is, on the
+   black, and every hue in it resolves into the one that was chosen - a
+   held moment that says "this is the light you took" before anything
+   moves. The orb draws a small breath in as it does it.
+
+   THEN it travels: down onto the site's own orb, which is waiting in the
+   same colour at the same size, held invisible until the last instant so
+   there are never two lights on screen at once. The ground and the
+   vignette lift on the way, so the world arrives around the light rather
+   than the light arriving into a world already there. At the end the two
+   orbs cross-fade, and what looked like one light travelling into place
+   was a handoff between two.
+
+   Everything below is delayed off the SAME t0 (the tap), so the beats are
+   readable in one place. Fading the whole gate instead (opacity on the
+   root) would take the orb with it and leave nothing to watch. */
 .pl-gate[data-taken="1"] {
   pointer-events: none;
+}
+
+/* — beat one: gather (0 → 0.72s) — */
+
+/* the instructions have done their job; only the chosen name is left to read */
+.pl-gate[data-taken="1"] .pl-gate__lead,
+.pl-gate[data-taken="1"] .pl-gate__hint,
+.pl-gate[data-taken="1"] .pl-gate__torch,
+.pl-gate[data-taken="1"] .pl-gate__mark,
+.pl-gate[data-taken="1"] .pl-gate__track,
+.pl-gate[data-taken="1"] .pl-gate__modes {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+/* The name is the receipt, and it goes just as the orb starts to move.
+   An animation rather than a transition because a tap has no hover before
+   it: on touch the name has never been shown, so there is no 1 to fall
+   from and a transition would leave the choice unnamed. Starting at 1
+   costs the pointer user nothing - they are already reading it. */
+.pl-gate[data-taken="1"] .pl-gate__name {
+  animation: pl-gate-confirm 0.66s ease both;
+}
+@keyframes pl-gate-confirm {
+  0%,
+  52% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The breath in. Carried on the orb rather than on .pl-gate__hit, which
+   is busy with the flight - one transform per element or the two fight
+   and the last one declared wins outright. */
+.pl-gate[data-taken="1"] .pl-gate__orb {
+  animation: pl-gate-gather 0.72s cubic-bezier(0.33, 0.9, 0.35, 1) both;
+  /* only at the very end, once it is sitting on top of the real one */
+  opacity: 0;
+  /* --prism-a/--solid-a have to be restated. `transition` is a shorthand,
+     so declaring one here for opacity alone resets the cross-fade the app
+     orb sets up - which is why the spectrum used to snap to the chosen hue
+     in a single frame instead of resolving into it. The whole first beat
+     lives in these two lines. */
+  transition:
+    --prism-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1),
+    --solid-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.24s ease 1.24s;
+}
+
+/* — beat two: travel (0.58s → 1.48s) — */
+
+.pl-gate[data-taken="1"] .pl-gate__hit {
+  transform: translate(var(--fly-x, 0px), var(--fly-y, 0px)) scale(var(--fly-s, 1));
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.58s;
+}
+/* The ground and the vignette go one at a time. Fading the root itself
+   would take the orb down with them and there would be nothing left to
+   watch arrive. */
+.pl-gate[data-taken="1"] {
   background: transparent;
+  transition: background 0.6s ease 0.58s;
 }
 .pl-gate[data-taken="1"]::after {
   opacity: 0;
-}
-.pl-gate[data-taken="1"] .pl-gate__lead,
-.pl-gate[data-taken="1"] .pl-gate__label,
-.pl-gate[data-taken="1"] .pl-gate__hint,
-.pl-gate[data-taken="1"] .pl-gate__torch {
-  opacity: 0;
-  transition: opacity 0.32s ease;
-}
-.pl-gate[data-taken="1"] .pl-gate__hit {
-  transform: translate(var(--fly-x, 0px), var(--fly-y, 0px)) scale(var(--fly-s, 1));
-}
-/* only at the end, once it has arrived on top of the real one */
-.pl-gate[data-taken="1"] .pl-gate__orb {
-  opacity: 0;
-  transition: opacity 0.28s ease 0.82s;
+  transition: opacity 0.6s ease 0.58s;
 }
 
-.pl-gate::after,
-.pl-gate {
-  transition:
-    background 0.5s ease,
-    opacity 0.5s ease;
+@keyframes pl-gate-gather {
+  0% {
+    transform: none;
+  }
+  42% {
+    transform: scale(0.945);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
-.pl-gate__hit {
-  transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+
+/* ── the site's own light, held back ──────────────────────────
+   While the gate is up there must be exactly one orb on screen, or the
+   flight ends by landing on a second one that was visible the whole time.
+   The page's orb cannot simply be absent - it is what the flight is
+   measured against - so it is hidden and still laid out, and lit only
+   once the gate's orb has arrived on top of it. The delay is measured
+   from the same t0 as everything in `handover` above; move one, move
+   both. */
+.pl3[data-gate="on"] .pl3-orb,
+.pl3[data-gate="on"] .pl3-say {
+  opacity: 0;
+  /* A replay opens over a page that is already lit, and the gate takes
+     0.26s to fade in over it. Without a matching fade the light under it
+     blinks out first, which reads as a fault rather than a curtain. On
+     arrival there is nothing to transition from, so this costs nothing. */
+  transition:
+    opacity 0.26s ease,
+    left 0.05s linear,
+    top 0.05s linear;
+}
+.pl3[data-gate="leaving"] .pl3-orb,
+.pl3[data-gate="leaving"] .pl3-say {
+  transition:
+    opacity 0.3s ease 1.18s,
+    left 0.05s linear,
+    top 0.05s linear;
 }
 
 .pl-gate__hit {
@@ -87,7 +184,7 @@
   width: min(420px, 70vw, 48vh);
   aspect-ratio: 1;
   border-radius: 50%;
-  touch-action: manipulation;
+  touch-action: none;
   --s: 1;
 }
 .pl-gate__hit:focus-visible {
@@ -99,6 +196,10 @@
   inset: 0;
   width: 100% !important;
   height: 100% !important;
+  /* The resolve is a beat of its own here (see `handover`), so it has to
+     finish before the flight starts. The app orb's own 0.8s would still
+     be running as the orb left. */
+  --orb-fade: 0.55s;
 }
 /* AppOrb scales its 200px stage by size/200 inline; override so the
    CORONA (400 units, the orb's true visual extent) spans exactly the hit
@@ -271,36 +372,297 @@
   }
 }
 
+/* One declaration, two animations - the soul, then the colour held back
+   until the soul has arrived. These were two rules, and because the
+   gate's orb IS the .app-orb, `.pl-gate .app-orb` (0,2,0) silently beat
+   `.pl-gate__orb` (0,1,0) and `animation` is a shorthand: the soul's
+   fade-in was reset away and never ran once. */
 .pl-gate__orb {
-  animation: pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-/* hold the colour back until the soul has arrived */
-.pl-gate .app-orb {
-  animation: pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
+  animation:
+    pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards,
+    pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
 }
 
 .pl-gate__lead,
 .pl-gate__label,
+.pl-gate__track,
 .pl-gate__hint {
   animation: pl-gate-words 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.05s backwards;
 }
 .pl-gate__label {
   animation-delay: 2.15s;
 }
+.pl-gate__track {
+  animation-delay: 2.2s;
+}
 .pl-gate__hint {
-  animation-delay: 2.25s;
+  animation-delay: 2.3s;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
-  .pl-gate .app-orb,
   .pl-gate__lead,
   .pl-gate__label,
+  .pl-gate__name,
+  .pl-gate__track,
   .pl-gate__hint {
     animation: none !important;
   }
   .pl-gate,
   .pl-gate * {
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
+  /* The site's orb waits for a flight that is no longer happening;
+     without this it would sit dark for the delay and then pop in. */
+  .pl3[data-gate="leaving"] .pl3-orb,
+  .pl3[data-gate="leaving"] .pl3-say {
+    transition-delay: 0s !important;
+  }
+}
+
+/* ── replay ───────────────────────────────────────────────────
+   Reopened from the header, not met on arrival. The whole arrival
+   timeline above is skipped: nobody should sit through a two-second
+   bloom they have already seen, least of all when all they wanted was
+   the other colour. --prism-a defaults to 1 on a prism orb, so dropping
+   the bloom leaves the ramp at full strength rather than blank.
+
+   The gate itself fades in instead - short, so it reads as a panel
+   opening rather than a second arrival. */
+@keyframes pl-gate-open {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.pl-gate[data-replay="1"] {
+  animation: pl-gate-open 0.26s ease backwards;
+}
+/* :not([data-taken]) is load-bearing - the handover's own gather runs on
+   .pl-gate__orb too, and killing every animation on a replay would kill
+   that one along with the arrival it was aimed at. */
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .app-orb,
+.pl-gate[data-replay="1"] .pl-gate__lead,
+.pl-gate[data-replay="1"] .pl-gate__label,
+.pl-gate[data-replay="1"] .pl-gate__track,
+.pl-gate[data-replay="1"] .pl-gate__hint {
+  animation: none;
+}
+
+/* Left without choosing. Nothing flies anywhere: the black simply lifts
+   off the site that was underneath it the whole time. */
+.pl-gate[data-closing="1"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+/* The way out. A replay must not be a one-way door either - the whole
+   point of it is that a choice can be taken back. Sits in the corner
+   rather than under the orb, where it would be one more thing to read
+   before choosing. */
+.pl-gate__close {
+  position: absolute;
+  top: clamp(14px, 3vh, 26px);
+  right: clamp(14px, 3vw, 30px);
+  z-index: 5;
+  padding: 9px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: var(--pl3-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+.pl-gate__close:hover {
+  color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.34);
+}
+.pl-gate__close:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 3px;
+}
+.pl-gate[data-taken="1"] .pl-gate__close {
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THREE WAYS TO CHOOSE - see gateMode.ts
+
+   A finger has no hover, and the gate above was built entirely out of
+   one. These are the three answers being tried against each other on a
+   real phone; two of them will be deleted, and this whole section with
+   them.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── the wheel's mark ─────────────────────────────────────────
+   The one fixed thing in a mechanic where everything else turns. It sits
+   just outside the rim - the ring's own band is finished by 43% of the
+   radius, so half the radius clears it - and the beam leaves from
+   underneath it, which is the point: the hand is at the bottom of the
+   screen and the colour it is choosing is at the top, uncovered. */
+.pl-gate__mark {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  z-index: 5;
+  width: 2px;
+  height: 15px;
+  margin: -7px 0 0 -1px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.92);
+  /* it lies inside its own beam, and white on light needs an edge */
+  box-shadow:
+    0 0 3px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+/* The bead above it wears the colour standing under the mark, so the
+   answer is legible without reading the word below the orb. */
+.pl-gate__mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--pick, #fff);
+  box-shadow: 0 0 10px 2px var(--pick, #fff);
+}
+
+/* ── the track ────────────────────────────────────────────────
+   The same spectrum unrolled. --pad insets the rail so the two end
+   colours sit ON the ends rather than half a thumb past them, and the
+   thumb is positioned by the same expression as the detents so they can
+   never drift apart. --thumb is a bare fraction, not a percentage,
+   because a percentage cannot be multiplied by one. */
+.pl-gate__track {
+  --pad: 16px;
+  position: relative;
+  z-index: 4;
+  width: min(340px, 84vw);
+  height: 48px;
+  /* The gate is a flex column, so `height` here is only a hint and a
+     short viewport squeezed the rail to nothing - a control with no
+     height, which is worse than one that is merely cramped. */
+  flex: none;
+  margin: clamp(2px, 1.2vh, 12px) 0 0;
+  touch-action: none;
+  cursor: pointer;
+}
+.pl-gate__track:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+.pl-gate__band {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 999px;
+  /* background-image comes from PRISM_LINEAR, so the bar and the orb are
+     painted from one list of stops rather than two that agree today */
+  opacity: 0.66;
+}
+.pl-gate__detent {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+.pl-gate__thumb {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--pad) + var(--thumb, 1) * (100% - 2 * var(--pad)));
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  background: var(--pick, #fff);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 18px 4px color-mix(in srgb, var(--pick, #fff) 55%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  /* no transition: it has to sit under the finger, not follow it */
+}
+
+/* ── room, and the right cursor ───────────────────────────────
+   The track costs about 60px of height that the orb was using, so the
+   orb gives it back. Everything else about the layout is unchanged. */
+.pl-gate[data-mode="track"] {
+  cursor: default;
+}
+.pl-gate[data-mode="track"] .pl-gate__hit {
+  width: min(380px, 66vw, 38vh);
+  cursor: default;
+}
+.pl-gate[data-mode="wheel"] {
+  cursor: grab;
+}
+.pl-gate[data-mode="wheel"]:active {
+  cursor: grabbing;
+}
+
+/* ── the switcher ─────────────────────────────────────────────
+   Only rendered while the three are being compared (`?gate` in the
+   address). It goes when they do. */
+/* Laid out in the column rather than pinned over it. Pinned to the
+   bottom it collided with the hint on a short viewport - a phone turned
+   sideways - and every padding that cleared it in one mode was too
+   little in another. In the flow it cannot overlap anything by
+   construction, and it is scaffolding: it does not have to be pretty. */
+.pl-gate__modes {
+  position: relative;
+  z-index: 6;
+  margin-top: clamp(12px, 3vh, 26px);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+.pl-gate__modes button {
+  padding: 7px 15px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--pl3-mono, ui-monospace, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+.pl-gate__modes button[data-on="1"] {
+  background: rgba(255, 255, 255, 0.88);
+  color: rgba(0, 0, 0, 0.82);
+}
+.pl-gate__modes button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 2px;
 }

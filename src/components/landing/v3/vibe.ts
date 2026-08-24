@@ -63,10 +63,15 @@ export function applyVibe(root: HTMLElement | null, vibe: Vibe) {
   // swings the baked-amber app screenshots onto this light
   root.style.setProperty("--v-rotate", `${vibe.shift}deg`);
   // Page text: near-white carrying just enough of the light to change its
-  // temperature, without dropping contrast on --void.
-  root.style.setProperty("--v-paper-rgb", mix([255, 253, 250], base, 0.09));
+  // temperature, without dropping contrast on --void. The anchor is a true
+  // white, not the warm off-white it used to be - that off-white was amber
+  // arriving by the back door, and it survived every colour choice.
+  root.style.setProperty("--v-paper-rgb", mix([255, 255, 255], base, 0.09));
   // Wireframe rules: the light, pulled well down toward the page's ash.
-  root.style.setProperty("--v-edge-rgb", mix(rgbOf(r.bright), [138, 128, 120], 0.34));
+  // The ash it is pulled toward is neutral for the same reason; under amber
+  // this lands within a point or two of the old warm anchor, and under the
+  // other four it is the difference between their hue and a muddied one.
+  root.style.setProperty("--v-edge-rgb", mix(rgbOf(r.bright), [130, 130, 130], 0.34));
 
   root.dataset.vibe = vibe.id;
 }

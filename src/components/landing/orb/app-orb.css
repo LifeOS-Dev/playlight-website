@@ -96,9 +96,13 @@
   --grp: 1;
   --prism-a: 1;
   --solid-a: 0;
+  /* How long the spectrum takes to resolve into the one hue. The gate
+     overrides it: there the resolve is a beat in its own right, and the
+     flight that follows must not start on top of it. */
+  --orb-fade: 0.8s;
   transition:
-    --prism-a 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-    --solid-a 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    --prism-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1),
+    --solid-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Only the gate sets data-mode; without it nothing below applies and the

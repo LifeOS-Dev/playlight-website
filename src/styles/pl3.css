@@ -28,10 +28,22 @@
      reaches the orb - see the SVG stops in LifeMap. */
   --ember-bright: var(--v-bright, #ffc95c);
   --filament: rgb(var(--paper-rgb));
-  /* Neutral by design and carrying documented contrast - left untinted so
-     the ratios below stay true whatever light is chosen. */
-  --ash: #a1978a; /* 7.4:1 on --void */
-  --ash-dim: #827a6f; /* 4.77:1 - the quietest this can go and stay AA */
+  /* The two quiet greys. Written in oklch so the lightness - and with it
+     the documented contrast on --void - is fixed, while the hue follows
+     the chosen light. The chroma is deliberately near zero: enough for the
+     grey to sit in the same air as the light, not enough to read as a
+     colour. Previously these were literal amber-tinted greys (#a1978a /
+     #827a6f, hue 75), which left every non-amber vibe with warm body copy. */
+  --ash: oklch(0.681 0.022 var(--glow-hue)); /* 6.98-7.10:1 on --void, over the five hues */
+  --ash-dim: oklch(
+    0.583 0.019 var(--glow-hue)
+  ); /* 4.74-4.83:1 - the quietest this can go and stay AA */
+  /* Unlit ink: what a motif looks like before the light reaches it. Dim
+     and low-chroma, but on the chosen hue rather than on amber's. Card
+     glass is written the same way inline - oklch(0.201 0.01 --glow-hue)
+     near, oklch(0.139 0.01 308) far - so a panel's faint warmth comes from
+     the light above it and its far edge stays on the neutral --void. */
+  --ash-pale: oklch(0.83 0.042 var(--glow-hue));
   --line: rgb(var(--edge-rgb) / 0.42);
   --line-soft: rgb(var(--edge-rgb) / 0.16);
   --horizon: 70%;
@@ -248,7 +260,11 @@
   width: 28%;
   height: 14%;
   transform: translate(-50%, 0);
-  background: radial-gradient(ellipse at 50% 0%, oklch(0.88 0.14 var(--glow-hue) / 0.2), transparent 70%);
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    oklch(0.88 0.14 var(--glow-hue) / 0.2),
+    transparent 70%
+  );
   filter: blur(8px);
   opacity: calc(var(--path-rush, 0) * 0.28);
   pointer-events: none;
@@ -521,6 +537,46 @@
   color: var(--filament);
 }
 
+/* ── The way back to the gate ──────────────────────────────────
+   The light you chose, worn small in the bar. It survives the 640px
+   cut below that hides the text links: the dot is the only route back
+   to the gate, and on a phone it is the only route at all.
+
+   The ring is drawn on the dot's own colour so it reads as one object
+   at 10px, and the whole control keeps a 34px box so it stays a legal
+   touch target while looking like a dot. */
+.pl3-nav__vibe {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: -12px -8px -12px 0;
+  border-radius: 50%;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.pl3-nav__vibe-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 0 0 1px rgb(var(--ember-rgb) / 0.34);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pl3-nav__vibe:hover .pl3-nav__vibe-dot {
+  transform: scale(1.18);
+  box-shadow:
+    0 0 0 1px rgb(var(--ember-rgb) / 0.6),
+    0 0 12px 2px rgb(var(--ember-rgb) / 0.45);
+}
+.pl3-nav__vibe:focus-visible {
+  outline: 2px solid rgb(var(--ember-rgb) / 0.6);
+  outline-offset: 1px;
+}
+
 @media (max-width: 640px) {
   .pl3-nav__links a,
   .pl3-nav__preview {
@@ -764,7 +820,11 @@
   padding: 26px 22px;
   /* On small screens the cards sit right where the orb is, so they need a
      real backdrop - otherwise the light bleeds through and eats the motif. */
-  background: linear-gradient(158deg, rgba(20, 16, 14, 0.72), rgba(9, 7, 11, 0.82));
+  background: linear-gradient(
+    158deg,
+    oklch(0.201 0.01 var(--glow-hue) / 0.72),
+    oklch(0.139 0.01 308 / 0.82)
+  );
   backdrop-filter: blur(7px);
   -webkit-backdrop-filter: blur(7px);
 }
@@ -848,7 +908,7 @@
 }
 
 .pl3-panel[data-side="problem"] .pl3-panel__motif {
-  color: rgba(216, 196, 170, 0.46);
+  color: oklch(0.83 0.042 var(--glow-hue) / 0.46);
 }
 
 .pl3-panel[data-side="solution"] .pl3-panel__motif {
@@ -1525,7 +1585,7 @@
   border-radius: 20px;
   background:
     radial-gradient(ellipse 90% 60% at 50% 0%, rgb(var(--ember-rgb) / 0.1), transparent 70%),
-    linear-gradient(160deg, rgba(22, 18, 15, 0.98), rgba(9, 7, 11, 0.99));
+    linear-gradient(160deg, oklch(0.201 0.01 var(--glow-hue) / 0.98), oklch(0.139 0.01 308 / 0.99));
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
   text-align: center;
 }

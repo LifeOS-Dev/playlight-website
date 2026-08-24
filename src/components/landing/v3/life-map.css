@@ -12,7 +12,7 @@
      than pushing it off the edge. */
   --ring-rx: clamp(190px, min(34vw, 50vw - 190px), 470px);
   --ring-ry: clamp(126px, 21vh, 232px);
-  --port: 34px;
+  --port: 44px;
 }
 
 /* ── The filaments ─────────────────────────────────────────────
@@ -168,7 +168,11 @@
   --dim: 0.45;
 }
 
-/* The port: where the filament lands. A lens, not a button. */
+/* The port: where the filament lands. A lens, not a button.
+   The lens is sized off the glyph, not the other way round: at half the
+   port the diagram inside it was ~17px, which is a texture, not a reading.
+   The glyph is the one thing here that has to be understood at a glance, so
+   it takes 0.62 of a wider port and the ring gives way to it. */
 .pl3-map__port {
   display: grid;
   place-items: center;
@@ -189,8 +193,8 @@
 }
 
 .pl3-map__port svg {
-  width: calc(var(--port) * 0.5);
-  height: calc(var(--port) * 0.5);
+  width: calc(var(--port) * 0.62);
+  height: calc(var(--port) * 0.62);
 }
 
 .pl3-map__label {
@@ -295,7 +299,7 @@
        ring cleared them on one phone and sat under them on the next. */
     --ring-rx: clamp(112px, min(37vw, 50vw - 70px), 220px);
     --ring-ry: clamp(112px, 18%, 180px);
-    --port: 29px;
+    --port: 36px;
   }
 
   /* Every word above its glyph. The bottom of the frame belongs to the
@@ -330,7 +334,7 @@
 @media (max-width: 820px) and (max-height: 700px) {
   .pl3-map {
     --ring-ry: clamp(104px, 17.7%, 140px);
-    --port: 22px;
+    --port: 27px;
   }
 
   .pl3-map__label {
