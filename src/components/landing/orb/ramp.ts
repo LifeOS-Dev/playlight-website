@@ -178,7 +178,7 @@ const CONIC_STOPS: Array<[pos: number, rgb: [number, number, number]]> = [
  * The torch uses this so the light leaving the rim is the same hue as the
  * rim it leaves from, rather than the nearest named vibe.
  */
-export function hueAtAngle(angle: number): string {
+function sampleConic(angle: number): [number, number, number] {
   const phi = 90 - angle;
   const p = ((((phi + 20) / 360) % 1) + 1) % 1;
   for (let i = 0; i < CONIC_STOPS.length - 1; i++) {
@@ -187,11 +187,34 @@ export function hueAtAngle(angle: number): string {
     if (p >= p0 && p <= p1) {
       const t = (p - p0) / (p1 - p0);
       const mix = (x: number, y: number) => Math.round(x + (y - x) * t);
-      return `rgb(${mix(a[0], b[0])},${mix(a[1], b[1])},${mix(a[2], b[2])})`;
+      return [mix(a[0], b[0]), mix(a[1], b[1]), mix(a[2], b[2])];
     }
   }
-  return `rgb(${CONIC_STOPS[0][1].join(",")})`;
+  return CONIC_STOPS[0][1];
 }
+
+export function hueAtAngle(angle: number): string {
+  return `rgb(${sampleConic(angle).join(",")})`;
+}
+
+/**
+ * The same colour as a bare "r g b" triple, for anything that needs to
+ * vary its alpha.
+ *
+ * The torch used to do that with color-mix(). The production CSS
+ * pipeline compiles color-mix() into a flat, fully opaque fallback plus
+ * an @supports block carrying the real thing - and any browser that
+ * fails that test gets the fallback, which for the beam meant a solid
+ * wedge with hard edges instead of a feathered one. A plain rgb() with a
+ * slash alpha needs no fallback and cannot be compiled into one.
+ */
+export const hueTripleAtAngle = (angle: number): string => sampleConic(angle).join(" ");
+
+/** A ramp colour as the same bare triple. */
+export const tripleOf = (hex: string): string => {
+  const n = parseInt(hex.slice(1), 16);
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+};
 
 /** Shortest signed distance between two angles, in degrees. */
 export const angleDelta = (a: number, b: number) => {

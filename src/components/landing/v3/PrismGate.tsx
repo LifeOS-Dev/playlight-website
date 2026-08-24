@@ -6,9 +6,11 @@ import {
   VIBES,
   angleForT,
   hueAtAngle,
+  hueTripleAtAngle,
   nearestVibe,
   spinFor,
   tForAngle,
+  tripleOf,
   type Vibe,
   type VibeId,
 } from "@/components/landing/orb/ramp";
@@ -191,6 +193,13 @@ export function PrismGate({
     const fit = () => {
       const w = node.getBoundingClientRect().width || FIELD;
       node.style.setProperty("--s", String(w / FIELD));
+      /* The torch is drawn at half size and scaled back up, so it needs
+         twice this. It gets its own property rather than a calc() in the
+         transform: `scale(calc(var(--s) * 2))` silently resolved to the
+         fallback in the production CSS pipeline and left the beam frozen
+         at the wrong size, while a plain `scale(var(--x))` has always
+         worked. Two numbers from one measurement cannot drift. */
+      node.style.setProperty("--s2", String((w / FIELD) * 2));
     };
     fit();
     const ro = new ResizeObserver(fit);
@@ -240,6 +249,8 @@ export function PrismGate({
 
   const paint = React.useCallback((deg: number) => {
     root.current?.style.setProperty("--pick", hueAtAngle(deg));
+    // the same colour as a bare triple, for the beam's alpha steps
+    root.current?.style.setProperty("--pick-rgb", hueTripleAtAngle(deg));
     const i = nearestVibe(deg);
     idx.current = i;
     setActive(i);
@@ -512,6 +523,13 @@ export function PrismGate({
     commit();
   };
 
+  /**
+   * The browser took the gesture away - an edge swipe, a system back.
+   * The drag is over, but the finger may well still be on the glass and
+   * no further events are coming for it, so the preview is LEFT standing
+   * rather than cleared: a colour held under a finger that is still
+   * there reads as paused, and a blank orb reads as broken.
+   */
   const onCancel = (e: React.PointerEvent) => {
     release(e);
   };
@@ -574,6 +592,7 @@ export function PrismGate({
     if (taken) return;
     halt();
     root.current?.style.setProperty("--pick", vibe.ramp.base);
+    root.current?.style.setProperty("--pick-rgb", tripleOf(vibe.ramp.base));
     // measure before the handover begins, while everything is still in place
     flyToSiteOrb();
     setTaken(vibe);
@@ -610,8 +629,18 @@ export function PrismGate({
       data-replay={replay ? "1" : "0"}
       data-closing={closing ? "1" : "0"}
       onPointerMove={onMove}
-      onPointerLeave={() => {
-        // a captured drag has not left anything - it is still steering
+      onPointerLeave={(e) => {
+        /* Only a cursor can leave and still be there to come back, and
+           only a cursor was ever previewing without pressing.
+
+           A finger that "leaves" has lifted, and pointerup has already
+           answered for that. Clearing here as well threw the preview
+           away mid-drag: the browser cancels the pointer when a gesture
+           strays near a screen edge, which drops `drag` and lets this
+           fire while the finger is still down and still moving - the
+           name and the beam going out under a hand that had not moved
+           off anything. */
+        if (e.pointerType !== "mouse") return;
         if (!taken && !drag.current && mode === "dial") clear();
       }}
       onPointerDown={onDown}

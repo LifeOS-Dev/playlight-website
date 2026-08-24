@@ -20,6 +20,7 @@
      claim one mid-choice. There is nothing to scroll under a fixed,
      full-screen gate, so nothing is given up by taking them. */
   touch-action: none;
+  overscroll-behavior: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -186,6 +187,8 @@
   border-radius: 50%;
   touch-action: none;
   --s: 1;
+  /* the torch's own scale - see the note beside `fit` in PrismGate.tsx */
+  --s2: 2;
 }
 .pl-gate__hit:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.45);
@@ -222,23 +225,38 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 1800px;
-  height: 1800px;
-  margin: -900px 0 0 -900px;
+  /* Drawn at half size and scaled back up by two.
+     It used to be an 1800px square - 3.2 million pixels carrying a conic,
+     a mask AND a 20px blur, re-rasterised on every pointermove. A phone
+     could not keep up: most frames showed no beam at all, and the ones
+     that did came back torn into hard-edged rectangles where the layer
+     had only partly rasterised. Quartering the pixel count fixes both,
+     and scaling by two afterwards means nothing about the look changes
+     (the blur below is halved to match). */
+  width: 900px;
+  height: 900px;
+  margin: -450px 0 0 -450px;
   pointer-events: none;
   z-index: 2;
   transform-origin: 50% 50%;
-  transform: scale(var(--s, 1)) rotate(var(--torch-deg, 0deg));
+  transform: scale(var(--s2, 2)) rotate(var(--torch-deg, 0deg));
+  /* keep it on its own layer, so aiming is a composite and not a repaint */
+  will-change: transform;
+  /* rgb() with a slash alpha, NOT color-mix(): the build compiles
+     color-mix() down to a flat opaque fallback plus an @supports block,
+     and a browser that fails that test drew this beam as a solid wedge
+     with hard edges rather than a feathered one. This needs no fallback,
+     so there is no second version of it to go wrong. */
   background: conic-gradient(
     from -42deg at 50% 50%,
     transparent 0deg,
-    color-mix(in srgb, var(--pick, #fff) 7%, transparent) 8deg,
-    color-mix(in srgb, var(--pick, #fff) 32%, transparent) 20deg,
-    color-mix(in srgb, var(--pick, #fff) 70%, transparent) 32deg,
-    color-mix(in srgb, var(--pick, #fff) 95%, transparent) 42deg,
-    color-mix(in srgb, var(--pick, #fff) 70%, transparent) 52deg,
-    color-mix(in srgb, var(--pick, #fff) 32%, transparent) 64deg,
-    color-mix(in srgb, var(--pick, #fff) 7%, transparent) 76deg,
+    rgb(var(--pick-rgb, 255 255 255) / 7%) 8deg,
+    rgb(var(--pick-rgb, 255 255 255) / 32%) 20deg,
+    rgb(var(--pick-rgb, 255 255 255) / 70%) 32deg,
+    rgb(var(--pick-rgb, 255 255 255) / 95%) 42deg,
+    rgb(var(--pick-rgb, 255 255 255) / 70%) 52deg,
+    rgb(var(--pick-rgb, 255 255 255) / 32%) 64deg,
+    rgb(var(--pick-rgb, 255 255 255) / 7%) 76deg,
     transparent 84deg,
     transparent 360deg
   );
@@ -247,20 +265,21 @@
      .07 -> .02), so a beam that only reached full strength out there
      appeared to start out of blackness instead of out of the orb. */
   --tm: radial-gradient(
-    circle 900px at 50% 50%,
+    circle 450px at 50% 50%,
     transparent 0px,
-    transparent 40px,
-    rgba(0, 0, 0, 0.62) 62px,
-    rgba(0, 0, 0, 0.96) 86px,
-    #000 150px,
-    rgba(0, 0, 0, 0.88) 380px,
-    rgba(0, 0, 0, 0.54) 540px,
-    rgba(0, 0, 0, 0.2) 690px,
-    transparent 830px
+    transparent 20px,
+    rgba(0, 0, 0, 0.62) 31px,
+    rgba(0, 0, 0, 0.96) 43px,
+    #000 75px,
+    rgba(0, 0, 0, 0.88) 190px,
+    rgba(0, 0, 0, 0.54) 270px,
+    rgba(0, 0, 0, 0.2) 345px,
+    transparent 415px
   );
   -webkit-mask-image: var(--tm);
   mask-image: var(--tm);
-  filter: blur(20px);
+  /* half of the old 20px, because the whole layer is scaled up by two */
+  filter: blur(10px);
   opacity: 0;
   /* short and linear - the beam sits under the cursor, it doesn't chase it */
   transition:
