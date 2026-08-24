@@ -67,7 +67,7 @@ export const FACES: Face[] = [
     n: 6,
     name: "Walking alone",
     quote: "This is a long road to walk alone.",
-    answer: "Ash walks with you. You still steer.",
+    answer: "Light walks with you. You still steer.",
     motif: "companion",
   },
 ];
@@ -113,7 +113,7 @@ export const FAQS = [
   },
   {
     q: "What does the AI actually do?",
-    a: "Ash reads the life data you've already given it and surfaces what's relevant now - a focus, a pattern, a memory you'd have forgotten. It suggests. You decide. Every insight can be asked why.",
+    a: "Light reads the life data you've already given it and surfaces what's relevant now - a focus, a pattern, a memory you'd have forgotten. It suggests. You decide. Every insight can be asked why.",
   },
   {
     q: "I've bounced off tools like this before.",

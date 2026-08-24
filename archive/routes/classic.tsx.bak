@@ -1,0 +1,84 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { Orb } from "@/components/landing/Orb";
+import { SpotlightBackground } from "@/components/landing/SpotlightBackground";
+import { Apple, Play } from "lucide-react";
+
+/** Archived previous homepage — kept for reference while Claude v3 is main. */
+export const Route = createFileRoute("/classic")({
+  head: () => ({
+    meta: [
+      { title: "PlayLight (classic) — archive" },
+      { name: "robots", content: "noindex, nofollow" },
+      {
+        name: "description",
+        content: "Archived previous Playlight landing page.",
+      },
+    ],
+  }),
+  component: ClassicIndex,
+});
+
+function ClassicIndex() {
+  return (
+    <div className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
+      <SpotlightBackground />
+
+      <main className="relative z-10 flex h-full w-full flex-col items-center justify-center px-6 text-center">
+        <Orb size={160} />
+
+        <h1 className="mt-10 text-5xl font-light tracking-tight text-foreground md:text-7xl">
+          play<span className="text-accent">light</span>
+        </h1>
+
+        <p className="mt-5 max-w-md text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+          A personalized OS to help you understand, organize, and play your life.
+        </p>
+
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
+          <a
+            href="#"
+            className="inline-flex items-center gap-3 rounded-full bg-foreground px-5 py-3 text-background transition-transform hover:-translate-y-0.5"
+          >
+            <Apple className="h-6 w-6" />
+            <span className="text-left leading-tight">
+              <span className="block font-mono text-[9px] uppercase tracking-[0.25em] opacity-70">
+                Download on the
+              </span>
+              <span className="block text-sm font-medium">App Store</span>
+            </span>
+          </a>
+          <a
+            href="#"
+            className="inline-flex items-center gap-3 rounded-full bg-foreground px-5 py-3 text-background transition-transform hover:-translate-y-0.5"
+          >
+            <Play className="h-6 w-6 fill-current" />
+            <span className="text-left leading-tight">
+              <span className="block font-mono text-[9px] uppercase tracking-[0.25em] opacity-70">
+                Get it on
+              </span>
+              <span className="block text-sm font-medium">Google Play</span>
+            </span>
+          </a>
+        </div>
+
+        <Link
+          to="/"
+          className="mt-8 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+        >
+          ← Back to current homepage
+        </Link>
+
+        <div className="mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <Link to="/privacy" className="transition-colors hover:text-foreground">
+            Privacy Policy
+          </Link>
+          <span aria-hidden className="h-1 w-1 rounded-full bg-border" />
+          <Link to="/support" className="transition-colors hover:text-foreground">
+            Support
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
+}

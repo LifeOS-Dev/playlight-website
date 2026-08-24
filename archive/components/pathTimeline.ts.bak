@@ -1,0 +1,119 @@
+import { FACES } from "./faces";
+
+export type PathKind = "depart" | "problem" | "solution" | "philosophy";
+
+/** Orb stays on the road centre — only depth (y / scale) changes. */
+export type OrbPose = {
+  y: number;
+  scale: number;
+  i: number;
+  grid: number;
+};
+
+export type PathStage = {
+  id: string;
+  kind: PathKind;
+  weight: number;
+  orb: OrbPose;
+  side?: "left" | "right";
+  faceIndex?: number;
+};
+
+const CENTER_X = 0.5;
+
+/** Orb sits under the reading stage — a lamp, not the content. */
+const VIEW_ORB: OrbPose = { y: 0.78, scale: 0.72, i: 1.05, grid: 0.9 };
+
+const coreStages: PathStage[] = FACES.flatMap((face, i) => {
+  const problemSide: "left" | "right" = i % 2 === 0 ? "left" : "right";
+  const solutionSide: "left" | "right" =
+    problemSide === "left" ? "right" : "left";
+  const sink = i * 0.008;
+  return [
+    {
+      id: `problem-${face.id}`,
+      kind: "problem" as const,
+      weight: 1,
+      orb: {
+        y: VIEW_ORB.y + sink,
+        scale: VIEW_ORB.scale - i * 0.01,
+        i: 1.05,
+        grid: 0.92,
+      },
+      side: problemSide,
+      faceIndex: i,
+    },
+    {
+      id: `solution-${face.id}`,
+      kind: "solution" as const,
+      weight: 1,
+      orb: {
+        y: VIEW_ORB.y + sink + 0.01,
+        scale: VIEW_ORB.scale - i * 0.01 - 0.02,
+        i: 1.08,
+        grid: 0.94,
+      },
+      side: solutionSide,
+      faceIndex: i,
+    },
+  ];
+});
+
+/**
+ * Scroll path after idle.
+ * Depart: fly through the hero (zoom past) → Core Four reading stage → philosophy.
+ * Idle (pre-scroll): hero + auto-cycling life facets on the road.
+ */
+export const PATH: PathStage[] = [
+  {
+    id: "depart",
+    kind: "depart",
+    weight: 0.7,
+    // Drift deeper into the road as we pass the hero
+    orb: { y: 0.76, scale: 0.74, i: 1.06, grid: 0.96 },
+  },
+  ...coreStages,
+  {
+    id: "philosophy",
+    kind: "philosophy",
+    weight: 0.8,
+    orb: { y: 0.7, scale: 0.64, i: 1.06, grid: 0.5 },
+  },
+];
+
+export const PATH_WEIGHT = PATH.reduce((s, st) => s + st.weight, 0);
+
+export const IDLE_ORB: OrbPose = {
+  y: 0.7,
+  scale: 0.84,
+  i: 1.05,
+  grid: 1,
+};
+
+export const ORB_X = CENTER_X;
+
+export const PATH_RANGES = (() => {
+  let cursor = 0;
+  return PATH.map((stage) => {
+    const start = cursor / PATH_WEIGHT;
+    cursor += stage.weight;
+    const end = cursor / PATH_WEIGHT;
+    return { stage, start, end };
+  });
+})();
+
+export function pathAt(p: number) {
+  const t = p <= 0 ? 0 : p >= 1 ? 1 : p;
+  let idx = PATH_RANGES.length - 1;
+  for (let i = 0; i < PATH_RANGES.length; i += 1) {
+    if (t < PATH_RANGES[i].end || i === PATH_RANGES.length - 1) {
+      idx = i;
+      break;
+    }
+  }
+  const cur = PATH_RANGES[idx];
+  const next = PATH_RANGES[Math.min(PATH_RANGES.length - 1, idx + 1)];
+  const span = cur.end - cur.start;
+  const local = span > 0 ? (t - cur.start) / span : 0;
+  return { idx, local, cur: cur.stage, next: next.stage, progress: t };
+}

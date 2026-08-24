@@ -1,0 +1,186 @@
+import * as React from "react";
+import { FacetGlyph } from "./glyphs";
+import type { FacetId } from "./faces";
+import "./facet-map.css";
+
+/**
+ * Local-mock illustration: a life bus.
+ *
+ * Option one sat the facets on a halo of rays - too much shrine, not enough
+ * system. This keeps the same eight facets and the same lamp, but routes them
+ * on orthogonal traces (the language of the second reference) and lights the
+ * hovered branch the way the third reference lights a card.
+ */
+
+const VB = { w: 1200, h: 560 };
+const LAMP = { x: 600, y: 280 };
+const LEFT_X = 210;
+const RIGHT_X = 990;
+
+type Node = {
+  id: FacetId;
+  label: string;
+  side: "left" | "right";
+  x: number;
+  y: number;
+  /** Where the vertical drop meets the spine */
+  jx: number;
+  line: string;
+  kicker: string;
+};
+
+const NODES: Node[] = [
+  { id: "health", label: "Health", side: "left", x: LEFT_X, y: 64, jx: 300, line: "Sleep ran short. The walk still happened.", kicker: "Today" },
+  { id: "work", label: "Work", side: "left", x: LEFT_X, y: 168, jx: 360, line: "Two projects are moving. One is waiting on you.", kicker: "Your projects" },
+  { id: "people", label: "People", side: "left", x: LEFT_X, y: 392, jx: 420, line: "Three people hold context you keep having to rebuild.", kicker: "Your circle" },
+  { id: "habits", label: "Habits", side: "left", x: LEFT_X, y: 496, jx: 480, line: "Four days on. The streak is not the point.", kicker: "Practice" },
+  { id: "mind", label: "Mind", side: "right", x: RIGHT_X, y: 64, jx: 900, line: "Attention is thin. One thing would help.", kicker: "Focus" },
+  { id: "wealth", label: "Wealth", side: "right", x: RIGHT_X, y: 168, jx: 840, line: "The curve is up. You have not looked this week.", kicker: "Trajectory" },
+  { id: "time", label: "Time", side: "right", x: RIGHT_X, y: 392, jx: 780, line: "Tuesday vanished into meetings that did not need you.", kicker: "This week" },
+  { id: "notes", label: "Notes", side: "right", x: RIGHT_X, y: 496, jx: 720, line: "The thought from March is still in there.", kicker: "Kept" },
+];
+
+const wire = (n: Node) =>
+  `M ${LAMP.x} ${LAMP.y} H ${n.jx} V ${n.y} H ${n.x}`;
+
+const pct = (n: number, of: number) => `${((n / of) * 100).toFixed(3)}%`;
+
+export function FacetMap() {
+  const root = React.useRef<HTMLDivElement | null>(null);
+  const lamp = React.useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = React.useState<FacetId | null>(null);
+  const current = NODES.find((n) => n.id === active) ?? null;
+
+  React.useEffect(() => {
+    const node = lamp.current;
+    const page = node?.closest(".pl3") as HTMLElement | null;
+    if (!node || !page) return;
+
+    const place = () => {
+      const r = node.getBoundingClientRect();
+      page.style.setProperty("--orb-x", `${(r.left + r.width / 2).toFixed(1)}px`);
+      page.style.setProperty("--orb-y", `${(r.top + r.height / 2).toFixed(1)}px`);
+    };
+
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(node);
+    window.addEventListener("resize", place);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", place);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={root}
+      className="pl3-map"
+      data-on={active || undefined}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "touch") return;
+        if (!root.current?.contains(document.activeElement)) setActive(null);
+      }}
+    >
+      <div className="pl3-map__stage">
+      <svg
+        className="pl3-map__svg"
+        viewBox={`0 0 ${VB.w} ${VB.h}`}
+        fill="none"
+        aria-hidden
+      >
+        <line
+          className="pl3-map__spine"
+          x1="248"
+          y1={LAMP.y}
+          x2="952"
+          y2={LAMP.y}
+        />
+        <line
+          className="pl3-map__spine-hot"
+          x1="548"
+          y1={LAMP.y}
+          x2="652"
+          y2={LAMP.y}
+        />
+
+        {NODES.map((n) => (
+          <line
+            key={`tick-${n.id}`}
+            className="pl3-map__tick"
+            data-lit={active === n.id ? "" : undefined}
+            x1={n.jx}
+            y1={LAMP.y - 7}
+            x2={n.jx}
+            y2={LAMP.y + 7}
+          />
+        ))}
+
+        {NODES.map((n, i) => {
+          const d = wire(n);
+          const lit = active === n.id;
+          return (
+            <g key={n.id} className="pl3-map__branch" data-lit={lit ? "" : undefined}>
+              <path className="pl3-map__wire" d={d} />
+              <path
+                className="pl3-map__pulse"
+                d={d}
+                pathLength={1}
+                style={{ animationDelay: `${i * 0.55}s` }}
+              />
+              <circle className="pl3-map__via" cx={n.jx} cy={LAMP.y} r="2.2" />
+              <circle className="pl3-map__port" cx={n.x} cy={n.y} r="2.4" />
+            </g>
+          );
+        })}
+      </svg>
+
+      <div ref={lamp} className="pl3-map__lamp" aria-hidden>
+        <span className="pl3-map__lamp-glow" />
+        <span className="pl3-map__lamp-ring" />
+        <span className="pl3-map__lamp-core" />
+      </div>
+
+      {NODES.map((n) => (
+        <button
+          key={n.id}
+          type="button"
+          className="pl3-map__node"
+          data-side={n.side}
+          data-lit={active === n.id ? "" : undefined}
+          style={
+            {
+              "--nx": pct(n.x, VB.w),
+              "--ny": pct(n.y, VB.h),
+            } as React.CSSProperties
+          }
+          onPointerEnter={() => setActive(n.id)}
+          onFocus={() => setActive(n.id)}
+          aria-pressed={active === n.id}
+        >
+          <span className="pl3-map__glyph">
+            <FacetGlyph id={n.id} />
+          </span>
+          <span className="pl3-map__label">{n.label}</span>
+        </button>
+      ))}
+      </div>
+
+      <div className="pl3-map__readout" aria-live="polite">
+        {current ? (
+          <>
+            <p className="pl3-map__tag">{current.label}</p>
+            <p className="pl3-map__line">{current.line}</p>
+            <p className="pl3-map__kicker">{current.kicker}</p>
+          </>
+        ) : (
+          <p className="pl3-map__idle">A life, wired as one system.</p>
+        )}
+      </div>
+
+      <p className="pl3-map__hint" aria-hidden>
+        Hover a facet
+      </p>
+    </div>
+  );
+}

@@ -1,0 +1,76 @@
+import * as React from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { LightField } from "@/components/landing/v3/LightField";
+import { SiteHeader } from "@/components/landing/v3/SiteHeader";
+import { GetPlaylightPanel } from "@/components/landing/v3/TryToday";
+import { FacetMap } from "@/components/landing/v3/FacetMap";
+import { pageMeta } from "@/seo";
+
+/**
+ * Local illustration sandbox. The live homepage is untouched.
+ * Open /mock, hover the facets, then we port what works.
+ */
+export const Route = createFileRoute("/mock")({
+  head: () => ({
+    meta: [
+      ...pageMeta({
+        path: "/mock",
+        title: "Playlight - illustration mock",
+        description: "Local sandbox for the landing illustration.",
+      }),
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: MockPage,
+});
+
+function MockPage() {
+  return (
+    <div
+      className="pl3"
+      data-mock
+      style={
+        {
+          "--orb-y": "58vh",
+          "--orb-x": "50vw",
+          "--orb-i": "0.38",
+          "--orb-scale": "0.42",
+          "--grid-o": "0.88",
+          "--horizon": "72%",
+          "--road-speed": "7",
+        } as React.CSSProperties
+      }
+    >
+      <LightField />
+
+      <SiteHeader />
+
+      <main className="pl3-main">
+        <section className="pl3-mock-hero" aria-label="Playlight - life system">
+          <div className="pl3-mock-copy">
+            <h1>playlight</h1>
+            <p>Your personalized OS to help you understand, organize, and play life.</p>
+          </div>
+
+          <FacetMap />
+
+          <span className="pl3-mock-cue" aria-hidden />
+        </section>
+
+        <section className="pl3-mock-after" aria-hidden>
+          <p>
+            The journey starts here.
+            <span>Scroll - not built in this mock</span>
+          </p>
+        </section>
+      </main>
+
+      <Link to="/" className="pl3-mock-badge">
+        local mock · live site
+      </Link>
+
+      <GetPlaylightPanel />
+    </div>
+  );
+}

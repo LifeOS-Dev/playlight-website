@@ -1,0 +1,463 @@
+/* Life bus - local mock illustration. Scoped under .pl3-map. */
+
+.pl3-map {
+  --map-wire: rgba(222, 176, 112, 0.4);
+  --map-wire-dim: rgba(222, 176, 112, 0.12);
+  position: relative;
+  width: min(1100px, 100%);
+  margin-inline: auto;
+}
+
+.pl3-map__stage {
+  position: relative;
+  aspect-ratio: 1200 / 560;
+  overflow: visible;
+}
+
+.pl3-map__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pl3-map__spine {
+  stroke: var(--map-wire);
+  stroke-width: 1.15;
+}
+
+.pl3-map__spine-hot {
+  stroke: rgba(255, 201, 92, 0.7);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.pl3-map__tick {
+  stroke: var(--map-wire);
+  stroke-width: 1.2;
+  transition: stroke 0.35s ease;
+}
+
+.pl3-map__tick[data-lit] {
+  stroke: var(--ember);
+}
+
+.pl3-map__wire {
+  stroke: var(--map-wire);
+  stroke-width: 1;
+  transition:
+    stroke 0.35s ease,
+    stroke-width 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.pl3-map__pulse {
+  stroke: #ffc95c;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 0.07 0.93;
+  opacity: 0.45;
+  animation: pl3-map-pulse 5.4s linear infinite;
+}
+
+.pl3-map__via,
+.pl3-map__port {
+  fill: rgba(255, 174, 71, 0.55);
+  transition: fill 0.35s ease;
+}
+
+.pl3-map[data-on] .pl3-map__branch:not([data-lit]) .pl3-map__wire {
+  stroke: var(--map-wire-dim);
+}
+
+.pl3-map[data-on] .pl3-map__branch:not([data-lit]) .pl3-map__pulse,
+.pl3-map[data-on] .pl3-map__branch:not([data-lit]) .pl3-map__via,
+.pl3-map[data-on] .pl3-map__branch:not([data-lit]) .pl3-map__port {
+  opacity: 0.18;
+}
+
+.pl3-map__branch[data-lit] .pl3-map__wire {
+  stroke: var(--ember);
+  stroke-width: 1.35;
+}
+
+.pl3-map__branch[data-lit] .pl3-map__pulse {
+  opacity: 1;
+  stroke: #fff4e2;
+  stroke-width: 2.2;
+  animation-duration: 1.6s;
+}
+
+.pl3-map__branch[data-lit] .pl3-map__via,
+.pl3-map__branch[data-lit] .pl3-map__port {
+  fill: var(--filament);
+}
+
+@keyframes pl3-map-pulse {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ── Lamp: a filament, not a sun ───────────────────────────── */
+
+.pl3-map__lamp {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 58px;
+  height: 58px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pl3-map__lamp-glow,
+.pl3-map__lamp-ring,
+.pl3-map__lamp-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pl3-map__lamp-glow {
+  width: 88px;
+  height: 88px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 174, 71, 0.16) 0%,
+    rgba(255, 174, 71, 0.05) 42%,
+    transparent 70%
+  );
+  transition: opacity 0.4s ease;
+}
+
+.pl3-map[data-on] .pl3-map__lamp-glow {
+  opacity: 0.7;
+}
+
+.pl3-map__lamp-ring {
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(
+    circle,
+    transparent 42%,
+    rgba(255, 201, 92, 0.55) 58%,
+    rgba(255, 163, 43, 0.2) 78%,
+    transparent 100%
+  );
+  animation: pl3-map-ring 5.2s ease-in-out infinite;
+}
+
+.pl3-map__lamp-core {
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #ffffff 0%, #fff4e2 55%, rgba(255, 244, 226, 0) 100%);
+  animation: pl3-map-core 5.2s ease-in-out infinite;
+}
+
+@keyframes pl3-map-ring {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes pl3-map-core {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0.88;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* ── Nodes ─────────────────────────────────────────────────── */
+
+.pl3-map__node {
+  position: absolute;
+  left: var(--nx);
+  top: var(--ny);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px 7px 11px;
+  border: 1px solid rgba(222, 176, 112, 0.22);
+  border-radius: 999px;
+  background: rgba(7, 6, 10, 0.62);
+  color: rgba(255, 174, 71, 0.62);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease,
+    opacity 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.pl3-map__node[data-side="left"] {
+  transform: translate(calc(-100% - 10px), -50%);
+}
+
+.pl3-map__node[data-side="right"] {
+  transform: translate(10px, -50%);
+}
+
+.pl3-map[data-on] .pl3-map__node:not([data-lit]) {
+  opacity: 0.32;
+}
+
+.pl3-map__node[data-lit],
+.pl3-map__node:hover,
+.pl3-map__node:focus-visible {
+  color: var(--ember);
+  border-color: rgba(255, 174, 71, 0.72);
+  background: rgba(20, 14, 10, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 174, 71, 0.12),
+    0 0 22px rgba(255, 174, 71, 0.12);
+  opacity: 1;
+}
+
+.pl3-map__glyph {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.pl3-map__glyph svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pl3-map__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ── Readout ───────────────────────────────────────────────── */
+
+.pl3-map__readout {
+  position: relative;
+  z-index: 4;
+  width: min(28rem, 86%);
+  min-height: 4.6rem;
+  margin: 0.4rem auto 0;
+  text-align: center;
+  pointer-events: none;
+}
+
+.pl3-map__tag,
+.pl3-map__kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.pl3-map__kicker {
+  margin-top: 8px;
+  color: var(--ash-dim);
+}
+
+.pl3-map__line {
+  margin-top: 6px;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 2.1vw, 1.45rem);
+  line-height: 1.3;
+  color: var(--filament);
+  text-wrap: balance;
+}
+
+.pl3-map__idle {
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.7vw, 1.2rem);
+  color: var(--ash);
+}
+
+.pl3-map__hint {
+  position: absolute;
+  right: 0;
+  bottom: 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.pl3-map[data-on] .pl3-map__hint {
+  opacity: 0.28;
+}
+
+/* ── Mock page chrome (homepage is untouched) ──────────────── */
+
+.pl3-mock-hero {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: clamp(88px, 11vh, 128px) clamp(18px, 4vw, 46px) 28px;
+}
+
+.pl3-mock-copy {
+  text-align: center;
+  animation: pl3-rise 1.1s 0.15s cubic-bezier(0.16, 0.8, 0.24, 1) both;
+}
+
+.pl3-mock-copy h1 {
+  font-size: min(clamp(2.4rem, 7vw, 4.4rem), 10vh);
+  font-weight: 200;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: var(--filament);
+}
+
+.pl3-mock-copy p {
+  margin: 12px auto 0;
+  max-width: 30rem;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.9vw, 1.35rem);
+  line-height: 1.4;
+  color: var(--filament);
+  text-wrap: balance;
+}
+
+.pl3-mock-hero .pl3-map {
+  flex: 1;
+  margin-top: clamp(8px, 2vh, 22px);
+  animation: pl3-rise 1.1s 0.4s cubic-bezier(0.16, 0.8, 0.24, 1) both;
+}
+
+.pl3-mock-cue {
+  display: block;
+  width: 1px;
+  height: 36px;
+  margin: 8px auto 0;
+  background: linear-gradient(to bottom, var(--line), transparent);
+  animation: pl3-road-cue 2.6s ease-in-out infinite;
+}
+
+.pl3-mock-after {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  min-height: 42vh;
+  padding: 48px 24px 80px;
+  text-align: center;
+}
+
+.pl3-mock-after p {
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 200;
+  font-size: clamp(1.4rem, 3.4vw, 2.2rem);
+  color: var(--ash);
+}
+
+.pl3-mock-after span {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+}
+
+.pl3-mock-badge {
+  position: fixed;
+  left: clamp(18px, 4vw, 46px);
+  bottom: 18px;
+  z-index: 40;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  transition: color 0.3s;
+}
+
+.pl3-mock-badge:hover {
+  color: var(--filament);
+}
+
+@media (max-width: 860px) {
+  .pl3-map__svg,
+  .pl3-map__hint {
+    display: none;
+  }
+
+  .pl3-map__stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    aspect-ratio: auto;
+    padding-top: 5.6rem;
+  }
+
+  .pl3-map__lamp {
+    top: 2.6rem;
+    width: 48px;
+    height: 48px;
+    transform: translate(-50%, 0);
+  }
+
+  .pl3-map__lamp-glow {
+    width: 96px;
+    height: 96px;
+  }
+
+  .pl3-map__node,
+  .pl3-map__node[data-side="left"],
+  .pl3-map__node[data-side="right"] {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .pl3-map__readout {
+    width: 100%;
+    margin-top: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl3-map__pulse,
+  .pl3-map__lamp-ring,
+  .pl3-map__lamp-core,
+  .pl3-mock-cue,
+  .pl3-mock-copy,
+  .pl3-mock-hero .pl3-map {
+    animation: none;
+  }
+}

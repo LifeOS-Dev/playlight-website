@@ -1648,6 +1648,62 @@
   color: var(--ash);
 }
 
+/* ── The three-way choice ──────────────────────────────────────
+   Discord, WhatsApp, or email - as plain thumbnails, no captions.
+   The first two leave the page; the third unfolds the form below. */
+
+.pl3-get__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: clamp(18px, 2.6vh, 24px);
+}
+
+.pl3-get__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgb(var(--paper-rgb) / 0.03);
+  transition:
+    border-color 0.3s,
+    background 0.3s,
+    transform 0.35s cubic-bezier(0.16, 0.8, 0.24, 1);
+}
+
+.pl3-get__tile:hover {
+  border-color: rgb(var(--ember-rgb) / 0.4);
+  background: rgb(var(--ember-rgb) / 0.06);
+  transform: translateY(-1px);
+}
+
+.pl3-get__tile[aria-expanded="true"] {
+  border-color: rgb(var(--ember-rgb) / 0.55);
+  background: rgb(var(--ember-rgb) / 0.08);
+}
+
+.pl3-get__tile-icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--ember);
+}
+
+.pl3-get__tile-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pl3-get__tile-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--filament);
+}
+
 /* ── The waitlist ──────────────────────────────────────────────
    The end of the road, until there is an app at the end of it. */
 

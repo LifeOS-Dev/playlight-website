@@ -1,0 +1,158 @@
+import * as React from "react";
+import { FACES, type Face } from "./faces";
+import { Motif } from "./motifs";
+
+/**
+ * Problem → solution, read horizontally.
+ *
+ * The track is eight panels: pressure, light, pressure, light… As you scroll,
+ * the answer slides in from the right and pushes the problem off to the left,
+ * then the next problem pushes the answer along. Six steps, and the motion
+ * dwells on each pair rather than sliding continuously.
+ */
+
+const PANELS = FACES.flatMap((face) => [
+  { face, side: "problem" as const },
+  { face, side: "solution" as const },
+]);
+
+const STEPS = PANELS.length - 2; // pairs of panels visible at once
+
+/** 6t⁵ − 15t⁴ + 10t³ — eases hard at both ends so each pair holds. */
+const smoother = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+
+function useStrip(
+  section: React.RefObject<HTMLElement | null>,
+  stage: React.RefObject<HTMLDivElement | null>,
+  track: React.RefObject<HTMLDivElement | null>,
+) {
+  const [step, setStep] = React.useState(0);
+
+  React.useEffect(() => {
+    const sectionEl = section.current;
+    const stageEl = stage.current;
+    const trackEl = track.current;
+    if (!sectionEl || !stageEl || !trackEl) return;
+
+    let frame = 0;
+    let lastStep = -1;
+
+    const apply = () => {
+      frame = 0;
+
+      // Two panels fill the stage exactly, whatever the scrollbar is doing.
+      const panelW = stageEl.clientWidth / 2;
+      stageEl.style.setProperty("--panel-w", `${panelW}px`);
+
+      const rect = sectionEl.getBoundingClientRect();
+      const travel = rect.height - window.innerHeight;
+      if (travel <= 0) return;
+
+      const p = Math.min(1, Math.max(0, -rect.top / travel));
+      const raw = p * STEPS;
+      const i = Math.min(STEPS - 1, Math.floor(raw));
+      const eased = i + smoother(raw - i);
+
+      trackEl.style.setProperty("--strip-x", `${-eased * panelW}px`);
+
+      const active = Math.round(raw);
+      if (active !== lastStep) {
+        lastStep = active;
+        setStep(active);
+      }
+    };
+
+    apply();
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(apply);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", apply);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", apply);
+    };
+  }, [section, stage, track]);
+
+  return step;
+}
+
+function Panel({ face, side, lit }: { face: Face; side: "problem" | "solution"; lit: boolean }) {
+  const isProblem = side === "problem";
+  return (
+    <article className="pl3-panel" data-side={side} data-lit={lit || undefined}>
+      <div className="pl3-panel__body">
+        <p className="pl3-panel__tag">{isProblem ? face.name : "The light"}</p>
+
+        <div className="pl3-panel__motif">
+          <Motif kind={face.motif} side={side} />
+        </div>
+
+        {isProblem ? (
+          <>
+            <blockquote className="pl3-panel__quote">“{face.quote}”</blockquote>
+            <p className="pl3-panel__root">{face.root}</p>
+          </>
+        ) : (
+          <>
+            <p className="pl3-panel__answer">{face.answer}</p>
+            <p className="pl3-panel__shift">
+              <span>{face.from}</span>
+              <span className="pl3-panel__arrow" aria-hidden="true">
+                →
+              </span>
+              <span className="pl3-panel__to">{face.to}</span>
+            </p>
+          </>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export function Filmstrip() {
+  const section = React.useRef<HTMLElement | null>(null);
+  const stage = React.useRef<HTMLDivElement | null>(null);
+  const track = React.useRef<HTMLDivElement | null>(null);
+  const step = useStrip(section, stage, track);
+
+  const panels = PANELS.map((p, i) => (
+    <Panel
+      key={`${p.face.id}-${p.side}`}
+      face={p.face}
+      side={p.side}
+      lit={i >= step - 0.5 && i <= step + 1.5}
+    />
+  ));
+
+  return (
+    <>
+      {/* Desktop: the strip is driven by vertical scroll */}
+      <section ref={section} className="pl3-strip" aria-label="What Playlight solves">
+        <div ref={stage} className="pl3-strip__stage">
+          <div ref={track} className="pl3-strip__track">
+            {panels}
+          </div>
+
+          <div className="pl3-strip__rail" aria-hidden="true">
+            {FACES.map((f, i) => (
+              <span key={f.id} className="pl3-strip__tick" data-done={step >= i * 2 || undefined} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Small screens: the same panels, swipeable */}
+      <section className="pl3-strip-m" aria-label="What Playlight solves">
+        <div className="pl3-strip-m__scroller">
+          {PANELS.map((p) => (
+            <Panel key={`m-${p.face.id}-${p.side}`} face={p.face} side={p.side} lit />
+          ))}
+        </div>
+        <p className="pl3-strip-m__hint">Swipe →</p>
+      </section>
+    </>
+  );
+}

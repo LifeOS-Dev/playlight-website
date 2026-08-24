@@ -1,0 +1,151 @@
+import * as React from "react";
+import { JOURNEY } from "./journey";
+import { FacetScene } from "./FacetScene";
+import { FACETS, type FacetId } from "./faces";
+import "./journey.css";
+
+const LABEL: Record<FacetId, string> = Object.fromEntries(
+  FACETS.map((f) => [f.id, f.label]),
+) as Record<FacetId, string>;
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+type Props = {
+  /** Page root that holds --orb-* CSS variables */
+  rootRef: React.RefObject<HTMLElement | null>;
+};
+
+/**
+ * Sticky journey: the orb walks the grid; life facets light left / right
+ * as it passes. Scroll owns the choreography.
+ */
+export const LifeJourney = React.forwardRef<HTMLElement, Props>(
+  function LifeJourney({ rootRef }, forwardedRef) {
+    const section = React.useRef<HTMLElement | null>(null);
+    const [active, setActive] = React.useState(0);
+    const [inView, setInView] = React.useState(false);
+
+    const setSection = React.useCallback(
+      (node: HTMLElement | null) => {
+        section.current = node;
+        if (typeof forwardedRef === "function") forwardedRef(node);
+        else if (forwardedRef) forwardedRef.current = node;
+      },
+      [forwardedRef],
+    );
+
+    React.useEffect(() => {
+      const el = section.current;
+      const root = rootRef.current;
+      if (!el || !root) return;
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let frame = 0;
+
+      const apply = () => {
+        frame = 0;
+        const rect = el.getBoundingClientRect();
+        const travel = el.offsetHeight - window.innerHeight;
+        if (travel <= 0) return;
+
+        const pinned = rect.top <= 2 && rect.bottom > window.innerHeight * 0.55;
+        setInView(pinned);
+
+        if (!pinned) {
+          // Hand orb back to the page scroll driver above or below the journey.
+          root.style.removeProperty("--journey-on");
+          root.removeAttribute("data-journey");
+          return;
+        }
+
+        root.style.setProperty("--journey-on", "1");
+        root.setAttribute("data-journey", "");
+
+        const p = clamp01(-rect.top / travel);
+        const n = JOURNEY.length;
+        // Spend most of each beat settled; ease across in the last third.
+        const raw = p * n;
+        const i = Math.min(n - 1, Math.floor(raw));
+        const localT = raw - i;
+        const cross = smooth(clamp01((localT - 0.62) / 0.38));
+        const a = JOURNEY[i];
+        const b = JOURNEY[Math.min(n - 1, i + 1)];
+        const move = i === n - 1 ? 0 : cross;
+
+        const x = a.orbX + (b.orbX - a.orbX) * move;
+        const y = a.orbY + (b.orbY - a.orbY) * move;
+
+        // Always place the orb; reduced-motion only skips the path easing feel.
+        root.style.setProperty("--orb-x", `${(reduced ? a.orbX : x) * 100}vw`);
+        root.style.setProperty("--orb-y", `${(reduced ? a.orbY : y) * 100}vh`);
+        root.style.setProperty("--orb-scale", reduced ? "0.62" : "0.68");
+        root.style.setProperty("--orb-i", "1.2");
+        root.style.setProperty("--grid-o", "0.9");
+
+        setActive(i);
+      };
+
+      apply();
+      const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(apply);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      return () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+        root.style.removeProperty("--journey-on");
+        root.removeAttribute("data-journey");
+      };
+    }, [rootRef]);
+
+    return (
+      <section
+        ref={setSection}
+        className="pl3-journey"
+        style={{ height: `${JOURNEY.length * 95}vh` }}
+        aria-label="A walk through your life facets"
+      >
+        <div className="pl3-journey__stage">
+          <p className="pl3-journey__eyebrow">One light. Every facet.</p>
+
+          <div className="pl3-journey__rail" aria-hidden>
+            {JOURNEY.map((beat, i) => (
+              <span
+                key={beat.id}
+                className="pl3-journey__tick"
+                data-on={i <= active || undefined}
+                data-now={i === active || undefined}
+              />
+            ))}
+          </div>
+
+          <div className="pl3-journey__cards">
+            {JOURNEY.map((beat, i) => {
+              const lit = inView && i === active;
+              const passed = inView && i < active;
+              return (
+                <article
+                  key={beat.id}
+                  className="pl3-jcard"
+                  data-side={beat.side}
+                  data-lit={lit || undefined}
+                  data-passed={passed || undefined}
+                >
+                  <div className="pl3-jcard__panel">
+                    <p className="pl3-jcard__tag">{LABEL[beat.id]}</p>
+                    <FacetScene id={beat.id} active={lit} />
+                    <p className="pl3-jcard__line">{beat.line}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  },
+);

@@ -1,0 +1,128 @@
+import * as React from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { LightField } from "@/components/landing/v2/LightField";
+import { LightOrb } from "@/components/landing/v2/LightOrb";
+import { FacetTiles } from "@/components/landing/v2/FacetTiles";
+import { Filmstrip } from "@/components/landing/v2/Filmstrip";
+import { Faq } from "@/components/landing/v2/Faq";
+import { V2Footer } from "@/components/landing/v2/V2Footer";
+import { DownloadButtons } from "@/components/landing/v2/DownloadButtons";
+import { useLightScroll, type OrbStop } from "@/components/landing/v2/useLightScroll";
+
+export const Route = createFileRoute("/v2")({
+  head: () => ({
+    meta: [
+      { title: "Playlight — your whole life, in one light" },
+      { name: "robots", content: "noindex, nofollow" },
+      {
+        name: "description",
+        content:
+          "Playlight shows you where you stand and what actually matters today.",
+      },
+    ],
+  }),
+  component: V2,
+});
+
+/** Where the light sits while each section owns the screen. */
+const STOPS: OrbStop[] = [
+  { y: 0.6, size: 1, i: 1, grid: 1 }, // hero — the light on its floor
+  { y: 0.15, size: 0.34, i: 0.7, grid: 0.32 }, // the four — a distant sun
+  { y: 0.33, size: 0.66, i: 1.3, grid: 0.5 }, // philosophy — it comes close
+  { y: 0.09, size: 0.24, i: 0.38, grid: 0.1 }, // faq — nearly out of frame
+  { y: 0.68, size: 0.5, i: 1.15, grid: 0.28 }, // footer — settles and blooms
+];
+
+function V2() {
+  const root = React.useRef<HTMLDivElement | null>(null);
+  const hero = React.useRef<HTMLElement | null>(null);
+  const four = React.useRef<HTMLElement | null>(null);
+  const philosophy = React.useRef<HTMLElement | null>(null);
+  const faq = React.useRef<HTMLElement | null>(null);
+  const footer = React.useRef<HTMLElement | null>(null);
+
+  const anchors = React.useMemo(
+    () => [hero, four, philosophy, faq, footer],
+    [],
+  );
+
+  useLightScroll(root, anchors, STOPS);
+
+  return (
+    <div ref={root} className="pl2">
+      <LightField />
+      <LightOrb />
+
+      <header className="pl2-nav">
+        <Link
+          to="/"
+          className="pl2-nav__preview"
+        >
+          ← live site
+        </Link>
+        <Link to="/v2" className="pl2-nav__mark">
+          playlight
+        </Link>
+        <nav className="pl2-nav__links" aria-label="Main">
+          <Link to="/v2-a">Grok v2-a</Link>
+          <Link to="/about">Story</Link>
+          <Link to="/support">Support</Link>
+          <Link to="/privacy">Privacy</Link>
+          <span className="pl2-nav__badge">claude · v2</span>
+        </nav>
+      </header>
+
+      <main className="pl2-main">
+        {/* ── Hero ─────────────────────────────────────────── */}
+        <section ref={hero} className="pl2-hero">
+          <FacetTiles />
+
+          <div className="pl2-hero__copy">
+            <h1 className="pl2-hero__mark">playlight</h1>
+            <p className="pl2-hero__line">Your whole life, in one light.</p>
+            <p className="pl2-hero__sub">
+              See where you stand — and what actually matters today.
+            </p>
+            <DownloadButtons />
+          </div>
+
+          <div className="pl2-hero__cue" aria-hidden="true">
+            <span className="pl2-hero__cue-rule" />
+          </div>
+        </section>
+
+        {/* ── The four pressures ───────────────────────────── */}
+        <section ref={four} className="pl2-four">
+          <div className="pl2-lead">
+            <h2 className="pl2-lead__title">Effort was never the problem.</h2>
+            <p className="pl2-lead__sub">
+              Fog was. Playlight holds the whole picture, then gives you the next
+              honest move.
+            </p>
+          </div>
+
+          <Filmstrip />
+        </section>
+
+        {/* ── How it feels ─────────────────────────────────── */}
+        <section ref={philosophy} className="pl2-phil">
+          <p className="pl2-phil__line">One thing at a time.</p>
+          <p className="pl2-phil__sub">
+            Built for a loaded mind. Visual first, and forgiving of the days you
+            miss.
+          </p>
+        </section>
+
+        {/* ── FAQ ──────────────────────────────────────────── */}
+        <section ref={faq} className="pl2-faq-anchor">
+          <Faq />
+        </section>
+      </main>
+
+      <section ref={footer} className="pl2-footer-anchor">
+        <V2Footer />
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,454 @@
+import * as React from "react";
+import { DownloadButtons } from "./DownloadButtons";
+import { FacetScene } from "./FacetScene";
+import { FACETS, FACES, type FacetId } from "./faces";
+import { JOURNEY } from "./journey";
+import { Motif } from "./motifs";
+import {
+  IDLE_ORB,
+  ORB_X,
+  PATH,
+  PATH_WEIGHT,
+  pathAt,
+  type OrbPose,
+  type PathStage,
+} from "./pathTimeline";
+import "./orb-path.css";
+
+const LABEL: Record<FacetId, string> = Object.fromEntries(
+  FACETS.map((f) => [f.id, f.label]),
+) as Record<FacetId, string>;
+
+const FACET_DWELL_MS = 2200;
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+function lerpPose(a: OrbPose, b: OrbPose, t: number): OrbPose {
+  const e = smooth(t);
+  return {
+    y: a.y + (b.y - a.y) * e,
+    scale: a.scale + (b.scale - a.scale) * e,
+    i: a.i + (b.i - a.i) * e,
+    grid: a.grid + (b.grid - a.grid) * e,
+  };
+}
+
+type Props = {
+  rootRef: React.RefObject<HTMLElement | null>;
+};
+
+type Frame = {
+  mode: "idle" | "travel" | "released";
+  kind: PathStage["kind"] | "idle";
+  faceIndex?: number;
+  faceSide?: "problem" | "solution";
+  heroOpacity: number;
+  philOpacity: number;
+  progress: number;
+  rush: number;
+};
+
+/**
+ * Landing: CSS grid cruise + life facets auto-cycle in 3D L/R.
+ * Scroll: fly through the hero → centered Core Four reading stage → philosophy.
+ */
+export const OrbPath = React.forwardRef<HTMLElement, Props>(
+  function OrbPath({ rootRef }, forwardedRef) {
+    const section = React.useRef<HTMLElement | null>(null);
+    const rushRef = React.useRef(0);
+    const modeRef = React.useRef<"idle" | "travel">("idle");
+    const [idleFacet, setIdleFacet] = React.useState(0);
+    const [frame, setFrame] = React.useState<Frame>({
+      mode: "idle",
+      kind: "idle",
+      heroOpacity: 1,
+      philOpacity: 0,
+      progress: 0,
+      rush: 0,
+    });
+
+    const setSection = React.useCallback(
+      (node: HTMLElement | null) => {
+        section.current = node;
+        if (typeof forwardedRef === "function") forwardedRef(node);
+        else if (forwardedRef) forwardedRef.current = node;
+      },
+      [forwardedRef],
+    );
+
+    // Always cycle life facets while idle — this is the landing content.
+    React.useEffect(() => {
+      if (frame.mode !== "idle") return;
+      const id = window.setInterval(() => {
+        setIdleFacet((i) => (i + 1) % JOURNEY.length);
+      }, FACET_DWELL_MS);
+      return () => window.clearInterval(id);
+    }, [frame.mode]);
+
+    React.useEffect(() => {
+      const el = section.current;
+      const root = rootRef.current;
+      if (!el || !root) return;
+
+      let raf = 0;
+      let lastKey = "";
+      let lastScrollY = window.scrollY;
+      let lastT = performance.now();
+      let velocity = 0;
+
+      const writeOrb = (pose: OrbPose, depth: number, rush: number) => {
+        // Cap bloom so the sphere never dissolves into a wash / streak
+        const intensity = Math.min(pose.i, 1.08);
+        const scale = Math.max(pose.scale, 0.68);
+        root.style.setProperty("--orb-x", `${ORB_X * 100}vw`);
+        root.style.setProperty("--orb-y", `${pose.y * 100}vh`);
+        root.style.setProperty("--orb-scale", `${scale}`);
+        root.style.setProperty("--orb-i", `${intensity}`);
+        root.style.setProperty("--grid-o", `${pose.grid}`);
+        // Quantize depth so scroll doesn't thrash the compositor every pixel
+        root.style.setProperty(
+          "--path-depth",
+          `${(Math.round(depth * 80) / 80).toFixed(4)}`,
+        );
+        root.style.setProperty("--path-rush", `${Math.min(rush, 0.55)}`);
+        rushRef.current = rush;
+      };
+
+      const writeHeroFly = (t: number) => {
+        // t: 0 = landing, 1 = fully passed through the hero
+        const e = smooth(clamp01(t));
+        const scale = 1 + e * 3.6;
+        const opacity =
+          e < 0.22 ? 1 : Math.max(0, 1 - smooth((e - 0.22) / 0.78));
+        const blur = e * e * 18;
+        const y = -e * 12;
+        const facetScale = 1 + e * 2.4;
+        root.style.setProperty("--hero-fly-scale", scale.toFixed(4));
+        root.style.setProperty("--hero-fly-o", opacity.toFixed(4));
+        root.style.setProperty("--hero-fly-blur", blur.toFixed(3));
+        root.style.setProperty("--hero-fly-y", y.toFixed(3));
+        root.style.setProperty("--facet-fly-scale", facetScale.toFixed(4));
+        return opacity;
+      };
+
+      const clearHeroFly = () => {
+        root.style.setProperty("--hero-fly-scale", "1");
+        root.style.setProperty("--hero-fly-o", "1");
+        root.style.setProperty("--hero-fly-blur", "0");
+        root.style.setProperty("--hero-fly-y", "0");
+        root.style.setProperty("--facet-fly-scale", "1");
+      };
+
+      const apply = () => {
+        raf = 0;
+        const now = performance.now();
+        const dt = Math.max(16, now - lastT);
+        lastT = now;
+
+        const rect = el.getBoundingClientRect();
+        const travel = el.offsetHeight - window.innerHeight;
+        if (travel <= 0) return;
+
+        // Sticky stage owns the viewport until the section bottom reaches the
+        // fold — a looser threshold left Core Four stuck over the FAQ.
+        const pinned =
+          rect.top <= 2 && rect.bottom > window.innerHeight - 2;
+        if (!pinned) {
+          modeRef.current = "idle";
+          rushRef.current = 0;
+          root.removeAttribute("data-path");
+          root.removeAttribute("data-rush");
+          root.style.removeProperty("--path-rush");
+          writeHeroFly(1);
+          // Yield orb ownership BEFORE the next light-scroll tick.
+          root.style.removeProperty("--path-on");
+          if (rect.top > 2) {
+            clearHeroFly();
+            writeOrb(IDLE_ORB, 0, 0);
+          } else {
+            window.dispatchEvent(new Event("scroll"));
+          }
+          if (lastKey !== "released") {
+            lastKey = "released";
+            setFrame({
+              mode: "released",
+              kind: "idle",
+              heroOpacity: 0,
+              philOpacity: 0,
+              progress: 1,
+              rush: 0,
+            });
+          }
+          return;
+        }
+
+        root.style.setProperty("--path-on", "1");
+        root.setAttribute("data-path", "");
+
+        const p = clamp01(-rect.top / travel);
+        const dy = Math.abs(window.scrollY - lastScrollY);
+        lastScrollY = window.scrollY;
+        const instant = Math.min(1, dy / (dt * 1.8));
+        velocity = velocity * 0.72 + instant * 0.28;
+
+        // Landing pad — hero + cycling facets + cruising grid.
+        if (p < 0.008) {
+          root.removeAttribute("data-rush");
+          modeRef.current = "idle";
+          clearHeroFly();
+          writeOrb(IDLE_ORB, 0, 0);
+          if (lastKey !== "idle") {
+            lastKey = "idle";
+            setFrame({
+              mode: "idle",
+              kind: "idle",
+              heroOpacity: 1,
+              philOpacity: 0,
+              progress: 0,
+              rush: 0,
+            });
+          }
+          return;
+        }
+
+        root.setAttribute("data-rush", "");
+        modeRef.current = "travel";
+
+        const { idx, local, cur, next, progress } = pathAt(p);
+        const cross = smooth(clamp01((local - 0.55) / 0.45));
+        const move = idx >= PATH.length - 1 ? 0 : cross;
+        const pose = lerpPose(cur.orb, next.orb, move);
+        const rush = clamp01(0.25 + progress * 0.4 + velocity * 0.5);
+        writeOrb(pose, progress, rush);
+
+        // Fly through the landing copy — zoom past, then problems arrive.
+        let heroOpacity = 0;
+        if (cur.kind === "depart") {
+          heroOpacity = writeHeroFly(local);
+        } else {
+          heroOpacity = writeHeroFly(1);
+        }
+
+        // Problems only after we've mostly passed through the hero.
+        const showCore =
+          cur.kind === "problem" ||
+          cur.kind === "solution" ||
+          (cur.kind === "depart" && local > 0.7);
+
+        let philOpacity = 0;
+        if (cur.kind === "philosophy") {
+          philOpacity = local < 0.25 ? smooth(local / 0.25) : 1;
+        }
+
+        const coreKind =
+          cur.kind === "problem" || cur.kind === "solution"
+            ? cur.kind
+            : showCore
+              ? ("problem" as const)
+              : undefined;
+        const coreFace =
+          typeof cur.faceIndex === "number"
+            ? cur.faceIndex
+            : showCore
+              ? 0
+              : undefined;
+
+        const key = [
+          idx,
+          cur.kind,
+          coreFace ?? "",
+          coreKind ?? "",
+          Math.round(heroOpacity * 20),
+          Math.round(philOpacity * 20),
+          Math.round(progress * 40),
+        ].join("|");
+
+        if (key === lastKey) return;
+        lastKey = key;
+
+        setFrame({
+          mode: "travel",
+          kind: coreKind ?? cur.kind,
+          faceIndex: coreFace,
+          faceSide: coreKind,
+          heroOpacity,
+          philOpacity,
+          progress,
+          rush,
+        });
+      };
+
+      root.setAttribute("data-path", "");
+      clearHeroFly();
+      writeOrb(IDLE_ORB, 0, 0);
+
+      apply();
+      const onScroll = () => {
+        if (raf) return;
+        raf = requestAnimationFrame(apply);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      return () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+        root.style.removeProperty("--path-on");
+        root.style.removeProperty("--path-rush");
+        root.style.removeProperty("--hero-fly-scale");
+        root.style.removeProperty("--hero-fly-o");
+        root.style.removeProperty("--hero-fly-blur");
+        root.style.removeProperty("--hero-fly-y");
+        root.style.removeProperty("--facet-fly-scale");
+        root.removeAttribute("data-path");
+        root.removeAttribute("data-rush");
+      };
+    }, [rootRef]);
+
+    const showFacets =
+      frame.mode === "idle" ||
+      (frame.kind === "depart" && frame.heroOpacity > 0.12);
+    const facetLitId =
+      frame.mode === "idle"
+        ? JOURNEY[idleFacet]?.id
+        : showFacets
+          ? JOURNEY[idleFacet]?.id
+          : undefined;
+    const showCore =
+      frame.kind === "problem" || frame.kind === "solution";
+    const faceActive = showCore ? frame.faceIndex : undefined;
+    const faceSide = frame.faceSide;
+    const activeFace =
+      typeof faceActive === "number" ? FACES[faceActive] : undefined;
+    const heroFlying =
+      frame.mode === "travel" && frame.heroOpacity > 0.04;
+
+    return (
+      <section
+        ref={setSection}
+        className="pl3-path"
+        style={{ height: `${PATH_WEIGHT * 100}vh` }}
+        aria-label="A forward journey through Playlight"
+      >
+        <div className="pl3-path__stage">
+          <div
+            className="pl3-path__hero"
+            data-gone={frame.heroOpacity < 0.05 || undefined}
+            data-flying={heroFlying || undefined}
+            aria-hidden={frame.heroOpacity < 0.2 || undefined}
+          >
+            <h1 className="pl3-path__mark">playlight</h1>
+            <p className="pl3-path__line">
+              Your personalized OS to help you understand, organize, and play
+              life.
+            </p>
+            <DownloadButtons />
+            <div className="pl3-path__cue" aria-hidden="true">
+              <span className="pl3-path__cue-rule" />
+            </div>
+          </div>
+
+          {/* Idle + early depart — life facets fly past with the hero */}
+          <div
+            className="pl3-path__cards pl3-path__cards--3d"
+            data-chapter="facets"
+            data-on={showFacets || undefined}
+            data-flying={heroFlying || undefined}
+          >
+            {JOURNEY.map((beat) => {
+              const lit = facetLitId === beat.id;
+              return (
+                <article
+                  key={beat.id}
+                  className="pl3-pcard"
+                  data-side={beat.side}
+                  data-lit={lit || undefined}
+                >
+                  <div className="pl3-pcard__panel">
+                    <p className="pl3-pcard__tag">{LABEL[beat.id]}</p>
+                    <FacetScene id={beat.id} active={!!lit} />
+                    <p className="pl3-pcard__line">{beat.line}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* Scroll — reading stage in the open middle; orb lights from below */}
+          <div
+            className="pl3-path__view"
+            data-on={showCore || undefined}
+            data-side={faceSide}
+          >
+            {activeFace ? (
+              <article
+                key={`${activeFace.id}-${faceSide}`}
+                className="pl3-path__plate"
+                data-kind={faceSide}
+              >
+                <p className="pl3-path__view-eyebrow">
+                  {faceSide === "problem"
+                    ? "What fog feels like"
+                    : "What the light does"}
+                </p>
+                {faceSide === "problem" ? (
+                  <>
+                    <p className="pl3-path__plate-tag">{activeFace.name}</p>
+                    <div className="pl3-path__plate-motif" data-side="problem">
+                      <Motif kind={activeFace.motif} side="problem" />
+                    </div>
+                    <blockquote className="pl3-path__plate-quote">
+                      “{activeFace.quote}”
+                    </blockquote>
+                    <p className="pl3-path__plate-root">{activeFace.root}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="pl3-path__plate-tag">The light</p>
+                    <div className="pl3-path__plate-motif" data-side="solution">
+                      <Motif kind={activeFace.motif} side="solution" />
+                    </div>
+                    <p className="pl3-path__plate-answer">{activeFace.answer}</p>
+                    <p className="pl3-path__plate-shift">
+                      <span>{activeFace.from}</span>
+                      <span aria-hidden> → </span>
+                      <span className="pl3-path__plate-to">{activeFace.to}</span>
+                    </p>
+                  </>
+                )}
+              </article>
+            ) : null}
+          </div>
+
+          <div
+            className="pl3-path__phil"
+            style={{ opacity: frame.philOpacity }}
+            data-on={frame.philOpacity > 0.05 || undefined}
+          >
+            <p className="pl3-path__phil-line">One thing at a time.</p>
+            <p className="pl3-path__phil-sub">
+              Built for a loaded mind. Visual first, and forgiving of the days
+              you miss.
+            </p>
+          </div>
+
+          <div className="pl3-path__rail" aria-hidden>
+            <span
+              className="pl3-path__rail-fill"
+              style={{
+                transform: `scaleX(${
+                  frame.mode === "released"
+                    ? 1
+                    : frame.mode === "idle"
+                      ? 0
+                      : frame.progress
+                })`,
+              }}
+            />
+          </div>
+        </div>
+      </section>
+    );
+  },
+);

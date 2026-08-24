@@ -1,0 +1,21 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { PlaylightV2A } from "@/components/landing/v2a/PlaylightV2A";
+
+export const Route = createFileRoute("/v2-a")({
+  head: () => ({
+    meta: [
+      { title: "Playlight v2-a — Grok design (local)" },
+      {
+        name: "description",
+        content:
+          "Grok’s original upgraded landing — visual-first Core Four. Local comparison only.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: V2APage,
+});
+
+function V2APage() {
+  return <PlaylightV2A />;
+}

@@ -14,8 +14,12 @@ export const WAITLIST_ENDPOINT = "/api/waitlist";
 
 export const NOTIFY_EMAIL = "hello@playlight.app";
 
+/** Community links offered alongside the email option. */
+export const DISCORD_URL = "https://discord.gg/sNFN2N5Cv";
+export const WHATSAPP_URL = "https://chat.whatsapp.com/Bcx6xNPich92FCMHEI8W3q";
+
 export function waitlistMailto(email: string) {
-  const subject = "Waitlist - Playlight";
-  const body = `Please add me to the Playlight waitlist.\n\nEmail: ${email}\n`;
+  const subject = "Notify me - Playlight";
+  const body = `Please email me when Playlight opens.\n\nEmail: ${email}\n`;
   return `mailto:${NOTIFY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

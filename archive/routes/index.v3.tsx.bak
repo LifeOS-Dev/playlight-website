@@ -1,0 +1,80 @@
+import * as React from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { LightField } from "@/components/landing/v3/LightField";
+import { LightOrb } from "@/components/landing/v3/LightOrb";
+import { OrbPath } from "@/components/landing/v3/OrbPath";
+import { Faq } from "@/components/landing/v3/Faq";
+import { V3Footer } from "@/components/landing/v3/V3Footer";
+import { useLightScroll, type OrbStop } from "@/components/landing/v3/useLightScroll";
+
+/**
+ * Homepage — one forward orb journey on the grid, then FAQ / footer.
+ */
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Playlight — your whole life, in one light" },
+      {
+        name: "description",
+        content:
+          "Playlight shows you where you stand and what actually matters today.",
+      },
+      { property: "og:title", content: "Playlight" },
+      {
+        property: "og:description",
+        content: "See where you stand — and what actually matters today.",
+      },
+      { property: "og:type", content: "website" },
+    ],
+  }),
+  component: HomePage,
+});
+
+/** Post-path orb stops — only active after the sticky journey releases. */
+const STOPS: OrbStop[] = [
+  { x: 0.5, y: 0.42, size: 0.7, i: 1.2, grid: 0.45 }, // path end / faq handoff
+  { x: 0.5, y: 0.12, size: 0.28, i: 0.4, grid: 0.12 }, // faq
+  { x: 0.5, y: 0.82, size: 0.42, i: 1.1, grid: 0.26 }, // footer
+];
+
+function HomePage() {
+  const root = React.useRef<HTMLDivElement | null>(null);
+  const path = React.useRef<HTMLElement | null>(null);
+  const faq = React.useRef<HTMLElement | null>(null);
+  const footer = React.useRef<HTMLElement | null>(null);
+
+  const anchors = React.useMemo(() => [path, faq, footer], []);
+
+  useLightScroll(root, anchors, STOPS);
+
+  return (
+    <div ref={root} className="pl3">
+      <LightField />
+      <LightOrb />
+
+      <header className="pl3-nav">
+        <Link to="/" className="pl3-nav__mark">
+          playlight
+        </Link>
+        <nav className="pl3-nav__links" aria-label="Main">
+          <Link to="/about">Story</Link>
+          <Link to="/support">Support</Link>
+          <Link to="/privacy">Privacy</Link>
+        </nav>
+      </header>
+
+      <main className="pl3-main">
+        <OrbPath ref={path} rootRef={root} />
+
+        <section ref={faq} className="pl3-faq-anchor">
+          <Faq />
+        </section>
+      </main>
+
+      <section ref={footer} className="pl3-footer-anchor">
+        <V3Footer />
+      </section>
+    </div>
+  );
+}

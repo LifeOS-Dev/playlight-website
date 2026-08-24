@@ -1,0 +1,173 @@
+import * as React from "react";
+import { DownloadButtons } from "./DownloadButtons";
+import { FacetScene } from "./FacetScene";
+import { FACETS, type FacetId } from "./faces";
+import { JOURNEY } from "./journey";
+import "./orb-path.css";
+
+const LABEL: Record<FacetId, string> = Object.fromEntries(
+  FACETS.map((f) => [f.id, f.label]),
+) as Record<FacetId, string>;
+
+/** Screens of scroll the intro holds the viewport for. */
+export const PINNED_SCREENS = 2.8;
+/** Share of that spent passing the life facets; the rest flies through the hero. */
+const FACET_PHASE = 0.66;
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+/**
+ * The landing: the light idles on the road, life facets pass left and right,
+ * then the hero flies past and hands over to the Core Four.
+ *
+ * Facets advance with the scroll wheel, never on a timer — nothing moves
+ * unless the reader moves it, so there is no content to miss and nothing to
+ * pause. The orb itself is NOT driven here; `useLightScroll` owns it for the
+ * whole page, which keeps a single writer per custom property.
+ */
+export const OrbIntro = React.forwardRef<HTMLElement>(function OrbIntro(_props, forwardedRef) {
+  const section = React.useRef<HTMLElement | null>(null);
+  const [facet, setFacet] = React.useState(0);
+
+  const setSection = React.useCallback(
+    (node: HTMLElement | null) => {
+      section.current = node;
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
+    },
+    [forwardedRef],
+  );
+
+  React.useEffect(() => {
+    const el = section.current;
+    if (!el) return;
+    const root = el.closest(".pl3") as HTMLElement | null;
+    if (!root) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const setVars = (
+      heroScale: number,
+      heroOpacity: number,
+      heroBlur: number,
+      heroY: number,
+      facetScale: number,
+      rush: number,
+    ) => {
+      root.style.setProperty("--hero-fly-scale", heroScale.toFixed(4));
+      root.style.setProperty("--hero-fly-o", heroOpacity.toFixed(4));
+      root.style.setProperty("--hero-fly-blur", heroBlur.toFixed(3));
+      root.style.setProperty("--hero-fly-y", heroY.toFixed(3));
+      root.style.setProperty("--facet-fly-scale", facetScale.toFixed(4));
+      root.style.setProperty("--road-rush", rush.toFixed(3));
+    };
+
+    if (reduced) {
+      setVars(1, 1, 0, 0, 1, 0);
+      return;
+    }
+
+    let raf = 0;
+    let lastFacet = -1;
+
+    const apply = () => {
+      raf = 0;
+      const travel = el.offsetHeight - window.innerHeight;
+      if (travel <= 0) return;
+
+      const rect = el.getBoundingClientRect();
+
+      // Once the intro is behind us, progress pins at 1 forever — which would
+      // leave the road stuck at full rush for the rest of the page. Hand the
+      // grid back and keep the hero parked out of sight.
+      if (rect.bottom <= 0) {
+        setVars(1.8, 0, 10, -8, 1.55, 0);
+        return;
+      }
+
+      const p = clamp01(-rect.top / travel);
+
+      // Facets: one beat each, advanced entirely by the reader.
+      const n = JOURNEY.length;
+      const raw = (p / FACET_PHASE) * n;
+      const next = Math.max(0, Math.min(n - 1, Math.floor(raw)));
+      if (next !== lastFacet) {
+        lastFacet = next;
+        setFacet(next);
+      }
+
+      // Fly-through: only after the facets are done.
+      const t = p <= FACET_PHASE ? 0 : (p - FACET_PHASE) / (1 - FACET_PHASE);
+      const e = smooth(clamp01(t));
+      // Capped at 1.8×. The old 4.6× inflated a viewport-sized element to
+      // ~22 megapixels, which stalls compositing on modest hardware.
+      const heroScale = 1 + e * 0.8;
+      const heroOpacity = e < 0.18 ? 1 : Math.max(0, 1 - smooth((e - 0.18) / 0.82));
+      setVars(heroScale, heroOpacity, e * e * 10, -e * 8, 1 + e * 0.55, e);
+    };
+
+    apply();
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(apply);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      root.style.removeProperty("--road-rush");
+    };
+  }, []);
+
+  return (
+    <section
+      ref={setSection}
+      className="pl3-intro"
+      style={{ height: `${(1 + PINNED_SCREENS) * 100}vh` }}
+      aria-label="Playlight"
+    >
+      <div className="pl3-path__stage">
+        {/* The scaled layer is the copy itself, not a viewport-sized box, so
+            the zoom stays inside the stage and needs no page-level clip. */}
+        <div className="pl3-path__hero">
+          <div className="pl3-path__hero-inner">
+            <h1 className="pl3-path__mark">playlight</h1>
+            <p className="pl3-path__line">
+              Your personalized OS to help you understand, organize, and play life.
+            </p>
+            <DownloadButtons />
+          </div>
+          <div className="pl3-path__cue" aria-hidden="true">
+            <span className="pl3-path__cue-rule" />
+          </div>
+        </div>
+
+        <div className="pl3-path__cards pl3-path__cards--3d" data-on>
+          {JOURNEY.map((beat, i) => (
+            <article
+              key={beat.id}
+              className="pl3-pcard"
+              data-side={beat.side}
+              data-lit={i === facet || undefined}
+              data-passed={i < facet || undefined}
+              aria-hidden={i !== facet || undefined}
+            >
+              <div className="pl3-pcard__panel">
+                <p className="pl3-pcard__tag">{LABEL[beat.id]}</p>
+                <FacetScene id={beat.id} active={i === facet} />
+                <p className="pl3-pcard__line">{beat.line}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <a className="pl3-skip" href="#core">
+          Skip intro
+        </a>
+      </div>
+    </section>
+  );
+});

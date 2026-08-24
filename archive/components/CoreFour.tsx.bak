@@ -1,0 +1,89 @@
+import * as React from "react";
+import { FACES, type Face } from "./faces";
+import { Motif } from "./motifs";
+import "./core-four.css";
+
+/**
+ * The four pressures, in ordinary document flow — no pinning, no hijack.
+ *
+ * Each face shows the problem and the answer side by side, because the
+ * argument only lands when you can see the before and the after at once.
+ * The answer reveals a beat after the problem, which keeps the "then the
+ * light arrives" moment without holding the scrollbar hostage.
+ */
+
+function Face({ face }: { face: Face }) {
+  const ref = React.useRef<HTMLElement | null>(null);
+  const [seen, setSeen] = React.useState(false);
+
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!node || seen) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSeen(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3, rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [seen]);
+
+  return (
+    <article ref={ref} className="pl3-face" data-seen={seen || undefined}>
+      <p className="pl3-face__name">{face.name}</p>
+
+      <div className="pl3-face__pair">
+        <div className="pl3-face__side" data-side="problem">
+          <p className="pl3-face__eyebrow">What fog feels like</p>
+          <div className="pl3-face__motif" data-side="problem">
+            <Motif kind={face.motif} side="problem" />
+          </div>
+          <blockquote className="pl3-face__quote">“{face.quote}”</blockquote>
+          <p className="pl3-face__root">{face.root}</p>
+        </div>
+
+        <div className="pl3-face__seam" aria-hidden="true">
+          <span className="pl3-face__seam-rule" />
+          <span className="pl3-face__seam-arrow">→</span>
+          <span className="pl3-face__seam-rule" />
+        </div>
+
+        <div className="pl3-face__side" data-side="solution">
+          <p className="pl3-face__eyebrow">What the light does</p>
+          <div className="pl3-face__motif" data-side="solution">
+            <Motif kind={face.motif} side="solution" />
+          </div>
+          <p className="pl3-face__answer">{face.answer}</p>
+          <p className="pl3-face__shift">
+            <span>{face.from}</span>
+            <span className="pl3-face__arrow" aria-hidden="true">
+              →
+            </span>
+            <span className="pl3-face__to">{face.to}</span>
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export const CoreFour = React.forwardRef<HTMLElement>(function CoreFour(_props, ref) {
+  return (
+    <section ref={ref} id="core" className="pl3-core" aria-label="What Playlight solves">
+      <div className="pl3-core__lead">
+        <h2 className="pl3-core__title">Effort was never the problem.</h2>
+        <p className="pl3-core__sub">
+          Fog was. Playlight holds the whole picture, then gives you the next honest move.
+        </p>
+      </div>
+
+      {FACES.map((face) => (
+        <Face key={face.id} face={face} />
+      ))}
+    </section>
+  );
+});
