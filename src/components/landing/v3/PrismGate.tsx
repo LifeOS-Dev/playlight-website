@@ -373,12 +373,20 @@ export function PrismGate({
   );
 
   /* ── where the gate opens ─────────────────────────────────────
-        The dial opens blank on arrival: nothing is chosen until a hand
-        says so, and an orb holding every colour at once is the honest
-        picture of that. The wheel and the track cannot - a mark and a
-        thumb stand somewhere from the first frame, and standing nowhere
-        would read as a fault - so they open on the light already worn,
-        or on the default.
+        The dial opens blank - on arrival and on a replay alike. Nothing
+        is chosen until a hand says so, and an orb holding every colour
+        at once is the honest picture of that.
+
+        A replay used to open lit, pointing at the light already worn. It
+        was defensible as state rather than decoration, but it put the
+        beam on screen before the visitor had done anything, which is the
+        one thing this screen is not supposed to do. Which light is in
+        use is a question the site behind the gate already answers.
+
+        The wheel and the track cannot open blank - a mark and a thumb
+        stand somewhere from the first frame, and standing nowhere would
+        read as a fault - so they still open on the light in use, or on
+        the default.
 
         A replay also takes the keyboard with it, because a button opened
         this one and the focus has to land somewhere. */
@@ -391,14 +399,12 @@ export function PrismGate({
       turnTo(spinFor(start, 0));
     } else if (mode === "track") {
       slideTo(tForAngle(start));
-    } else if (replay && seed >= 0) {
-      point(start);
     } else {
       clear();
     }
 
     if (replay) (mode === "track" ? track.current : hit.current)?.focus({ preventScroll: true });
-  }, [mode, current, replay, aim, turnTo, slideTo, point, clear]);
+  }, [mode, current, replay, aim, turnTo, slideTo, clear]);
 
   /* ── the demo ─────────────────────────────────────────────────
         A timer, in a file that otherwise refuses them. The arrival's own
