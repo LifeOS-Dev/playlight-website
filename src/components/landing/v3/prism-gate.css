@@ -71,6 +71,7 @@
 /* — beat one: gather (0 → 0.72s) — */
 
 /* the instructions have done their job; only the chosen name is left to read */
+.pl-gate[data-taken="1"] .pl-gate__creed,
 .pl-gate[data-taken="1"] .pl-gate__lead,
 .pl-gate[data-taken="1"] .pl-gate__hint,
 .pl-gate[data-taken="1"] .pl-gate__torch,
@@ -181,8 +182,9 @@
   /* The vh term is load-bearing: the orb is square, so on a short or
      landscape viewport a width-only cap pushes the lead off the top and
      the hint off the bottom, and the gate's overflow:hidden clips both.
-     Roughly 130px of the height is copy, hence 48vh rather than half. */
-  width: min(420px, 70vw, 48vh);
+     The creed sits above the lead and costs roughly 90px more, so the
+     copy is now ~190px of the height - hence 44vh, not the old 48. */
+  width: min(420px, 70vw, 44vh);
   aspect-ratio: 1;
   border-radius: 50%;
   touch-action: none;
@@ -294,11 +296,42 @@
    The instruction is a quiet eyebrow, the same mono device the site uses
    elsewhere ("HOVER A FACET"). Only one of the two texts should carry
    weight, and it is the one that changes. */
+.pl-gate__creed,
 .pl-gate__lead,
 .pl-gate__label,
 .pl-gate__hint {
   position: relative;
   z-index: 4;
+}
+
+/* The creed. Serif, because it is the one sentence here spoken in the
+   site's own voice rather than the interface's - everything else on this
+   screen is mono, and mono is what instructions look like.
+
+   Held under the name in size on purpose. The name is the thing that
+   changes as you point, and only one line may carry weight; the creed is
+   read once on the way past. The 28ch cap is what breaks it across two
+   balanced lines instead of one long ruler - and with `balance` on, the
+   break lands on the comma, which is where the sentence turns. */
+.pl-gate__creed {
+  max-width: min(28ch, 88vw);
+  margin: 0 0 clamp(16px, 3.4vh, 34px);
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.02rem, 2.1vw, 1.45rem);
+  line-height: 1.36;
+  letter-spacing: 0.004em;
+  color: rgba(255, 255, 255, 0.74);
+  text-wrap: balance;
+}
+
+/* The brand wears whatever light is being tried on, which is the whole
+   claim of the sentence acted out. White until a hand arrives, so the
+   word is still the brightest thing in the line before anything is
+   chosen - and `--pick` is unset until then, hence the fallback. */
+.pl-gate__brand {
+  color: var(--pick, #fff);
+  transition: color 0.34s ease;
 }
 
 .pl-gate__lead {
@@ -342,11 +375,30 @@
 /* The torch sweeps under this text, and small dim type over a lit beam
    loses its contrast. A soft scrim keeps it legible whichever way the
    light points, without a visible box behind it. */
+.pl-gate__creed,
 .pl-gate__lead,
 .pl-gate__hint {
   text-shadow:
     0 1px 14px rgba(0, 0, 0, 0.65),
     0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* The one thing on this screen that can be given up.
+
+   Everything else here is the mechanic or its label; the creed is a
+   sentence you read once. On a landscape phone there is no room for both
+   it and an orb big enough to point at, and the orb is what the screen is
+   for - so it thins, and then it goes. */
+@media (max-height: 640px) {
+  .pl-gate__creed {
+    font-size: clamp(0.94rem, 1.7vw, 1.15rem);
+    margin-bottom: clamp(10px, 2.2vh, 18px);
+  }
+}
+@media (max-height: 460px) {
+  .pl-gate__creed {
+    display: none;
+  }
 }
 
 /* ── arrival ──────────────────────────────────────────────────
@@ -402,11 +454,15 @@
     pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
 }
 
+.pl-gate__creed,
 .pl-gate__lead,
 .pl-gate__label,
 .pl-gate__track,
 .pl-gate__hint {
   animation: pl-gate-words 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.05s backwards;
+}
+.pl-gate__creed {
+  animation-delay: 1.98s;
 }
 .pl-gate__label {
   animation-delay: 2.15s;
@@ -420,6 +476,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
+  .pl-gate__creed,
   .pl-gate__lead,
   .pl-gate__label,
   .pl-gate__name,
@@ -465,6 +522,7 @@
    that one along with the arrival it was aimed at. */
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .app-orb,
+.pl-gate[data-replay="1"] .pl-gate__creed,
 .pl-gate[data-replay="1"] .pl-gate__lead,
 .pl-gate[data-replay="1"] .pl-gate__label,
 .pl-gate[data-replay="1"] .pl-gate__track,

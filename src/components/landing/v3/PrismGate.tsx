@@ -677,6 +677,14 @@ export function PrismGate({
       onPointerUp={onUp}
       onPointerCancel={onCancel}
     >
+      {/* The promise. The only line on this screen that asks nothing of
+          you - it is why the choosing is worth doing, said once, above
+          the instruction that follows it. */}
+      <p className="pl-gate__creed">
+        Life is the most important game, and <span className="pl-gate__brand">Playlight</span> helps
+        you win it.
+      </p>
+
       <p className="pl-gate__lead">{replay ? "Choose another vibe" : "Choose your vibe"}</p>
 
       {/* A replay must not be a one-way door either - being able to take
