@@ -29,13 +29,6 @@ export const GATE_MODE_LABEL: Record<GateMode, string> = {
   track: "Track",
 };
 
-/** The instruction under the orb. Each mechanic asks for a different hand. */
-export const GATE_MODE_HINT: Record<GateMode, string> = {
-  dial: "(press the light, slide, lift to take)",
-  wheel: "(swipe to turn - tap to take)",
-  track: "(slide to choose)",
-};
-
 /**
  * What a device gets when nobody has asked for anything in particular.
  *

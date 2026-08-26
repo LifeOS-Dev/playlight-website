@@ -17,7 +17,6 @@ import {
 import {
   DEFAULT_GATE_MODE,
   GATE_MODES,
-  GATE_MODE_HINT,
   GATE_MODE_LABEL,
   type GateMode,
 } from "@/components/landing/v3/gateMode";
@@ -60,14 +59,15 @@ const TAP_SLOP = 9;
 /**
  * Show the mechanic once, unprompted, rather than describing it.
  *
- * The dial and the wheel are both invisible until a hand arrives, and a
- * black screen with one orb on it does not say "this turns". After the
- * words land the light demonstrates itself and then lets go. The track
- * needs none of this - it is a control, and it looks like one.
+ * Off. The arrival ends on a still orb in the dark, and the beam is
+ * something the visitor causes - the first time it lights, it lights
+ * because they moved the cursor. A demo sweep got there first and spent
+ * the effect before it was theirs; worse, it lit the screen on its own
+ * during the one moment nobody had asked for anything.
  *
- * Set false to meet each mechanic cold.
+ * Set true to have each mechanic demonstrate itself again.
  */
-const ATTRACT = true;
+const ATTRACT = false;
 
 /** A gesture belongs to whichever control it started on. */
 type Drag = {
@@ -678,14 +678,12 @@ export function PrismGate({
       onPointerCancel={onCancel}
     >
       {/* The promise. The only line on this screen that asks nothing of
-          you - it is why the choosing is worth doing, said once, above
-          the instruction that follows it. */}
+          you - it is why the choosing is worth doing, said once, before
+          anything is asked. */}
       <p className="pl-gate__creed">
         Life is the most important game, and <span className="pl-gate__brand">Playlight</span> helps
         you win it.
       </p>
-
-      <p className="pl-gate__lead">{replay ? "Choose another vibe" : "Choose your vibe"}</p>
 
       {/* A replay must not be a one-way door either - being able to take
           the choice back is the whole reason it exists. */}
@@ -735,6 +733,15 @@ export function PrismGate({
         <span className="pl-gate__name">{shown ? shown.name : " "}</span>
       </div>
 
+      {/* The ask, under the answer. It used to sit above the orb with a
+          parenthetical below spelling out the grip - "(press the light,
+          slide, lift to take)" - which described the touch mechanic to a
+          cursor that only had to hover. The grip is discoverable by
+          doing it; what is worth saying is what the screen is FOR, so
+          only that is left, and it says the same thing on a replay.
+          Below the name, because the name is the part that changes. */}
+      <p className="pl-gate__lead">Choose your vibe</p>
+
       {mode === "track" ? (
         <div ref={track} className="pl-gate__track" onPointerDown={onTrackDown} {...slider}>
           <div className="pl-gate__band" aria-hidden style={{ backgroundImage: PRISM_LINEAR }} />
@@ -749,8 +756,6 @@ export function PrismGate({
           <div className="pl-gate__thumb" aria-hidden />
         </div>
       ) : null}
-
-      <p className="pl-gate__hint">{GATE_MODE_HINT[mode]}</p>
 
       {/* Only while the three are being tried against each other. */}
       {onMode ? (

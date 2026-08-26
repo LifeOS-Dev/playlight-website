@@ -73,7 +73,6 @@
 /* the instructions have done their job; only the chosen name is left to read */
 .pl-gate[data-taken="1"] .pl-gate__creed,
 .pl-gate[data-taken="1"] .pl-gate__lead,
-.pl-gate[data-taken="1"] .pl-gate__hint,
 .pl-gate[data-taken="1"] .pl-gate__torch,
 .pl-gate[data-taken="1"] .pl-gate__mark,
 .pl-gate[data-taken="1"] .pl-gate__track,
@@ -180,11 +179,12 @@
   position: relative;
   z-index: 4;
   /* The vh term is load-bearing: the orb is square, so on a short or
-     landscape viewport a width-only cap pushes the lead off the top and
-     the hint off the bottom, and the gate's overflow:hidden clips both.
-     The creed sits above the lead and costs roughly 90px more, so the
-     copy is now ~190px of the height - hence 44vh, not the old 48. */
-  width: min(420px, 70vw, 44vh);
+     landscape viewport a width-only cap pushes the creed off the top and
+     the eyebrow off the bottom, and the gate's overflow:hidden clips both.
+     The creed sits above the orb and the eyebrow below the name, which
+     together cost ~60px more than the lead-and-hint pair they replaced -
+     hence 46vh rather than the old 48. */
+  width: min(420px, 70vw, 46vh);
   aspect-ratio: 1;
   border-radius: 50%;
   touch-action: none;
@@ -293,13 +293,14 @@
 }
 
 /* ── copy ─────────────────────────────────────────────────────
-   The instruction is a quiet eyebrow, the same mono device the site uses
-   elsewhere ("HOVER A FACET"). Only one of the two texts should carry
-   weight, and it is the one that changes. */
+   Three lines, reading down: the promise, the answer, the ask. Only one
+   of them carries weight, and it is the one that changes - the name. The
+   ask is a quiet eyebrow, the same mono device the site uses elsewhere
+   ("HOVER A FACET"), and it sits under the name rather than over the orb
+   so the top of the screen is the promise and the light, nothing else. */
 .pl-gate__creed,
 .pl-gate__lead,
-.pl-gate__label,
-.pl-gate__hint {
+.pl-gate__label {
   position: relative;
   z-index: 4;
 }
@@ -341,7 +342,10 @@
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.44);
-  margin: 0 0 clamp(12px, 3.2vh, 36px);
+  /* Top margin only. It used to hang above the orb and hold the whole
+     composition apart with a bottom margin; under the name it only has
+     to clear it - and on the track, whatever follows sets its own. */
+  margin: clamp(4px, 1.1vh, 12px) 0 0;
 }
 
 .pl-gate__label {
@@ -364,20 +368,11 @@
   opacity: 0;
 }
 
-.pl-gate__hint {
-  font-family: var(--pl3-mono, ui-monospace, monospace);
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.62);
-  margin: clamp(2px, 0.9vw, 8px) 0 0;
-}
-
 /* The torch sweeps under this text, and small dim type over a lit beam
    loses its contrast. A soft scrim keeps it legible whichever way the
    light points, without a visible box behind it. */
 .pl-gate__creed,
-.pl-gate__lead,
-.pl-gate__hint {
+.pl-gate__lead {
   text-shadow:
     0 1px 14px rgba(0, 0, 0, 0.65),
     0 0 4px rgba(0, 0, 0, 0.4);
@@ -457,21 +452,20 @@
 .pl-gate__creed,
 .pl-gate__lead,
 .pl-gate__label,
-.pl-gate__track,
-.pl-gate__hint {
+.pl-gate__track {
   animation: pl-gate-words 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.05s backwards;
 }
 .pl-gate__creed {
   animation-delay: 1.98s;
 }
 .pl-gate__label {
-  animation-delay: 2.15s;
+  animation-delay: 2.06s;
+}
+.pl-gate__lead {
+  animation-delay: 2.14s;
 }
 .pl-gate__track {
-  animation-delay: 2.2s;
-}
-.pl-gate__hint {
-  animation-delay: 2.3s;
+  animation-delay: 2.22s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -480,8 +474,7 @@
   .pl-gate__lead,
   .pl-gate__label,
   .pl-gate__name,
-  .pl-gate__track,
-  .pl-gate__hint {
+  .pl-gate__track {
     animation: none !important;
   }
   .pl-gate,
@@ -525,8 +518,7 @@
 .pl-gate[data-replay="1"] .pl-gate__creed,
 .pl-gate[data-replay="1"] .pl-gate__lead,
 .pl-gate[data-replay="1"] .pl-gate__label,
-.pl-gate[data-replay="1"] .pl-gate__track,
-.pl-gate[data-replay="1"] .pl-gate__hint {
+.pl-gate[data-replay="1"] .pl-gate__track {
   animation: none;
 }
 
