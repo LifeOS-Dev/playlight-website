@@ -93,7 +93,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      // The mark is artwork, not a gradient an SVG could redraw - see
+      // scripts/orb-prism.mjs, which cuts these from the same source and
+      // the same rotation as the orb on the gate. Raster, therefore, and
+      // one file per size: at 16px a browser's own downscale turns the
+      // spectrum to mud, so each is resampled from the full-resolution
+      // original instead.
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
+      { rel: "icon", type: "image/png", sizes: "180x180", href: "/favicon-180.png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

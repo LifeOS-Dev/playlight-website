@@ -206,6 +206,80 @@
      be running as the orb left. */
   --orb-fade: 0.55s;
 }
+/* ── the mark ─────────────────────────────────────────────────
+   The every-colour face is the brand's own artwork, not a conic built to
+   resemble it: public/orb-prism.png, spanning the whole hit box - which
+   is the orb's CORONA (400 units), the same field the AppOrb underneath
+   draws into, so the two share a centre and a size.
+
+   It was authored as light on black. The black is carried as alpha in
+   the asset rather than as pixels, so it composites normally; a screen
+   blend would have been the other answer, and the hit box's own stacking
+   context would have isolated it away.
+
+   The orb below keeps its white soul and its chosen hue, and gives up
+   its conic prism layers - this IS the spectrum now, and two of them
+   would double every hue. */
+.pl-gate__orb .app-orb__prism {
+  display: none;
+}
+.pl-gate__logo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: url("/orb-prism.png") center / 100% 100% no-repeat;
+  pointer-events: none;
+  /* The colour resolves over the same beat the app orb's cross-fade
+     takes - see --orb-fade below. */
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* ── the breath ───────────────────────────────────────────────
+   A light that never moves reads as a picture of a light. This is the
+   orb's own 5.2s breath (see app-orb-breath), borrowed so the gate keeps
+   the brand's rhythm rather than inventing a second one.
+
+   What breathes is the BRIGHTNESS, and only that. The gate holds its orb
+   still for a reason - the torch leaves from the rim, and a rim that
+   swells and shrinks opens and closes the junction the beam is welded
+   to. Nothing here moves or scales, so that junction stays welded and
+   the mark's own bands stay exactly where they were drawn: this was
+   first tried as a slightly larger copy of the artwork fading in and
+   out over the original, and every hard-edged ring in it landed just
+   beside its twin - one breath, twice the rings.
+
+   `filter` rather than `opacity`, because opacity cannot touch the
+   white heart (it is already solid, and laying the mark over itself
+   changes nothing where alpha is 1) - the pulse would have shown in the
+   glow and skipped the part of the light you actually look at.
+
+   It rides the same animation shorthand as the arrival bloom but a
+   different property, so the two cannot fight, and neither disturbs the
+   opacity the resolve transitions. */
+.pl-gate__logo {
+  animation:
+    pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards,
+    pl-gate-breath 5.2s ease-in-out infinite;
+}
+@keyframes pl-gate-breath {
+  0%,
+  100% {
+    filter: brightness(0.84);
+  }
+  50% {
+    filter: brightness(1.14);
+  }
+}
+
+/* Beat one of the handover, and the track's first touch: every colour
+   gives way to the one that was chosen, which the orb beneath is already
+   wearing. */
+.pl-gate[data-orb="solid"] .pl-gate__logo {
+  opacity: 0;
+  /* Nothing left to look at, and the handover is the busiest moment this
+     screen has - stop repainting a mark that is on its way out. */
+  animation-play-state: paused;
+}
+
 /* AppOrb scales its 200px stage by size/200 inline; override so the
    CORONA (400 units, the orb's true visual extent) spans exactly the hit
    box. scale(--s) - NOT --s * 2, which drew the orb at twice the box and
@@ -419,12 +493,16 @@
     transform: none;
   }
 }
+/* The second beat of the arrival: the soul lands white, and only then
+   does the colour come up inside it. It used to ramp the orb's own
+   --prism-a; the spectrum is the artwork above the orb now, so the same
+   curve at the same delay rides its opacity instead. */
 @keyframes pl-gate-bloom {
   from {
-    --prism-a: 0;
+    opacity: 0;
   }
   to {
-    --prism-a: 1;
+    opacity: 1;
   }
 }
 @keyframes pl-gate-words {
@@ -438,15 +516,15 @@
   }
 }
 
-/* One declaration, two animations - the soul, then the colour held back
-   until the soul has arrived. These were two rules, and because the
-   gate's orb IS the .app-orb, `.pl-gate .app-orb` (0,2,0) silently beat
-   `.pl-gate__orb` (0,1,0) and `animation` is a shorthand: the soul's
-   fade-in was reset away and never ran once. */
+/* The soul arriving white. The colour that follows it belongs to the
+   mark above, and rides the shorthand up beside the breath.
+
+   Beware the specificity here: the gate's orb IS the .app-orb, so
+   `.pl-gate .app-orb` (0,2,0) beats `.pl-gate__orb` (0,1,0), and
+   `animation` is a shorthand - any such rule silently resets the
+   fade-in below to none. */
 .pl-gate__orb {
-  animation:
-    pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards,
-    pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
+  animation: pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .pl-gate__creed,
@@ -470,6 +548,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
+  .pl-gate__logo,
   .pl-gate__creed,
   .pl-gate__lead,
   .pl-gate__label,
@@ -514,6 +593,7 @@
    .pl-gate__orb too, and killing every animation on a replay would kill
    that one along with the arrival it was aimed at. */
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__logo,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .app-orb,
 .pl-gate[data-replay="1"] .pl-gate__creed,
 .pl-gate[data-replay="1"] .pl-gate__lead,

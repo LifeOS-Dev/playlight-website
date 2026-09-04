@@ -642,6 +642,17 @@ export function PrismGate({
    */
   const shown = taken ?? (active === null ? null : VIBES[active]);
 
+  /**
+   * Whether the orb is still holding every colour, or has resolved into
+   * the one being taken.
+   *
+   * Hoisted out of the JSX because the root needs it as well: the prism
+   * face is artwork now (see .pl-gate__logo in prism-gate.css) and it
+   * sits outside the AppOrb, so it cannot read the orb's own --prism-a.
+   * One expression, two readers - they cannot disagree.
+   */
+  const orbMode = taken !== null || (mode === "track" && engaged) ? "solid" : "prism";
+
   /** The one control the keyboard drives. It moves with the mechanic. */
   const slider = {
     tabIndex: 0,
@@ -661,6 +672,7 @@ export function PrismGate({
       data-mode={mode}
       data-trying={onMode ? "1" : "0"}
       data-picking={live && shown ? "1" : "0"}
+      data-orb={orbMode}
       data-taken={taken ? "1" : "0"}
       data-replay={replay ? "1" : "0"}
       data-closing={closing ? "1" : "0"}
@@ -725,10 +737,17 @@ export function PrismGate({
              the feedback, so it stops holding every colour and starts
              wearing the one being chosen. A cursor keeps the spectrum,
              because it has a beam to answer with instead. */
-          mode={taken !== null || (mode === "track" && engaged) ? "solid" : "prism"}
+          mode={orbMode}
           ramp={shown?.ramp}
           className="pl-gate__orb"
         />
+        {/* The mark itself, over the orb's white soul. The spectrum on
+            this screen is the brand's own artwork rather than a conic
+            built to look like it - so the orb below keeps the white
+            heart and the chosen hue, and hands the every-colour state
+            up here. It fades out as the choice resolves, uncovering the
+            single light the orb underneath has already become. */}
+        <div className="pl-gate__logo" aria-hidden />
         {/* The wheel's fixed mark: just off the rim at twelve o'clock,
             inside the beam that leaves from under it, and the only part
             of that mechanic which never moves. */}
