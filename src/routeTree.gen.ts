@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as V3RouteImport } from './routes/v3'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DeleteRouteImport } from './routes/delete'
@@ -20,6 +21,11 @@ import { Route as ApiDeletionRequestRouteImport } from './routes/api/deletion-re
 const V3Route = V3RouteImport.update({
   id: '/v3',
   path: '/v3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportRoute = SupportRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/v3': typeof V3Route
   '/api/deletion-request': typeof ApiDeletionRequestRoute
   '/api/waitlist': typeof ApiWaitlistRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/v3': typeof V3Route
   '/api/deletion-request': typeof ApiDeletionRequestRoute
   '/api/waitlist': typeof ApiWaitlistRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/delete': typeof DeleteRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/v3': typeof V3Route
   '/api/deletion-request': typeof ApiDeletionRequestRoute
   '/api/waitlist': typeof ApiWaitlistRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/delete'
     | '/privacy'
     | '/support'
+    | '/terms'
     | '/v3'
     | '/api/deletion-request'
     | '/api/waitlist'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/delete'
     | '/privacy'
     | '/support'
+    | '/terms'
     | '/v3'
     | '/api/deletion-request'
     | '/api/waitlist'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/delete'
     | '/privacy'
     | '/support'
+    | '/terms'
     | '/v3'
     | '/api/deletion-request'
     | '/api/waitlist'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   DeleteRoute: typeof DeleteRoute
   PrivacyRoute: typeof PrivacyRoute
   SupportRoute: typeof SupportRoute
+  TermsRoute: typeof TermsRoute
   V3Route: typeof V3Route
   ApiDeletionRequestRoute: typeof ApiDeletionRequestRoute
   ApiWaitlistRoute: typeof ApiWaitlistRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/v3'
       fullPath: '/v3'
       preLoaderRoute: typeof V3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeleteRoute: DeleteRoute,
   PrivacyRoute: PrivacyRoute,
   SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
   V3Route: V3Route,
   ApiDeletionRequestRoute: ApiDeletionRequestRoute,
   ApiWaitlistRoute: ApiWaitlistRoute,

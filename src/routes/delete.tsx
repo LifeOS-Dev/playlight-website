@@ -150,20 +150,42 @@ function DeletePage() {
       title="Delete your Playlight account"
       lead={
         <p>
-          Submitting this form emails a deletion request to Light Technologies. We acknowledge
-          verifiable requests within about 2 business days. Deletion currently begins as an account
-          soft-delete (account marked deleted; devices revoked), then we purge or anonymise
-          user-owned records under our deletion workflow. This cannot be undone once processed.
+          The fastest way to delete your account is inside Playlight: open Settings → Account →
+          Delete Account. You can also send a verified request through this page. Deletion cannot be
+          undone once processed.
         </p>
       }
     >
+      <section>
+        <h2>Delete directly in the app</h2>
+        <ol className="mt-3 ml-5 list-decimal space-y-2 text-[15px] leading-relaxed text-muted-foreground">
+          <li>Open Playlight and go to Settings.</li>
+          <li>Select Account, then Delete Account.</li>
+          <li>Review what will be deleted, verify your identity, and confirm.</li>
+        </ol>
+        <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+          Active sessions are revoked when deletion begins. User-owned account data is permanently
+          deleted or anonymised within 30 days, and we email you when processing is complete.
+          Encrypted backups may remain for up to 30 additional days before automatic expiry. Limited
+          security, fraud-prevention, audit, or legal records may be retained only where necessary.
+        </p>
+      </section>
+
+      <section>
+        <h2>Request deletion from the website</h2>
+        <p>
+          If you cannot access the app, submit the form below. We will verify that you control the
+          account before deletion begins. Never send us your password.
+        </p>
+      </section>
+
       <DeleteRequestForm />
 
       <p className="mt-8 text-sm leading-relaxed text-muted-foreground">
-        After processing, we remove or anonymise account profile data and user-owned product content
-        (tasks, projects, habits, notes, wealth records, AI chats/memories/insights where
-        applicable, and related preferences). Security events, audit records, backups, and data
-        required by law may be retained as described in our{" "}
+        Within 30 days of a verified request, we remove or anonymise account profile data and
+        user-owned product content (tasks, projects, habits, notes, wealth records, AI
+        chats/memories/insights where applicable, and related preferences). Security events, audit
+        records, backups, and data required by law may be retained as described in our{" "}
         <Link to="/privacy" className="text-accent underline-offset-4 hover:underline">
           privacy policy
         </Link>
@@ -221,7 +243,8 @@ function DeletePage() {
         </section>
 
         <p className="pl3-doc__note">
-          Response: within 2 business days · Purge: per deletion workflow (see Privacy Policy)
+          Acknowledgement: about 2 business days · Account purge: within 30 days · Backup expiry: up
+          to 30 additional days
         </p>
       </div>
     </DocPage>

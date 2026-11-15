@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { DocPage } from "@/components/landing/v3/DocPage";
 import { pageMeta } from "@/seo";
 
@@ -35,6 +35,41 @@ function SupportPage() {
       </a>
 
       <section>
+        <h2>Contact details</h2>
+        <div className="pl3-doc__qa">
+          <div>
+            <h3>Operator</h3>
+            <p>Light Technologies · Islamabad, Pakistan</p>
+          </div>
+          <div>
+            <h3>Telephone</h3>
+            <p>
+              <a href="tel:+923365192688" className="inline-flex items-center gap-2">
+                <Phone aria-hidden className="size-4" />
+                +92 336 519 2688
+              </a>
+            </p>
+          </div>
+          <div>
+            <h3>Postal address</h3>
+            <p className="inline-flex items-start gap-2">
+              <MapPin aria-hidden className="mt-1 size-4 shrink-0" />
+              <span>
+                Ardium, Hub Commercial Plaza #97, Phase 8, Bahria Town, Islamabad, Pakistan
+              </span>
+            </p>
+          </div>
+          <div>
+            <h3>Privacy and legal</h3>
+            <p>
+              Email hello@playlight.app. Please include “Privacy” or “Legal” in the subject so we
+              can route your message correctly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
         <h2>Common questions</h2>
 
         <div className="pl3-doc__qa">
@@ -43,9 +78,9 @@ function SupportPage() {
             <p>
               Full steps are on our <Link to="/delete">Delete Account or Data</Link> page. Email
               hello@playlight.app from your account address (or use the form on that page). We
-              acknowledge requests within about 2 business days. Deletion begins as an account
-              soft-delete, then we purge or anonymise user-owned records under our deletion
-              workflow - see the <Link to="/privacy">Privacy Policy</Link>.
+              acknowledge requests within about 2 business days, revoke active sessions, and delete
+              or anonymise user-owned records within 30 days. Encrypted backups expire within up to
+              30 additional days - see the <Link to="/privacy">Privacy Policy</Link>.
             </p>
           </div>
 
@@ -70,6 +105,13 @@ function SupportPage() {
             <p>
               Our full Privacy Policy is available <Link to="/privacy">here</Link>. It explains what
               we collect, how we use it, and your rights.
+            </p>
+          </div>
+
+          <div>
+            <h3>Where can I read the Terms of Use?</h3>
+            <p>
+              The current Terms of Use are available <Link to="/terms">here</Link>.
             </p>
           </div>
         </div>

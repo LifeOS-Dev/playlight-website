@@ -9,6 +9,7 @@ import {
   WHATSAPP_URL,
   waitlistMailto,
 } from "@/waitlist";
+import { webAppUrl } from "@/webApp";
 
 /** Brand marks kept to a single path each, colored via currentColor. */
 function DiscordIcon() {
@@ -40,6 +41,14 @@ export function TryToday({
   variant?: "solid" | "quiet";
   className?: string;
 }) {
+  if (webAppUrl) {
+    return (
+      <a href={webAppUrl} className={`pl3-try ${className}`} data-variant={variant}>
+        Open Playlight
+      </a>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -217,6 +226,10 @@ export function GetPlaylightPanel() {
           <span aria-hidden className="pl3-get__dot" />
           <Link to="/privacy" onClick={close}>
             Privacy
+          </Link>
+          <span aria-hidden className="pl3-get__dot" />
+          <Link to="/terms" onClick={close}>
+            Terms
           </Link>
         </div>
       </div>
