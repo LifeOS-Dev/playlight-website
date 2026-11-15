@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TryToday } from "./TryToday";
+import { StoreButtons } from "./StoreButtons";
 import { LifeMap, type LifeMapHandle } from "./LifeMap";
 import { FACES, FACE_COUNT } from "./faces";
 import { Motif } from "./motifs";
@@ -494,14 +494,14 @@ export function RoadJourney() {
           <p className="pl3-road__line">
             Your personalized OS to help you understand, organize, and play life.
           </p>
-          <TryToday />
+          <StoreButtons />
           <span className="pl3-road__cue" aria-hidden="true" />
         </div>
 
         <div ref={philRef} className="pl3-road__phil">
           <p className="pl3-road__phil-line">Come into the light.</p>
           <p className="pl3-road__phil-sub">Not more noise. A calmer next step.</p>
-          <TryToday />
+          <StoreButtons />
         </div>
 
         <a className="pl3-skip" href="#faq">

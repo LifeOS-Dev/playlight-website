@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { TryToday } from "./TryToday";
+import { StoreButtons } from "./StoreButtons";
 
 export function V3Footer() {
   return (
@@ -7,7 +7,7 @@ export function V3Footer() {
       <div className="pl3-footer__close">
         <p className="pl3-footer__line">Come into the light.</p>
         <p className="pl3-footer__sub">Not for more noise. For a calmer next step.</p>
-        <TryToday />
+        <StoreButtons />
       </div>
 
       <div className="pl3-footer__base">
@@ -15,6 +15,7 @@ export function V3Footer() {
 
         <nav className="pl3-footer__nav" aria-label="Footer">
           <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
           <Link to="/support">Support</Link>
           <Link to="/delete">Delete account or data</Link>
         </nav>

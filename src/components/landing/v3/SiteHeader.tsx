@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { TryToday } from "./TryToday";
+import { StoreButtons } from "./StoreButtons";
 import type { Vibe } from "@/components/landing/orb/ramp";
 
 type Props = {
@@ -26,7 +26,7 @@ export function SiteHeader({ vibe, onChangeVibe }: Props = {}) {
       <nav className="pl3-nav__links" aria-label="Main">
         <Link to="/support">Support</Link>
         <Link to="/privacy">Privacy</Link>
-        <TryToday variant="quiet" />
+        <StoreButtons variant="quiet" />
         {/* The dot is the label. A word here - "vibe", "colour", "theme" -
             would be the only piece of interface copy on a page that
             otherwise explains nothing, and the swatch says it better:

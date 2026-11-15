@@ -380,7 +380,8 @@
 
 /* The hero layer is click-through so the road behind it stays reachable;
    the call to action has to opt back in or it cannot be pressed at all. */
-.pl3-road__hero .pl3-try {
+.pl3-road__hero .pl3-try,
+.pl3-road__hero .pl3-stores {
   pointer-events: auto;
   margin-top: clamp(18px, 3vh, 30px);
 }
@@ -448,7 +449,8 @@
   pointer-events: none;
 }
 
-.pl3-road__phil .pl3-try {
+.pl3-road__phil .pl3-try,
+.pl3-road__phil .pl3-stores {
   pointer-events: auto;
   margin-top: clamp(22px, 3.6vh, 38px);
 }
