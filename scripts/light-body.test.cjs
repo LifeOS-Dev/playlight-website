@@ -55,6 +55,7 @@ function loadTs(filename) {
 
 const shader = loadTs(`${ORB}/lightShader.ts`);
 const profile = loadTs(`${ORB}/lightProfile.ts`);
+const character = loadTs(`${ORB}/lightCharacter.ts`);
 
 /**
  * The GLSL program as SkSL, by undoing the four differences lightShader.ts
@@ -89,13 +90,21 @@ test("the shader and the profile agree on the numbers they share", () => {
   // the other is not, this fails before the slow render test even starts, and
   // says which term moved.
   const shared = [
-    ["aura falloff", /exp\(-sq\(max\(rn - 0\.30, 0\.0\) \/ 0\.58\)\)/, /Math\.max\(r - 0\.3, 0\) \/ 0\.58/],
+    [
+      "aura falloff",
+      /exp\(-sq\(max\(rn - 0\.30, 0\.0\) \/ 0\.58\)\)/,
+      /Math\.max\(r - 0\.3, 0\) \/ 0\.58/,
+    ],
     ["corona falloff", /exp\(-rn \* 1\.35\)/, /Math\.exp\(-r \* 1\.35\)/],
     ["body mask", /exp\(-sq\(rn \/ 0\.78\)\)/, /Math\.exp\(-sq\(r \/ 0\.78\)\)/],
     ["vitality floor", /mix\(0\.62, 1\.0, uEnergy\)/, /mix\(0\.62, 1, energy\)/],
     ["aura weight", /aura \* 0\.42 \* lit/, /aura \* 0\.42 \* lit/],
     ["corona weight", /corona \* 0\.20 \* lit/, /corona \* 0\.2 \* lit/],
-    ["deep blend", /smoothstep\(0\.55, 1\.15, rn\) \* 0\.55/, /smoothstep\(0\.55, 1\.15, r\) \* 0\.55/],
+    [
+      "deep blend",
+      /smoothstep\(0\.55, 1\.15, rn\) \* 0\.55/,
+      /smoothstep\(0\.55, 1\.15, r\) \* 0\.55/,
+    ],
     ["brightness compression", /1\.0 - exp\(-lm \* 1\.35\)/, /1 - Math\.exp\(-peak \* 1\.35\)/],
     ["edge fade", /fall\(2\.0, 2\.45, r\)/, /smoothstep\(2\.0, 2\.45, r\)/],
     ["heart coverage", /exp\(-sq\(hr \/ hR\)\) \* 1\.25/, /1\.7 \* 1\.25/],
@@ -105,6 +114,53 @@ test("the shader and the profile agree on the numbers they share", () => {
     assert.match(glsl, inShader, `${name}: not found in lightShader.ts`);
     assert.match(source, inProfile, `${name}: not found in lightProfile.ts`);
   }
+});
+
+test("the heart leans the right way, and can never leave its own body", () => {
+  const { gazeToward, GAZE_MAX } = character;
+  const R = 100;
+
+  // Direction first: the heart turns toward the cursor, in every quadrant.
+  const cases = [
+    ["right", 400, 0, 1, 0],
+    ["left", -400, 0, -1, 0],
+    ["below", 0, 400, 0, 1],
+    ["above", 0, -400, 0, -1],
+    ["below right", 400, 300, 1, 1],
+    ["above left", -400, -300, -1, -1],
+  ];
+  for (const [name, dx, dy, sx, sy] of cases) {
+    const g = gazeToward(dx, dy, R);
+    assert.equal(Math.sign(+g.x.toFixed(6)), sx, `${name}: wrong horizontal lean`);
+    assert.equal(Math.sign(+g.y.toFixed(6)), sy, `${name}: wrong vertical lean`);
+  }
+
+  // Nothing on the page may pull the heart outside the body it lives in.
+  // The orb is a light, not an eye in a socket, and a core that clipped its
+  // own edge would be the one way to make that obvious.
+  for (let dx = -4000; dx <= 4000; dx += 137) {
+    for (let dy = -4000; dy <= 4000; dy += 211) {
+      const g = gazeToward(dx, dy, R);
+      assert(
+        Math.hypot(g.x, g.y) <= GAZE_MAX + 1e-9,
+        `a cursor at ${dx},${dy} pulled the heart ${Math.hypot(g.x, g.y)} past ${GAZE_MAX}`,
+      );
+    }
+  }
+
+  // And it saturates, which is what lets the whole page drive it: something
+  // across the room and something just off the orb lean it almost the same,
+  // so the gesture reads as attention rather than as a cursor on a string.
+  const near = Math.hypot(...Object.values(gazeToward(300, 0, R)));
+  const far = Math.hypot(...Object.values(gazeToward(3000, 0, R)));
+  assert(far > near, "further away must still lean at least as far");
+  assert(
+    far - near < GAZE_MAX * 0.2,
+    `ten times the distance moved the heart by ${(far - near).toFixed(4)} - it is not saturating`,
+  );
+
+  // Dead centre is no direction at all, and must not divide by zero.
+  assert.deepEqual(gazeToward(0, 0, R), { x: 0, y: 0 });
 });
 
 test("the profile's stops are a dissolve, with no edge anywhere", () => {
@@ -123,7 +179,11 @@ test("the profile's stops are a dissolve, with no edge anywhere", () => {
   ]) {
     assert.equal(stops[0].offset, 0, `${name}: must start at the centre`);
     assert.equal(stops[stops.length - 1].offset, 1, `${name}: must reach the rim`);
-    assert.equal(stops[stops.length - 1].opacity, 0, `${name}: must end at nothing, or it has an edge`);
+    assert.equal(
+      stops[stops.length - 1].opacity,
+      0,
+      `${name}: must end at nothing, or it has an edge`,
+    );
     for (let i = 1; i < stops.length; i++) {
       assert(stops[i].offset > stops[i - 1].offset, `${name}: stop ${i} goes backwards`);
       assert(
@@ -181,9 +241,7 @@ test("the shader compiles, and declares exactly the uniforms the body sends", as
   // happened to break.
   const sent = new Set([...body.matchAll(/gl\.uniform[0-9][a-z]*\(\s*U\.(\w+)/g)].map((m) => m[1]));
   const mapped = new Set(
-    [...body.matchAll(/(\w+):\s*loc\("(\w+)"\)/g)]
-      .filter((m) => sent.has(m[1]))
-      .map((m) => m[2]),
+    [...body.matchAll(/(\w+):\s*loc\("(\w+)"\)/g)].filter((m) => sent.has(m[1])).map((m) => m[2]),
   );
   assert.deepEqual([...mapped].sort(), [...declared].sort());
 });

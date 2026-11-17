@@ -252,6 +252,8 @@ export function LightBody({
      * style, and the values are then eased toward, so what the orb does is
      * smooth even though what it reads is steppy.
      */
+    /** Where the heart is actually looking, eased toward whatever leads it. */
+    let gazeNow = { x: 0, y: 0 };
     let rush = 0;
     let rushTo = 0;
     let glow = 1;
@@ -279,6 +281,12 @@ export function LightBody({
           queueDoubleBlink(lid, now);
           break;
         case "glance": {
+          // While a cursor is leading the heart, a glance would be the orb
+          // looking away from the person watching it - so it blinks instead.
+          if (cursorOn) {
+            queueBlink(lid, now);
+            break;
+          }
           const spot = glanceSpot(Math.random());
           queueLookAt(gazeX, gazeY, now, spot.x, spot.y, 1100);
           break;
@@ -300,41 +308,71 @@ export function LightBody({
       }
     };
 
-    // ---- pointer ----------------------------------------------------------
+    // ---- the cursor --------------------------------------------------------
     /**
-     * Pointer position in body radii.
+     * The heart looks at the cursor, wherever it is on the page.
      *
-     * Measured against the CANVAS, not the host: the canvas is the drawing,
-     * and it is 2.1 times the host box, so measuring the host would put the
-     * pointer twice as far out as the shader thinks it is.
+     * Not a hover: the orb is a fixed, `pointer-events: none` decoration, so
+     * it never receives a pointer event at all and never could without taking
+     * clicks away from the page under it. This listens on the window instead,
+     * which is also what the gesture wants to be - the light noticing you
+     * across the room, not a control lighting up when you touch it.
+     *
+     * `gazeToward` saturates, so a cursor at the far corner and a cursor just
+     * off the orb pull it nearly the same distance. That is the whole trick:
+     * the heart leans the RIGHT WAY long before it leans far, and it can
+     * never be dragged out of its own body.
+     *
+     * Mouse and pen only. A finger is not a cursor - it is only ever on the
+     * glass for a moment, and having the heart lunge at each tap and then
+     * forget would read as a twitch rather than attention.
      */
-    const toBody = (e: PointerEvent) => {
-      const r = canvas.getBoundingClientRect();
-      if (r.width <= 0) return { x: 0, y: 0, dx: 0, dy: 0, half: 1 };
-      const half = r.width / 2;
-      const dx = e.clientX - (r.left + half);
-      const dy = e.clientY - (r.top + r.height / 2);
-      // The body is LIGHT_RADIUS of LIGHT_CANVAS, so one body radius is a
-      // fifth of the canvas however large it is drawn.
-      const perRadius = r.width / 5;
-      return { x: dx / perRadius, y: dy / perRadius, dx, dy, half };
+    let cursorOn = false;
+    let cursorX = 0;
+    let cursorY = 0;
+    /** Where the orb is on screen, refreshed with the other sampled reads. */
+    let centreX = 0;
+    let centreY = 0;
+    let perRadius = 1;
+
+    const onMove = (e: PointerEvent) => {
+      if (!look.current.interactive) return;
+      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      cursorOn = true;
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+    };
+    /** Cursor gone from the window, or the tab lost: the heart comes back. */
+    const onOut = (e?: PointerEvent) => {
+      if (e && e.relatedTarget) return;
+      cursorOn = false;
+    };
+    const onBlur = () => {
+      cursorOn = false;
     };
 
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerout", onOut, { passive: true });
+    window.addEventListener("blur", onBlur);
+
+    // Press and ripple stay available for a caller that CAN receive events -
+    // the orb answering a click where it is not a decoration. On the home
+    // page nothing below ever fires, by design.
     onPointer.current = (e) => {
       if (!look.current.interactive) return;
-      const b = toBody(e);
-      touch = { x: b.x, y: b.y };
+      const r = canvas.getBoundingClientRect();
+      if (r.width <= 0) return;
+      // One body radius is a fifth of the canvas, however large it is drawn.
+      const per = r.width / 5;
+      touch = {
+        x: (e.clientX - (r.left + r.width / 2)) / per,
+        y: (e.clientY - (r.top + r.height / 2)) / per,
+      };
       hovering = true;
-      const g = gazeToward(b.dx, b.dy, b.half);
-      gazeX.cut(performance.now()).to(g.x, 260);
-      gazeY.cut(performance.now()).to(g.y, 260);
     };
     onLeave.current = () => {
       hovering = false;
-      const now = performance.now();
-      press.cut(now).to(0, 260);
-      gazeX.cut(now).to(0, 420);
-      gazeY.cut(now).to(0, 420);
+      press.cut(performance.now()).to(0, 260);
     };
     onDown.current = () => {
       if (!look.current.interactive) return;
@@ -344,8 +382,7 @@ export function LightBody({
       queueBlink(lid, now, false, 60);
     };
     onUp.current = () => {
-      const now = performance.now();
-      press.cut(now).to(0, 320);
+      press.cut(performance.now()).to(0, 320);
     };
 
     // ---- buffer sizing ----------------------------------------------------
@@ -367,14 +404,25 @@ export function LightBody({
     };
 
     /**
-     * How wide the canvas actually lands on screen, transforms and all.
+     * Where and how big the canvas actually lands on screen, transforms and
+     * all - the drawing buffer, the orb's centre for the gaze, and what one
+     * body radius is worth in screen pixels.
      *
      * A ResizeObserver would report the canvas's own layout box and miss
      * every scale above it, and the hero is scaled by the scroll on an
-     * ancestor - so the measurement has to be the rect, and it has to be
-     * taken now and then rather than per frame.
+     * ancestor - so this has to be the rect. One read, three answers, taken
+     * now and then rather than per frame.
      */
-    const measure = () => sizeTo(canvas.getBoundingClientRect().width || size);
+    const measure = () => {
+      const r = canvas.getBoundingClientRect();
+      if (r.width > 0) {
+        centreX = r.left + r.width / 2;
+        centreY = r.top + r.height / 2;
+        // The body is LIGHT_RADIUS of LIGHT_CANVAS: a fifth of the canvas.
+        perRadius = r.width / 5;
+      }
+      sizeTo(r.width || size);
+    };
     measure();
 
     // ---- gating -----------------------------------------------------------
@@ -401,10 +449,13 @@ export function LightBody({
         return;
       }
 
-      // Grow-only, so this settles within the first second of any scroll and
-      // then costs one rect read a half-second thereafter.
-      if (tick % 30 === 0) measure();
-      if (tick % 6 === 0) readDrive();
+      // Both sampled at about 10Hz. The rect is needed this often because
+      // the orb travels while the page scrolls and the gaze is measured from
+      // where it actually is; the buffer side of it stays grow-only.
+      if (tick % 6 === 0) {
+        measure();
+        readDrive();
+      }
       tick += 1;
 
       const dt = Math.min((now - last) / 1000, 1 / 20);
@@ -460,8 +511,27 @@ export function LightBody({
       const pressNow = press.at(now);
       const vitality = Math.max(ORB_VITALITY_FLOOR, Math.min(1, e));
 
+      /**
+       * Who the heart is following.
+       *
+       * The cursor while there is one, the quirk tracks otherwise - never
+       * both, or a glance and the cursor would add up and throw the heart
+       * further than it can go. Either way the result is EASED rather than
+       * set, so a cursor flung across the page turns the heart rather than
+       * teleporting it, and losing the cursor lets it drift back instead of
+       * snapping to the middle.
+       */
+      const want = cursorOn
+        ? gazeToward(cursorX - centreX, cursorY - centreY, perRadius)
+        : { x: gazeX.at(now), y: gazeY.at(now) };
+      const turn = Math.min(1, dt * 5.5);
+      gazeNow = {
+        x: gazeNow.x + (want.x - gazeNow.x) * turn,
+        y: gazeNow.y + (want.y - gazeNow.y) * turn,
+      };
+
       gl.uniform1f(U.flow, flow);
-      gl.uniform2f(U.gaze, gazeX.at(now), gazeY.at(now));
+      gl.uniform2f(U.gaze, gazeNow.x, gazeNow.y);
       gl.uniform1f(U.lid, lid.at(now));
       gl.uniform1f(U.energy, vitality);
       gl.uniform1f(U.charge, 0);
@@ -512,6 +582,9 @@ export function LightBody({
       cancelAnimationFrame(raf);
       window.clearTimeout(ready);
       io.disconnect();
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerout", onOut);
+      window.removeEventListener("blur", onBlur);
       onPointer.current = null;
       onLeave.current = null;
       onDown.current = null;
