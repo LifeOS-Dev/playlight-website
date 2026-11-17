@@ -87,9 +87,9 @@ export const DEPART_TRAVEL = 1400;
  * card arrived, six times over, was the single most restless thing on the page.
  */
 export const LIGHT = {
-  heroY: 70,
-  heroSize: 0.84,
-  heroHorizon: 70,
+  heroY: 64,
+  heroSize: 0.92,
+  heroHorizon: 64,
   /**
    * Empty-road frame, and the pose the whole journey is measured from.
    *
@@ -102,8 +102,8 @@ export const LIGHT = {
    * the lowest edge a card ever reaches. The composition stops overlapping
    * before any of the motion is asked to fix it.
    */
-  cruiseY: 72,
-  cruiseSize: 0.8,
+  cruiseY: 68,
+  cruiseSize: 0.88,
   cruiseHorizon: 58,
   /**
    * While a problem/answer owns the middle, the light drops onto the near road

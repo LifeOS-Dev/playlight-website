@@ -46,10 +46,16 @@
   --ash-pale: oklch(0.83 0.042 var(--glow-hue));
   --line: rgb(var(--edge-rgb) / 0.42);
   --line-soft: rgb(var(--edge-rgb) / 0.16);
-  --horizon: 70%;
-  --orb-base: clamp(160px, 18vw, 280px);
+  --horizon: 64%;
+  /* The light's size.
+     `min(18vw, 26vh)` because the orb is sized against the WIDTH of the
+     page but has to live in its HEIGHT: on a wide, short screen - any
+     1280x700 laptop - the width term alone drew it so large that its foot
+     ran off the bottom of the road. The height term only bites where that
+     is true, so a normal window keeps exactly the size it had. */
+  --orb-base: clamp(160px, min(18vw, 26vh), 280px);
   /* defaults until the scroll listener takes over */
-  --orb-y: 70vh;
+  --orb-y: 64vh;
   --orb-x: 50vw;
   --orb-scale: 0.82;
   --orb-i: 1;

@@ -238,6 +238,35 @@ export function LightBody({
     let touch = { x: 0, y: 0 };
     let hovering = false;
 
+    /**
+     * How the page is travelling, read from the tokens the scroll already
+     * writes: `--road-rush` is the road's pace, 0 standing still to 1 flat
+     * out, and `--orb-i` is how much light the page is asking for.
+     *
+     * Read rather than passed, because the page has two drivers - the road
+     * while its stage is pinned, the stop table afterwards - and they agreed
+     * long ago to speak through these tokens. A second channel would be a
+     * second thing to keep in step.
+     *
+     * Sampled at about 10Hz, not per frame: reading a custom property flushes
+     * style, and the values are then eased toward, so what the orb does is
+     * smooth even though what it reads is steppy.
+     */
+    let rush = 0;
+    let rushTo = 0;
+    let glow = 1;
+    let glowTo = 1;
+    const readDrive = () => {
+      const cs = getComputedStyle(host);
+      const r = parseFloat(cs.getPropertyValue("--road-rush"));
+      const i = parseFloat(cs.getPropertyValue("--orb-i"));
+      rushTo = Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 0;
+      glowTo = Number.isFinite(i) ? i : 1;
+    };
+    readDrive();
+    rush = rushTo;
+    glow = glowTo;
+
     const runQuirk = (now: number) => {
       switch (pickQuirk(Math.random(), state)) {
         case "blink":
@@ -374,16 +403,47 @@ export function LightBody({
 
       // Grow-only, so this settles within the first second of any scroll and
       // then costs one rect read a half-second thereafter.
-      if (tick++ % 30 === 0) measure();
+      if (tick % 30 === 0) measure();
+      if (tick % 6 === 0) readDrive();
+      tick += 1;
 
       const dt = Math.min((now - last) / 1000, 1 / 20);
       last = now;
 
+      // Ease toward what the page is doing. The road can jump its pace
+      // between frames; the light is a body and may not.
+      const chase = Math.min(1, dt * 5);
+      rush += (rushTo - rush) * chase;
+      glow += (glowTo - glow) * chase;
+
       const { accent: on, energy: e, sparks: sp, ramp: r } = look.current;
 
-      const heatNow = heat.at(now);
-      // The app's clock exactly: charge is a hold, which the site never has.
-      flow += dt * posture.flow * (1 + heatNow * 1.6);
+      /**
+       * What travelling does to the body.
+       *
+       * The orb is the thing moving down the road, so the road's pace is its
+       * pace: the currents inside it stream faster and wind harder around
+       * the heart (`uSwirl`), and the silhouette firms up (`uTense` is what
+       * rounds a drifting edge). Where the page asks for more light - an
+       * answer landing, the closing line - that arrives as heat, which is
+       * the shader's own word for a warmer aura and a fuller heart.
+       *
+       * Not `uScatter`, which was the first thing tried: it only throws the
+       * finished-task sparks wider, and the site shows none, so it was an
+       * effect that could never appear.
+       *
+       * All four are terms the shader already had for the app's own states.
+       * Nothing new is invented here; the page is simply allowed to drive
+       * what a thumb drives in the app.
+       */
+      const bloom = Math.max(0, glow - 1.08);
+      const heatNow = Math.min(1, heat.at(now) + bloom * 0.5);
+      const tenseNow = Math.min(1, posture.tense + rush * 0.42);
+      const swirlNow = posture.swirl + rush * 0.9;
+
+      // The app's clock, plus the road: charge is a hold, which the site
+      // has no equivalent of.
+      flow += dt * posture.flow * (1 + heatNow * 1.6 + rush * 1.5);
       if (flow > FLOW_WRAP) flow -= FLOW_WRAP;
 
       if (now >= nextQuirk) {
@@ -416,8 +476,8 @@ export function LightBody({
       gl.uniform1f(U.heat, heatNow);
       gl.uniform1f(U.cool, 0);
       gl.uniform1f(U.alert, 0);
-      gl.uniform1f(U.swirl, posture.swirl);
-      gl.uniform1f(U.tense, posture.tense);
+      gl.uniform1f(U.swirl, swirlNow);
+      gl.uniform1f(U.tense, tenseNow);
       gl.uniform1f(U.rays, 0);
       gl.uniform1f(U.sparks, Math.max(0, Math.min(6, sp)));
       gl.uniform1f(U.scatter, scatter.at(now));
