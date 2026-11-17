@@ -1,0 +1,145 @@
+/**
+ * The living body's two drawings, stacked.
+ *
+ * Both are centred on the same point and the same size, because they are the
+ * same picture: the vector body (gradients, no GL, also what the server
+ * renders) and the shader body (a canvas). The cross-fade between them is the
+ * whole trick - get it wrong and the visitor sees one orb swapped for another
+ * rather than one orb starting to move.
+ *
+ * Nothing here clips: the corona has no edge, and `overflow: hidden` anywhere
+ * on this stack would give it one.
+ */
+
+/**
+ * The box is the orb's 200-unit layout box; the drawings inside are BIGGER
+ * than it (the corona reaches about 2.1x) and are centred on it by absolute
+ * positioning.
+ *
+ * This was a grid with `place-items: center` once, which is wrong in a way
+ * worth recording: an auto-sized grid track grows to its largest item, so the
+ * 420-unit canvas sized the track to 420 and every item was then centred on
+ * THAT, not on the 200-unit box. The box stayed where it belonged and the
+ * light sat 110 units down and to the right of it. Nothing here may size a
+ * track off the drawing - which is also why the stacked-gradient orb it
+ * replaced kept its oversized layers absolutely positioned inside a stage.
+ */
+.light-body {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Exactly the box's size, so its own origin IS the box's origin. */
+.light-body__vector {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Bigger than the box, so it is centred by half its own width - carried as a
+   margin rather than a translate, because the frame loop owns `transform`. */
+.light-body__gl {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.light-vector {
+  position: relative;
+  pointer-events: none;
+}
+
+.light-vector__stage {
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.light-vector__body,
+.light-vector__heart {
+  pointer-events: none;
+}
+
+/* ── solid / prism ────────────────────────────────────────────
+   The body is drawn twice when a caller sets a mode: once in the one
+   ramp, once as the spectrum, cross-faded by --solid-a / --prism-a.
+   Only the gate sets it; without a mode neither selector below applies
+   and the body is simply itself.
+
+   Unlike the stacked-gradient orb these are plain `opacity`
+   declarations, because nothing here is animated by keyframes - there
+   is no running animation to lose the cascade to. */
+.light-vector {
+  --prism-a: 1;
+  --solid-a: 0;
+  /* How long the spectrum takes to resolve into the one hue. The gate
+     overrides it: there the resolve is a beat in its own right. */
+  --orb-fade: 0.8s;
+  transition:
+    --prism-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1),
+    --solid-a var(--orb-fade) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-vector[data-mode="prism"] {
+  --prism-a: 1;
+  --solid-a: 0;
+}
+
+.light-vector[data-mode="solid"] {
+  --prism-a: 0;
+  --solid-a: 1;
+}
+
+.light-vector[data-mode] .light-vector__prism {
+  opacity: var(--prism-a);
+}
+
+.light-vector[data-mode] .light-vector__solid {
+  opacity: var(--solid-a);
+}
+
+@property --prism-a {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@property --solid-a {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/**
+ * The handover. The vector body leaves as the shader arrives, and they are
+ * only ever both at full strength for no frames at all - these are additive
+ * light, so an overlap would read as the orb flaring.
+ */
+.light-body__vector,
+.light-body__gl {
+  transition: opacity 420ms ease;
+}
+
+/* Sized inline, in the orb's own units: it is the whole drawing, corona
+   included, so it is wider than the layout box and overflows it on purpose. */
+.light-body__gl {
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.light-body[data-live] .light-body__gl {
+  opacity: 1;
+}
+
+.light-body[data-live] .light-body__vector {
+  opacity: 0;
+}
+
+/* A visitor who asked for less motion keeps the still body, at full strength
+   and with no transition to sit through. */
+@media (prefers-reduced-motion: reduce) {
+  .light-body__vector,
+  .light-body__gl {
+    transition: none;
+  }
+}

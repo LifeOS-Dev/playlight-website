@@ -220,7 +220,7 @@
    The orb below keeps its white soul and its chosen hue, and gives up
    its conic prism layers - this IS the spectrum now, and two of them
    would double every hue. */
-.pl-gate__orb .app-orb__prism {
+.pl-gate__orb .light-vector__prism {
   display: none;
 }
 .pl-gate__logo {
@@ -285,7 +285,7 @@
    box. scale(--s) - NOT --s * 2, which drew the orb at twice the box and
    left the torch, sized in the same 400-unit space, starting inside the
    ring instead of on it. */
-.pl-gate__orb .app-orb__stage {
+.pl-gate__orb .light-vector__stage {
   transform: scale(var(--s)) !important;
 }
 
@@ -519,8 +519,8 @@
 /* The soul arriving white. The colour that follows it belongs to the
    mark above, and rides the shorthand up beside the breath.
 
-   Beware the specificity here: the gate's orb IS the .app-orb, so
-   `.pl-gate .app-orb` (0,2,0) beats `.pl-gate__orb` (0,1,0), and
+   Beware the specificity here: the gate's orb IS the .light-vector, so
+   `.pl-gate .light-vector` (0,2,0) beats `.pl-gate__orb` (0,1,0), and
    `animation` is a shorthand - any such rule silently resets the
    fade-in below to none. */
 .pl-gate__orb {
@@ -594,7 +594,7 @@
    that one along with the arrival it was aimed at. */
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__logo,
-.pl-gate[data-replay="1"]:not([data-taken="1"]) .app-orb,
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .light-vector,
 .pl-gate[data-replay="1"] .pl-gate__creed,
 .pl-gate[data-replay="1"] .pl-gate__lead,
 .pl-gate[data-replay="1"] .pl-gate__label,

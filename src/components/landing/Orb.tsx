@@ -1,4 +1,4 @@
-import { AppOrb } from "@/components/landing/orb/AppOrb";
+import { LightBody } from "@/components/landing/orb/LightBody";
 
 interface OrbProps {
   size?: number;
@@ -10,15 +10,15 @@ interface OrbProps {
 }
 
 /**
- * Shared marketing orb - same object as the Playlight app.
- * White essence never tints; amber lives outside as ring / aura / corona.
+ * Shared marketing orb - the same body the app draws.
+ *
+ * `mood` and `intensity` predate the living body and are kept because callers
+ * still pass them: night dims and decolours, everything else stays lit. The
+ * app expresses those as postures the shader knows about, and if this orb ever
+ * needs them properly they should come from `postureFor` rather than from
+ * opacity on a wrapper.
  */
-export function Orb({
-  size = 140,
-  className = "",
-  intensity = 1,
-  mood = "rest",
-}: OrbProps) {
+export function Orb({ size = 140, className = "", intensity = 1, mood = "rest" }: OrbProps) {
   const accent = mood !== "night" && intensity > 0.35;
   return (
     <div
@@ -28,7 +28,7 @@ export function Orb({
       }}
       aria-label="Playlight"
     >
-      <AppOrb size={size} accent={accent} sparks={0} />
+      <LightBody size={size} accent={accent} sparks={0} />
     </div>
   );
 }

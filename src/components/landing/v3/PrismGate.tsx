@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { AppOrb } from "@/components/landing/orb/AppOrb";
+import { LightVectorBody } from "@/components/landing/orb/LightVectorBody";
 import {
   PRISM_LINEAR,
   VIBES,
@@ -142,7 +142,7 @@ export function PrismGate({
    * It used to be a boolean, and the departing orb read its colour back
    * off `active` - which is cleared the moment the pointer leaves. On
    * touch the browser fires pointerleave the instant the finger lifts, so
-   * by the time the orb began to move `active` was already null, AppOrb
+   * by the time the orb began to move `active` was already null, the orb
    * fell back to its default ramp, and every choice flew home amber.
    */
   const [taken, setTaken] = React.useState<Vibe | null>(null);
@@ -648,7 +648,7 @@ export function PrismGate({
    *
    * Hoisted out of the JSX because the root needs it as well: the prism
    * face is artwork now (see .pl-gate__logo in prism-gate.css) and it
-   * sits outside the AppOrb, so it cannot read the orb's own --prism-a.
+   * sits outside the orb, so it cannot read the orb's own --prism-a.
    * One expression, two readers - they cannot disagree.
    */
   const orbMode = taken !== null || (mode === "track" && engaged) ? "solid" : "prism";
@@ -728,11 +728,15 @@ export function PrismGate({
             no cursor to carry it, it is not worth its cost, so the orb
             answers with a bloom instead (see prism-gate.css). */}
         {mode === "track" ? null : <div className="pl-gate__torch" aria-hidden />}
-        <AppOrb
+        {/* The still body, not the shader. The torch is welded to the orb's
+            rim, and the living body's silhouette DRIFTS - that is the point
+            of it - so a shader here would walk the beam's junction off the
+            edge it leaves from. The vector body is the shader's own angular
+            mean, which is to say a perfectly round version of it: the same
+            orb, holding still, which is exactly what this screen needs. */}
+        <LightVectorBody
           size={FIELD}
           accent
-          sparks={0}
-          reducedMotion
           /* Resolved once a hand is on the bar: on a phone the orb IS
              the feedback, so it stops holding every colour and starts
              wearing the one being chosen. A cursor keeps the spectrum,
