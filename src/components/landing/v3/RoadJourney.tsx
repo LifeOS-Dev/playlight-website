@@ -492,7 +492,7 @@ export function RoadJourney() {
         <div ref={heroRef} className="pl3-road__hero">
           <h1 className="pl3-road__mark">playlight</h1>
           <p className="pl3-road__line">
-            Your personalized OS to help you understand, organize, and play life.
+            Your personalized OS to help you visualize, interpret, and navigate life.
           </p>
           <StoreButtons />
           <span className="pl3-road__cue" aria-hidden="true" />

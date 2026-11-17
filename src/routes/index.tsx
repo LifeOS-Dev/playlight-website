@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: pageMeta({
       title: "Playlight - your personalized OS for life",
-      description: "Your personalized OS to help you understand, organize, and play life.",
+      description: "Your personalized OS to help you visualize, interpret, and navigate life.",
     }),
   }),
   component: HomePage,
