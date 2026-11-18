@@ -78,13 +78,14 @@ export const DEPART_TRAVEL = 1400;
  * Where the light sits on the road, in vh (y) and % (horizon).
  *
  * After the hero flies, the light settles onto the road - down and slightly
- * smaller, the far end of the journey opening above it. That cruise is the
- * path for the rest of the way. A problem/answer card is the only thing that
- * moves it off that path: it leans back onto the near road to give the card
- * the middle, and returns once the card has passed.
+ * smaller, the far end of the journey opening above it. When the VIN cards
+ * arrive it drops onto the near road beneath them, because from there on it
+ * is the one doing the talking: its words sit on its crown, between it and
+ * the card.
  *
- * The three poses are deliberately close together. A 12vh plunge every time a
- * card arrived, six times over, was the single most restless thing on the page.
+ * The poses are deliberately close together. A 12vh plunge every time a card
+ * arrived, six times over, was the single most restless thing on an earlier
+ * version of this page.
  */
 export const LIGHT = {
   heroY: 64,
@@ -106,15 +107,23 @@ export const LIGHT = {
   cruiseSize: 0.88,
   cruiseHorizon: 58,
   /**
-   * While a problem/answer owns the middle, the light drops onto the near road
-   * to give the card the frame. It leans back; it does not shrink away. Taking
-   * this to 0.56 is what turned the protagonist into a bead pinched between the
-   * card's lower edge and the rail - depth here is read from the gap above the
-   * orb, not from how small the orb gets. The card's resting height (--plate-y
-   * in road.css) is set against this pose: the two must never touch.
+   * Under the VIN cards: low on the near road, where it speaks from. It leans
+   * back; it does not shrink away - an earlier version took a reading pose
+   * to 0.56 and turned the protagonist into a bead pinched under a card.
+   * Depth is read from the gap above the orb, not from how small it gets.
+   *
+   * vin.css sizes the card off this pose (--vin-orb-y / --vin-orb-s): change
+   * one, change the other.
    */
-  readY: 78,
-  readSize: 0.7,
+  vinY: 86,
+  vinSize: 0.64,
+  /**
+   * Under the "what it solves" collage. Nothing to say here, so the light
+   * steps further back and gives the tiles the frame; solve.css sizes the
+   * collage off this pose (--slv-orb-y / --slv-orb-s).
+   */
+  solveY: 91,
+  solveSize: 0.5,
 } as const;
 
 /**
@@ -128,51 +137,68 @@ export const LIGHT = {
 export const zForScale = (s: number) => (-PERSP * (1 - s)) / s;
 
 /**
- * One station, in its own local time (0 → 1 of its slot).
+ * Everything on the road after the hero, measured in screens of scroll
+ * travelled (one screen = one viewport height). Counting in screens rather
+ * than as fractions of the whole pin means adding a beat to the road never
+ * silently re-times every beat before it.
  *
- * A point of light shows up at the vanishing point, above the orb and far
- * down the road. It grows into a card carrying one numbered problem, holds
- * long enough to be read, and then the light sweeps across it and the problem
- * renders into its answer. The card passes the camera, and by then the next
- * point of light is already out there.
+ * The hero flies. A point of light shows on the horizon and three cards grow
+ * out of it - Visualize, Interpret, Navigate - standing together. Then one
+ * band of scroll per state: the three fold into one card, and that card shows
+ * everything about you, joins three of those things into an insight, and
+ * stands them up as steps. As it passes the camera, what all of that solves
+ * comes up the road behind it as one collage. Then the road opens.
  *
- * Hold the problem a beat longer than the answer: landing on the feeling
- * is the job; the wipe is the relief.
+ * The VIN bands are long on purpose. The change between states plays as a
+ * timed transformation the moment a threshold is crossed, so the scroll only
+ * has to decide WHICH state you are in - and a reader needs time on each one
+ * for the light to finish speaking.
  */
-export const STATION = {
-  /** the signal is already on the road before the slot formally opens */
-  sigIn: -0.1,
-  sigPeak: 0.02,
-  /** by here the card has taken over and the point of light is spent */
-  sigOut: 0.18,
-  /** apparent size the moment the card separates from the signal */
-  bornScale: 0.12,
-  /** card grows out of the vanishing point into reading position */
-  arrive: 0.22,
-  /**
-   * By here the light has finished yielding - well before the card is solid
-   * enough to argue with it. The yield used to run 0.088 → 0.22, which is
-   * behind the card's own fade-in (complete by 0.11): the light was still
-   * getting out of the way of something already fully drawn on top of it.
-   * Leading rather than trailing is the whole difference between a light that
-   * makes room and a light that gets shoved.
-   */
-  yieldBy: 0.11,
-  /** the sweep: problem renders into answer */
-  turnFrom: 0.5,
-  turnTo: 0.68,
-  /** and away past the camera */
-  passFrom: 0.88,
-} as const;
-
-export const PHASE = {
+export const ROAD = {
   /** facets + hero fly past the camera */
-  depart: 0.14,
-  /** six numbered stations share the middle */
-  stations: 0.76,
-  /** closing line */
-  philosophy: 0.1,
+  depart: 1.2,
+  vin: {
+    /** The point of light the three cards are born out of. */
+    sigIn: 0.7,
+    sigPeak: 1.15,
+    sigOut: 1.7,
+    /** The three grow out of the horizon into place. */
+    arriveFrom: 1.1,
+    arriveTo: 2.1,
+    /** Apparent size the moment the cards separate from the point of light. */
+    bornScale: 0.12,
+    /** Where each state takes over. Before `v`, the three stand together. */
+    v: 3.0,
+    i: 4.6,
+    n: 6.2,
+    /** Navigate is the last word, so it holds the longest - then away. */
+    passFrom: 8.0,
+    passTo: 8.75,
+  },
+  /**
+   * What it solves: five tiles, composed at once and never queued. They come
+   * out of the horizon as the VIN card is in its last moments past the
+   * camera - late enough that the card's large, near words are already gone,
+   * early enough that the road is never empty between the two.
+   */
+  solve: {
+    arriveFrom: 8.45,
+    arriveTo: 9.5,
+    /** Each tile starts this much later than the one before, in arrival time. */
+    stagger: 0.07,
+    /**
+     * Then the focus walks the tiles one at a time, this many screens each,
+     * and once all five have had a turn the whole collage holds as one
+     * picture until it passes.
+     */
+    focusFrom: 9.4,
+    focusEvery: 0.42,
+    passFrom: 12.0,
+    passTo: 12.8,
+  },
+  /** The closing line, as the collage goes. */
+  closeFrom: 12.4,
 } as const;
 
-/** Extra screens of scroll so six stations each get a full read. */
-export const STAGE_SCREENS = 12;
+/** Screens of scroll the pinned road lasts beyond its first. */
+export const STAGE_SCREENS = 14;

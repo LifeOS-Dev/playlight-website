@@ -3,8 +3,12 @@ import * as React from "react";
 /**
  * What the light says while it is still with you, before the road takes over.
  * Short, spoken, no product pitch - the hero copy already does that job.
+ *
+ * One line, said once and held. It used to cycle through three, which kept a
+ * second piece of text changing beside the headline for as long as anyone
+ * was reading it. Add a line here and the cycling comes back on its own.
  */
-const LINES = ["I see the whole of it.", "Not more noise.", "Walk when you're ready."] as const;
+const LINES: readonly string[] = ["I see the whole of it."];
 
 const GO_LINE = "Let's move forward.";
 
@@ -79,7 +83,7 @@ export function OrbSpeech() {
   }, [reduced]);
 
   React.useEffect(() => {
-    if (!ready || reduced || go || said) return;
+    if (!ready || reduced || go || said || LINES.length < 2) return;
     const text = LINES[index];
     const stay = inDuration(text, CHAR_MS) + HOLD_MS;
     const out = window.setTimeout(() => setPhase("out"), stay);
