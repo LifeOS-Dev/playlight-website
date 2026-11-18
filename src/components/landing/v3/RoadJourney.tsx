@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Wordmark } from "@/components/landing/Logo";
 import { StoreButtons } from "./StoreButtons";
 import { LifeMap, type LifeMapHandle } from "./LifeMap";
 import { VinStory, type VinHandle } from "./VinStory";
@@ -339,7 +340,11 @@ export function RoadJourney() {
 
         {/* Hero rides at the front of the camera and flies past first */}
         <div ref={heroRef} className="pl3-road__hero">
-          <h1 className="pl3-road__mark">playlight</h1>
+          {/* The full lockup: the one place it is large enough for play
+              to sit beside the orb, the way it was drawn. */}
+          <h1 className="pl3-road__mark">
+            <Wordmark variant="lockup" />
+          </h1>
           <p className="pl3-road__line">
             Your personalized OS to help you visualize, interpret, and navigate life.
           </p>

@@ -499,12 +499,16 @@
   background: linear-gradient(to bottom, var(--void) 18%, rgba(7, 6, 10, 0.78) 58%, transparent);
 }
 
+/* The drawn wordmark, inline form. Sized by height so the bar keeps its
+   rhythm; 30px makes light's x-height about 13px and play's about 6. */
 .pl3-nav__mark {
-  font-weight: 300;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  color: var(--filament);
-  opacity: 0.9;
+  display: block;
+  line-height: 0;
+}
+.pl3-nav__mark svg {
+  display: block;
+  height: 30px;
+  width: auto;
 }
 
 .pl3-nav__preview,
@@ -587,6 +591,9 @@
   .pl3-nav__links > a,
   .pl3-nav__preview {
     display: none;
+  }
+  .pl3-nav__mark svg {
+    height: 27px;
   }
 }
 
@@ -1147,11 +1154,17 @@
   border-top: 1px solid var(--line-soft);
 }
 
+/* Quieter than the bar's: the same drawing, a little smaller and dimmer,
+   the way the old text mark sat at 70%. */
 .pl3-footer__mark {
-  font-weight: 300;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  color: rgb(var(--paper-rgb) / 0.7);
+  display: block;
+  line-height: 0;
+  opacity: 0.8;
+}
+.pl3-footer__mark svg {
+  display: block;
+  height: 26px;
+  width: auto;
 }
 
 .pl3-footer__nav {

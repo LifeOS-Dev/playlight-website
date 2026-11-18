@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Wordmark } from "@/components/landing/Logo";
 import { StoreButtons } from "./StoreButtons";
 
 export function V3Footer() {
@@ -11,7 +12,9 @@ export function V3Footer() {
       </div>
 
       <div className="pl3-footer__base">
-        <span className="pl3-footer__mark">playlight</span>
+        <span className="pl3-footer__mark">
+          <Wordmark variant="inline" />
+        </span>
 
         <nav className="pl3-footer__nav" aria-label="Footer">
           <Link to="/privacy">Privacy</Link>
