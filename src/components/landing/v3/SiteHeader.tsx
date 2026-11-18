@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Wordmark } from "@/components/landing/Logo";
 import { StoreButtons } from "./StoreButtons";
 import type { Vibe } from "@/components/landing/orb/ramp";
 
@@ -21,11 +20,8 @@ type Props = {
 export function SiteHeader({ vibe, onChangeVibe }: Props = {}) {
   return (
     <header className="pl3-nav">
-      {/* Inline, not the nested lockup: at bar height the nested play
-          would be a few pixels tall. On one line it is half of light's
-          x-height and still reads. */}
       <Link to="/" className="pl3-nav__mark">
-        <Wordmark variant="inline" label="playlight, home" />
+        <span className="pl3-play">play</span>light
       </Link>
       <nav className="pl3-nav__links" aria-label="Main">
         <Link to="/support">Support</Link>
