@@ -1901,9 +1901,10 @@ html[data-platform="android"] .pl3-store[data-variant="solid"][data-store="apple
 
 /* ── Light's voice, wherever it speaks ───────────────────────────
    One look for everything the light says: the tint and the glow above,
-   and - where it speaks on the road, over the grid and under the
-   pictures - a soft pool of night behind the words, so they hold on
-   their own instead of reading as one more caption on the scene. */
+   and - where it speaks on the road - a faint haze of its own colour
+   behind the words, so they read as condensing out of the light's glow
+   rather than sitting on the scene. (A dark backing was tried; it cut a
+   hole in the light's own glow.) */
 .pl3 .pl3-say__line,
 .pl3 .pl3-vin__words,
 .pl3 .pl3-vin__still-says,
@@ -1930,8 +1931,8 @@ html[data-platform="android"] .pl3-store[data-variant="solid"][data-store="apple
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    rgb(7 6 10 / 0.72),
-    rgb(7 6 10 / 0.38) 62%,
+    oklch(0.72 0.13 var(--glow-hue) / 0.13),
+    oklch(0.72 0.13 var(--glow-hue) / 0.05) 60%,
     transparent
   );
   pointer-events: none;
