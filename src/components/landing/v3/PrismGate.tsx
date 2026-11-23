@@ -3,7 +3,6 @@ import * as React from "react";
 import { LightVectorBody } from "@/components/landing/orb/LightVectorBody";
 import {
   DEFAULT_VIBE,
-  PRISM_CONIC,
   PRISM_LINEAR,
   VIBES,
   angleForT,
@@ -55,6 +54,9 @@ function Said({ text, k, accent }: { text: string; k: string; accent?: string })
     </p>
   );
 }
+
+/** The light a visitor who never chose wears - the body under the spectrum. */
+const HOUSE_RAMP = (VIBES.find((v) => v.id === DEFAULT_VIBE) ?? VIBES[VIBES.length - 1]).ramp;
 
 /** The orb's full visual extent is CORONA (400), so scale by width/400. */
 const FIELD = 400;
@@ -682,7 +684,7 @@ export function PrismGate({
    * the one being taken.
    *
    * Hoisted out of the JSX because the root needs it as well: the prism
-   * face is artwork now (see .pl-gate__logo in prism-gate.css) and it
+   * is the light's own spectrum layer now (see prism-gate.css) and it
    * sits outside the orb, so it cannot read the orb's own --prism-a.
    * One expression, two readers - they cannot disagree.
    */
@@ -802,17 +804,15 @@ export function PrismGate({
              wearing the one being chosen. A cursor keeps the spectrum,
              because it has a beam to answer with instead. */
           mode={orbMode}
-          ramp={shown?.ramp}
+          /* While it holds every colour, the body underneath is the house
+             light - the very light a visitor who never chose would get - and
+             the spectrum only turns its hue (see prism-gate.css), so its
+             depth, saturation and glow are the final light's exactly. Once
+             a colour is taken - or a finger is on the track - it is that
+             light, in that colour. */
+          ramp={orbMode === "prism" ? HOUSE_RAMP : shown?.ramp}
           className="pl-gate__orb"
         />
-        {/* The rainbow ring around the light: the colour wheel you pick
-            from, drawn from the same spectrum (and the same angles) the
-            light itself wears here. The light inside is the site's own
-            light, in its every-colour state - the same body, the same
-            white heart - so the light you meet at the gate is visibly the
-            one that lights the page after, in the colour you gave it. The
-            ring fades as the choice resolves. */}
-        <div className="pl-gate__logo" aria-hidden style={{ backgroundImage: PRISM_CONIC }} />
         {/* The wheel's fixed mark: just off the rim at twelve o'clock,
             inside the beam that leaves from under it, and the only part
             of that mechanic which never moves. */}

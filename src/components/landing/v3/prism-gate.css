@@ -222,37 +222,20 @@
    would double every hue. */
 /* The light's own every-colour state shows now: the site's light body,
    coloured by the spectrum, rather than a picture laid over it. */
-/* A thin ring of the spectrum around the light - the wheel you choose
-   from - with its colour falling softly inward, toward the light. Background (the conic, aligned with the picker's angles) is set
-   inline from PRISM_CONIC; this cuts it to a ring and gives it a glow. */
-.pl-gate__logo {
-  position: absolute;
-  inset: 17%;
-  z-index: 1;
-  border-radius: 50%;
-  -webkit-mask: radial-gradient(
-    closest-side,
-    transparent calc(100% - 16px),
-    rgb(0 0 0 / 0.14) calc(100% - 10px),
-    rgb(0 0 0 / 0.5) calc(100% - 4.5px),
-    #000 calc(100% - 3px),
-    #000 calc(100% - 1px),
-    transparent 100%
-  );
-  mask: radial-gradient(
-    closest-side,
-    transparent calc(100% - 16px),
-    rgb(0 0 0 / 0.14) calc(100% - 10px),
-    rgb(0 0 0 / 0.5) calc(100% - 4.5px),
-    #000 calc(100% - 3px),
-    #000 calc(100% - 1px),
-    transparent 100%
-  );
-  box-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
-  pointer-events: none;
-  /* The colour resolves over the same beat the app orb's cross-fade
-     takes - see --orb-fade below. */
-  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+/* ── the light, in every colour ───────────────────────────────
+   The gate shows the site's own light - the same body, the same white
+   heart, the same soft falloff - and lays the spectrum over it as colour
+   only: hue from the spectrum, brightness from the light. It is the light
+   the page ends on, wearing every colour; choosing lets the spectrum go
+   and leaves that same light in the one colour picked. The body under the
+   spectrum is the house light (PrismGate passes its ramp until a colour is
+   taken) and the spectrum turns only its HUE, so saturation, depth and
+   glow stay exactly the final light's. */
+.pl-gate .pl-gate__orb[data-mode="prism"] {
+  --solid-a: 1;
+}
+.pl-gate__orb .light-vector__prism {
+  mix-blend-mode: hue;
 }
 /* ── the breath ───────────────────────────────────────────────
    A light that never moves reads as a picture of a light. This is the
@@ -276,7 +259,7 @@
    It rides the same animation shorthand as the arrival bloom but a
    different property, so the two cannot fight, and neither disturbs the
    opacity the resolve transitions. */
-.pl-gate__logo {
+.pl-gate__orb .light-vector__prism {
   animation:
     pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards,
     pl-gate-breath 5.2s ease-in-out infinite;
@@ -294,8 +277,7 @@
 /* Beat one of the handover, and the track's first touch: every colour
    gives way to the one that was chosen, which the orb beneath is already
    wearing. */
-.pl-gate[data-orb="solid"] .pl-gate__logo {
-  opacity: 0;
+.pl-gate[data-orb="solid"] .pl-gate__orb .light-vector__prism {
   /* Nothing left to look at, and the handover is the busiest moment this
      screen has - stop repainting a mark that is on its way out. */
   animation-play-state: paused;
@@ -562,7 +544,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
-  .pl-gate__logo,
+  .pl-gate__orb .light-vector__prism,
   .pl-gate__w,
   .pl-gate__say,
   .pl-gate__skip,
@@ -609,7 +591,7 @@
    .pl-gate__orb too, and killing every animation on a replay would kill
    that one along with the arrival it was aimed at. */
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
-.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__logo,
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb .light-vector__prism,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .light-vector,
 .pl-gate[data-replay="1"] .pl-gate__w,
 .pl-gate[data-replay="1"] .pl-gate__say,
