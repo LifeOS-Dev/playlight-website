@@ -13,6 +13,8 @@
  * server and the client draw the same thing.
  */
 
+import { LINES } from "./narration";
+
 export type VinStep = "intro" | "v" | "i" | "n";
 
 /** The three states, in order. "intro" is the trio before they fold into one. */
@@ -20,9 +22,10 @@ export const VIN_STEPS = ["v", "i", "n"] as const;
 export type VinStage = (typeof VIN_STEPS)[number];
 
 /**
- * One sentence each, in the light's own voice, and no more. Each one is said
- * once the picture above it has settled, so there is only ever one thing to
- * take in at a time: the picture, then the sentence.
+ * One sentence each, in the light's own voice, and no more - the words live
+ * with the rest of Light's lines in narration.ts. Each one is said once the
+ * picture above it has settled, so there is only ever one thing to take in
+ * at a time: the picture, then the sentence.
  *
  * The reasons each one matters used to follow as three tags under every
  * sentence. They are now the "What it solves" collage further down the road,
@@ -33,19 +36,19 @@ export const VIN = {
     letter: "V",
     word: "Visualize",
     rest: "isualize",
-    says: "I put everything about you in one view, so you can see what was invisible.",
+    says: LINES.vin.v,
   },
   i: {
     letter: "I",
     word: "Interpret",
     rest: "nterpret",
-    says: "I connect the dots across your life, and show you where to improve.",
+    says: LINES.vin.i,
   },
   n: {
     letter: "N",
     word: "Navigate",
     rest: "avigate",
-    says: "I break the plan into steps, and walk them with you - one at a time.",
+    says: LINES.vin.n,
   },
 } as const;
 
