@@ -504,6 +504,32 @@
   color: var(--ember);
 }
 
+/* Just chosen at the gate: the light lands in "play" as the gate lifts -
+   the player's word lighting up in the player's colour. Once. */
+.pl3[data-handed] .pl3-road__mark .pl3-play {
+  animation: pl3-play-take 1.7s cubic-bezier(0.16, 0.8, 0.24, 1) 1.05s both;
+}
+
+@keyframes pl3-play-take {
+  0% {
+    text-shadow: 0 0 0 transparent;
+  }
+  35% {
+    text-shadow:
+      0 0 18px rgb(var(--ember-rgb) / 0.9),
+      0 0 44px rgb(var(--ember-rgb) / 0.55);
+  }
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl3[data-handed] .pl3-road__mark .pl3-play {
+    animation: none;
+  }
+}
+
 .pl3-nav__mark {
   font-weight: 300;
   font-size: 15px;

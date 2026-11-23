@@ -132,11 +132,26 @@ function HomePage() {
     }, after);
   }, []);
 
+  /** Held, so a second choice cannot be cut short by the first one's timer. */
+  const handed = React.useRef(0);
+  React.useEffect(() => () => window.clearTimeout(handed.current), []);
+
   const choose = React.useCallback(
     (chosen: Vibe) => {
       setVibe(chosen);
       applyVibe(root.current, chosen);
       writeVibe(chosen.id);
+      // The visitor has met the light at the gate, so the hero's voice does
+      // not introduce itself a second time (see OrbSpeech). And the chosen
+      // light lands in the wordmark's "play" - the player's word - with a
+      // brief glow as the gate lifts off it.
+      const page = root.current;
+      if (page) {
+        page.setAttribute("data-met", "");
+        page.setAttribute("data-handed", "");
+        window.clearTimeout(handed.current);
+        handed.current = window.setTimeout(() => page.removeAttribute("data-handed"), 3200);
+      }
       // the gate stays mounted for the whole handover - PrismGate owns its length
       setPhase("leaving");
       close(gateExitMs());

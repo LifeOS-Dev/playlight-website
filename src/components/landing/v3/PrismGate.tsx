@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { LightVectorBody } from "@/components/landing/orb/LightVectorBody";
 import {
+  DEFAULT_VIBE,
   PRISM_LINEAR,
   VIBES,
   angleForT,
@@ -20,6 +21,39 @@ import {
   GATE_MODE_LABEL,
   type GateMode,
 } from "@/components/landing/v3/gateMode";
+import { LINES, wordsOf } from "@/components/landing/v3/narration";
+
+/**
+ * One of Light's lines, set word by word. The timing is CSS - each word is
+ * delayed off `--at` by its index - because the arrival is a CSS timeline
+ * and nothing in the React lifecycle may be able to strand it half-said.
+ */
+function Said({ text, k, accent }: { text: string; k: string; accent?: string }) {
+  return (
+    <p className="pl-gate__say" data-k={k} aria-hidden="true">
+      {wordsOf(text).map((w, i) => {
+        // The word that wears the light being chosen, if there is one -
+        // "play" is the player's, so it takes the player's colour.
+        const bare = w.replace(/[.,!?]$/, "");
+        const tail = w.slice(bare.length);
+        return (
+          <React.Fragment key={i}>
+            <span className="pl-gate__w" style={{ "--i": i } as React.CSSProperties}>
+              {accent && bare === accent ? (
+                <>
+                  <span className="pl-gate__play">{bare}</span>
+                  {tail}
+                </>
+              ) : (
+                w
+              )}
+            </span>{" "}
+          </React.Fragment>
+        );
+      })}
+    </p>
+  );
+}
 
 /** The orb's full visual extent is CORONA (400), so scale by width/400. */
 const FIELD = 400;
@@ -695,13 +729,23 @@ export function PrismGate({
       onPointerUp={onUp}
       onPointerCancel={onCancel}
     >
-      {/* The promise. The only line on this screen that asks nothing of
-          you - it is why the choosing is worth doing, said once, before
-          anything is asked. */}
-      <p className="pl-gate__creed">
-        Life is the most important game, and <span className="pl-gate__brand">Playlight</span> helps
-        you win it.
-      </p>
+      {/* The promise, said by the light itself: the brand's definition in
+          its own first words. Two sentences, one at a time, word by word -
+          then, once a light is taken, the answer to the choice: "Let's
+          play.", with "play" in the player's colour, which is the whole
+          wordmark acted out (Light white, play yours). A replay skips the
+          first sentence: it has been heard. */}
+      <div className="pl-gate__creed">
+        {taken ? (
+          <Said k="taken" text={LINES.gate.taken} accent="play" />
+        ) : (
+          <>
+            {replay ? null : <Said k="a" text={LINES.gate.creed[0]} />}
+            <Said k="b" text={LINES.gate.creed[1]} />
+          </>
+        )}
+        <p className="sr-only">{LINES.gate.creed.join(" ")}</p>
+      </div>
 
       {/* A replay must not be a one-way door either - being able to take
           the choice back is the whole reason it exists. */}
@@ -715,6 +759,21 @@ export function PrismGate({
           Keep this one
         </button>
       ) : null}
+
+      {/* The first visit's way past: nobody should have to choose a colour
+          to see what the product is. It takes the house light, the same
+          one a visitor who never chose would wear, and hands over exactly
+          as a choice does. Bottom right, where the road keeps its own
+          "Skip ahead", so a skip is always found in the same place. */}
+      {replay ? null : (
+        <button
+          type="button"
+          className="pl-gate__skip"
+          onClick={() => take(VIBES.find((v) => v.id === DEFAULT_VIBE) ?? VIBES[VIBES.length - 1])}
+        >
+          {LINES.gate.skip}
+        </button>
+      )}
 
       <div ref={hit} className="pl-gate__hit" {...(mode === "track" ? {} : slider)}>
         {/* Above the orb: underneath, the orb's own faint outer layers
@@ -769,7 +828,7 @@ export function PrismGate({
           doing it; what is worth saying is what the screen is FOR, so
           only that is left, and it says the same thing on a replay.
           Below the name, because the name is the part that changes. */}
-      <p className="pl-gate__lead">Choose your vibe</p>
+      <p className="pl-gate__lead">{LINES.gate.ask}</p>
 
       {mode === "track" ? (
         <div ref={track} className="pl-gate__track" onPointerDown={onTrackDown} {...slider}>

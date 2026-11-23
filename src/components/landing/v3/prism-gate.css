@@ -71,8 +71,8 @@
 /* — beat one: gather (0 → 0.72s) — */
 
 /* the instructions have done their job; only the chosen name is left to read */
-.pl-gate[data-taken="1"] .pl-gate__creed,
 .pl-gate[data-taken="1"] .pl-gate__lead,
+.pl-gate[data-taken="1"] .pl-gate__skip,
 .pl-gate[data-taken="1"] .pl-gate__torch,
 .pl-gate[data-taken="1"] .pl-gate__mark,
 .pl-gate[data-taken="1"] .pl-gate__track,
@@ -389,9 +389,11 @@
    balanced lines instead of one long ruler - and with `balance` on, the
    break lands on the comma, which is where the sentence turns. */
 .pl-gate__creed {
-  max-width: min(28ch, 88vw);
+  display: grid;
+  max-width: min(30ch, 88vw);
   margin: 0 0 clamp(16px, 3.4vh, 34px);
   font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
   font-weight: 300;
   font-size: clamp(1.02rem, 2.1vw, 1.45rem);
   line-height: 1.36;
@@ -400,20 +402,11 @@
   text-wrap: balance;
 }
 
-/* The brand wears whatever light is being tried on, which is the whole
-   claim of the sentence acted out. White until a hand arrives, so the
-   word is still the brightest thing in the line before anything is
-   chosen - and `--pick` is unset until then, hence the fallback. */
-.pl-gate__brand {
-  color: var(--pick, #fff);
-  transition: color 0.34s ease;
-}
-
 .pl-gate__lead {
   font-family: var(--pl3-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.44);
   /* Top margin only. It used to hang above the orb and hold the whole
@@ -527,14 +520,14 @@
   animation: pl-gate-soul 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-.pl-gate__creed,
 .pl-gate__lead,
 .pl-gate__label,
-.pl-gate__track {
+.pl-gate__track,
+.pl-gate__skip {
   animation: pl-gate-words 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.05s backwards;
 }
-.pl-gate__creed {
-  animation-delay: 1.98s;
+.pl-gate__skip {
+  animation-delay: 2.4s;
 }
 .pl-gate__label {
   animation-delay: 2.06s;
@@ -549,7 +542,9 @@
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
   .pl-gate__logo,
-  .pl-gate__creed,
+  .pl-gate__w,
+  .pl-gate__say,
+  .pl-gate__skip,
   .pl-gate__lead,
   .pl-gate__label,
   .pl-gate__name,
@@ -595,7 +590,8 @@
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__logo,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .light-vector,
-.pl-gate[data-replay="1"] .pl-gate__creed,
+.pl-gate[data-replay="1"] .pl-gate__w,
+.pl-gate[data-replay="1"] .pl-gate__say,
 .pl-gate[data-replay="1"] .pl-gate__lead,
 .pl-gate[data-replay="1"] .pl-gate__label,
 .pl-gate[data-replay="1"] .pl-gate__track {
@@ -877,4 +873,124 @@
 .pl-gate__modes button:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.45);
   outline-offset: 2px;
+}
+
+/* ── Light speaking ───────────────────────────────────────────
+   The creed is the light's own first words: "Life is the most important
+   game." then "I'm Light. I'm here to help you win it." - one sentence at
+   a time, in one grid cell, each arriving word by word the way the light
+   speaks everywhere on the road. Pure CSS, like the rest of the arrival:
+   nothing in React can strand it half-said.
+
+     0.50s  the first sentence, while the colour blooms
+     2.10s  it leaves
+     2.45s  the second, which stays
+
+   Once a light is taken the creed says "Let's play." - quickly, because
+   the flight is already leaving - and goes before the orb lands. */
+
+.pl-gate__say {
+  grid-area: 1 / 1;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.pl-gate__w {
+  display: inline-block;
+  animation: pl-gate-word 0.62s cubic-bezier(0.16, 0.8, 0.24, 1) backwards;
+  animation-delay: calc(var(--at, 0s) + var(--i) * 70ms);
+}
+
+@keyframes pl-gate-word {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.4em);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+.pl-gate__say[data-k="a"] {
+  --at: 0.5s;
+  animation: pl-gate-line-out 0.34s ease 2.1s forwards;
+}
+
+.pl-gate__say[data-k="b"] {
+  --at: 2.45s;
+}
+
+/* Replay: the first sentence has been heard; the second is simply there. */
+.pl-gate[data-replay="1"] .pl-gate__say[data-k="b"] {
+  --at: 0s;
+}
+
+.pl-gate__say[data-k="taken"] {
+  --at: 0s;
+  animation: pl-gate-line-out 0.4s ease 1s forwards;
+}
+
+.pl-gate__say[data-k="taken"] .pl-gate__w {
+  animation-duration: 0.42s;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+@keyframes pl-gate-line-out {
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+/* The player's word wears the player's light. */
+.pl-gate__play {
+  font-style: normal;
+  color: var(--pick, #fff);
+  transition: color 0.34s ease;
+}
+
+/* Skip: the first visit's way past, in the corner the road's own "Skip
+   ahead" uses. Quiet, but a full-size target. */
+.pl-gate__skip {
+  position: absolute;
+  right: clamp(14px, 3vw, 30px);
+  bottom: clamp(14px, 3vh, 26px);
+  z-index: 5;
+  min-height: 40px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: var(--pl3-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.28s ease;
+}
+.pl-gate__skip:hover {
+  color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.34);
+}
+.pl-gate__skip:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 3px;
+}
+
+/* Reduced motion: both sentences, standing together - the order is kept,
+   only the timing goes. */
+@media (prefers-reduced-motion: reduce) {
+  .pl-gate__creed {
+    display: block;
+  }
+  .pl-gate__say[data-k="a"] {
+    opacity: 1;
+  }
 }
