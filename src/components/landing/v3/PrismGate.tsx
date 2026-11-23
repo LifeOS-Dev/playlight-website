@@ -744,11 +744,10 @@ export function PrismGate({
           <Said k="taken" text={LINES.gate.taken} accent="play" />
         ) : (
           <>
-            {replay ? null : <Said k="a" text={LINES.gate.creed[0]} />}
-            <Said k="b" text={LINES.gate.creed[1]} />
+            <Said k="b" text={LINES.gate.creed} />
           </>
         )}
-        <p className="sr-only">{LINES.gate.creed.join(" ")}</p>
+        <p className="sr-only">{LINES.gate.creed}</p>
       </div>
 
       {/* A replay must not be a one-way door either - being able to take

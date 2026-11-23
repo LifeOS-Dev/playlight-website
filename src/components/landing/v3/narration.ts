@@ -25,7 +25,7 @@
 export const LINES = {
   /** The gate: the first thing anyone meets, and the brand said by its own light. */
   gate: {
-    creed: ["Life is the most important game.", "I'm Light. I'm here to help you win it."],
+    creed: "Life is the biggest game, Light helps you win it.",
     /** The ask, under the controls. */
     ask: "Choose your vibe",
     /** Said as the chosen light flies home, after the vibe's own name. */

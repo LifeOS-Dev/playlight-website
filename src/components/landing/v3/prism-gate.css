@@ -949,7 +949,7 @@
 }
 
 .pl-gate__say[data-k="b"] {
-  --at: 2.45s;
+  --at: 0.6s;
 }
 
 /* Replay: the first sentence has been heard; the second is simply there. */
