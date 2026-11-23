@@ -187,6 +187,31 @@ def replace(
         set_text(img, font_path, size, new, colour, baseline, left=box[0])
 
 
+def three_tabs(img: Image.Image) -> None:
+    """The app's bar has three tabs now: Game Plan, Home (the light) and the
+    player. The captures show the older five, so the map and the list go and
+    the other two move in, evenly either side of the light."""
+    px = img.load()
+    y0, y1 = 945, 1008
+
+    def box(cx: int) -> Box:
+        xs, ys = [], []
+        for y in range(y0, y1):
+            for x in range(cx - 32, cx + 33):
+                if max(px[x, y][:3]) > 70:
+                    xs.append(x)
+                    ys.append(y)
+        return (min(xs) - 3, min(ys) - 3, max(xs) + 4, max(ys) + 4)
+
+    found = {k: box(c) for k, c in {"pin": 50, "list": 150, "plan": 351, "you": 451}.items()}
+    moving = {k: img.crop(found[k]) for k in ("plan", "you")}
+    for b in found.values():
+        erase(img, b, "h", pad=1)
+    for k, cx in (("plan", 125), ("you", 377)):
+        b = found[k]
+        img.paste(moving[k], (b[0] + cx - (b[0] + b[2]) // 2, b[1]))
+
+
 def main(src: Path, fonts: Path, out: Path) -> None:
     fraunces_light = fonts / "Fraunces_72pt-Light.ttf"
     fraunces = fonts / "Fraunces_72pt-Regular.ttf"
@@ -292,6 +317,7 @@ def main(src: Path, fonts: Path, out: Path) -> None:
         set_text(trail, hanken, sub_size, new, colour, baseline, centre=centre)
 
     for name, im in (("now", now), ("whole", whole), ("trail", trail)):
+        three_tabs(im)
         im.save(out / f"{name}.png", "PNG", optimize=True)
         im.save(out / f"{name}.webp", "WEBP", quality=86, method=6)
         print("wrote", out / f"{name}.png")
