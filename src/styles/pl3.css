@@ -1673,127 +1673,102 @@
   color: var(--filament);
 }
 
-/* ── The two stores ─────────────────────────────────
-   Two buttons where one used to be. They sit on one line and fold to a
-   column only when the line will not hold them, so the pair never reads
-   as two unrelated decisions. */
+/* ── Download ───────────────────────────────────────────────
+   One word and two marks: "Download", then the App Store and Google Play
+   logos, each a link to its store. As little as a call to action can be
+   while still saying what it does. */
 
 .pl3-stores {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.pl3-store {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 13px 26px;
+  gap: 8px;
+  padding: 6px 6px 6px 20px;
+  border: 1px solid rgb(var(--paper-rgb) / 0.22);
   border-radius: 999px;
-  border: 1px solid transparent;
+  background: rgb(var(--paper-rgb) / 0.05);
+  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.12);
+}
+
+.pl3-stores__label {
+  margin-right: 6px;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.005em;
+  color: var(--filament);
   white-space: nowrap;
+}
+
+.pl3-store {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--filament);
+  color: var(--void);
   cursor: pointer;
   transition:
     transform 0.35s cubic-bezier(0.16, 0.8, 0.24, 1),
     background 0.35s,
-    border-color 0.35s,
-    color 0.35s,
     box-shadow 0.35s;
 }
 
-.pl3-store__icon {
-  display: inline-flex;
-  width: 17px;
-  height: 17px;
-  flex: 0 0 auto;
+.pl3-store svg {
+  width: 18px;
+  height: 18px;
 }
 
-.pl3-store__icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* The App Store button carries the weight; the Play Store one stands
-   beside it in outline, so the pair is one call to action. A phone shows
-   only its own store (<html data-platform>, set before first paint in
-   __root.tsx), and then that one button is the solid one. */
-.pl3-store[data-variant="solid"] {
-  background: var(--filament);
-  border-color: var(--filament);
-  color: var(--void);
-  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.16);
-}
-
-.pl3-store[data-variant="solid"]:hover {
+.pl3-store:hover,
+.pl3-store:focus-visible {
   transform: translateY(-2px);
   background: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 0 0 60px rgb(var(--ember-rgb) / 0.3);
+  box-shadow: 0 0 30px rgb(var(--ember-rgb) / 0.35);
 }
 
-html:not([data-platform="android"]) .pl3-store[data-variant="solid"][data-store="play"] {
-  border-color: rgb(var(--paper-rgb) / 0.3);
-  background: rgb(var(--paper-rgb) / 0.05);
-  color: var(--filament);
+/* The header's, smaller and quieter. */
+.pl3-stores[data-variant="quiet"] {
+  gap: 5px;
+  padding: 4px 4px 4px 13px;
+  border-color: var(--line);
+  background: rgb(var(--paper-rgb) / 0.03);
   box-shadow: none;
 }
 
-html:not([data-platform="android"]) .pl3-store[data-variant="solid"][data-store="play"]:hover {
-  border-color: rgb(var(--ember-rgb) / 0.6);
-  background: rgb(var(--ember-rgb) / 0.12);
-  box-shadow: 0 0 40px rgb(var(--ember-rgb) / 0.18);
-}
-
-html[data-platform="ios"] .pl3-store[data-variant="solid"][data-store="play"],
-html[data-platform="android"] .pl3-store[data-variant="solid"][data-store="apple"] {
-  display: none;
-}
-
-.pl3-store[data-variant="quiet"] {
-  gap: 7px;
-  padding: 8px 15px;
+.pl3-stores[data-variant="quiet"] .pl3-stores__label {
+  margin-right: 4px;
   font-size: 12.5px;
   font-weight: 400;
-  border-color: var(--line);
-  background: rgb(var(--paper-rgb) / 0.03);
   color: rgb(var(--paper-rgb) / 0.9);
 }
 
-.pl3-store[data-variant="quiet"] .pl3-store__icon {
+.pl3-store[data-variant="quiet"] {
+  width: 28px;
+  height: 28px;
+  background: rgb(var(--paper-rgb) / 0.1);
+  color: var(--filament);
+}
+
+.pl3-store[data-variant="quiet"] svg {
   width: 13px;
   height: 13px;
 }
 
-.pl3-store[data-variant="quiet"]:hover {
-  border-color: rgb(var(--ember-rgb) / 0.5);
-  background: rgb(var(--ember-rgb) / 0.08);
-  color: var(--filament);
+.pl3-store[data-variant="quiet"]:hover,
+.pl3-store[data-variant="quiet"]:focus-visible {
+  transform: none;
+  background: rgb(var(--ember-rgb) / 0.25);
+  box-shadow: none;
 }
 
-.pl3-stores[data-variant="quiet"] {
-  gap: 8px;
-}
-
-/* In the bar, at phone width, the icons say it on their own - the pair
-   has to share the row with the wordmark and the vibe dot. */
-@media (max-width: 460px) {
-  .pl3-store[data-variant="quiet"] {
-    padding: 8px 10px;
+/* A narrow phone's bar has the wordmark and the vibe dot to fit as well:
+   the marks say it on their own there. */
+@media (max-width: 380px) {
+  .pl3-stores[data-variant="quiet"] .pl3-stores__label {
+    display: none;
   }
 
-  .pl3-store[data-variant="quiet"] .pl3-store__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .pl3-stores[data-variant="quiet"] {
+    padding-left: 4px;
   }
 }
 

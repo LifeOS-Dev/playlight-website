@@ -18,16 +18,15 @@ function PlayIcon() {
 }
 
 /**
- * The call to action: one button per store, side by side.
+ * The call to action, as little as it can be: one word, "Download", and the
+ * two stores' marks beside it - each mark is the link to its store. One
+ * thing to read, two places to tap, instead of two long buttons that both
+ * say "Download on the ...".
  *
- * A phone sees only its own store's button - a second one it cannot use is
- * only something more to read. Which one is pure CSS off <html
- * data-platform>, set before the first paint (see __root.tsx); a desktop,
- * or a page with no script, shows both.
- *
- * The "quiet" variant rides in the header bar, where the labels shorten to
- * the store's name - the full phrase is kept for screen readers, because
- * "App Store" alone does not say what pressing it does.
+ * The "quiet" variant is the same thing, smaller, in the header bar. The
+ * word is a label, not a link: each mark carries the full phrase for
+ * screen readers ("Download on the App Store"), because a bare logo does
+ * not say what pressing it does.
  */
 export function StoreButtons({
   variant = "solid",
@@ -36,10 +35,11 @@ export function StoreButtons({
   variant?: "solid" | "quiet";
   className?: string;
 }) {
-  const short = variant === "quiet";
-
   return (
     <div className={`pl3-stores ${className}`} data-variant={variant}>
+      <span className="pl3-stores__label" aria-hidden>
+        Download
+      </span>
       <a
         href={APP_STORE_URL}
         target="_blank"
@@ -48,15 +48,10 @@ export function StoreButtons({
         data-variant={variant}
         data-store="apple"
         aria-label="Download on the App Store"
+        title="App Store"
       >
-        <span className="pl3-store__icon">
-          <AppleIcon />
-        </span>
-        <span className="pl3-store__label">
-          {short ? "App Store" : "Download on the App Store"}
-        </span>
+        <AppleIcon />
       </a>
-
       <a
         href={PLAY_STORE_URL}
         target="_blank"
@@ -64,14 +59,10 @@ export function StoreButtons({
         className="pl3-store"
         data-variant={variant}
         data-store="play"
-        aria-label="Download on the Play Store"
+        aria-label="Download on Google Play"
+        title="Google Play"
       >
-        <span className="pl3-store__icon">
-          <PlayIcon />
-        </span>
-        <span className="pl3-store__label">
-          {short ? "Play Store" : "Download on the Play Store"}
-        </span>
+        <PlayIcon />
       </a>
     </div>
   );
