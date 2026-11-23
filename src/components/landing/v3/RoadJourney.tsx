@@ -393,7 +393,7 @@ export function RoadJourney() {
           <p className="pl3-road__line">
             Your personalized OS to help you visualize, interpret, and navigate life.
           </p>
-          <StoreButtons />
+          <StoreButtons note />
           <span className="pl3-road__cue" aria-hidden="true" />
         </div>
 

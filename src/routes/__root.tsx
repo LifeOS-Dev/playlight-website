@@ -67,6 +67,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const PLATFORM_SCRIPT = `(function(){try{var u=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);document.documentElement.setAttribute("data-platform",ios?"ios":/Android/.test(u)?"android":"desktop")}catch(e){}})();`;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     // Only the things every page shares. Titles, descriptions and share
@@ -112,6 +114,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,200..400;1,6..72,200..400&display=swap",
       },
     ],
+    scripts: [
+      // Which phone this is, on <html>, before the first paint - so the
+      // download buttons can offer the one store this phone uses (and a
+      // desktop the QR sheet) without a flash of the wrong ones. CSS reads
+      // it; with no script at all, both stores simply show. iPadOS reports
+      // a Mac, so a Mac with a touchscreen is counted as one.
+      { children: PLATFORM_SCRIPT },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -121,7 +131,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={{ colorScheme: "only dark" }}>
+    // data-platform is set on this element by PLATFORM_SCRIPT before React
+    // hydrates, which React would otherwise report as a mismatch.
+    <html lang="en" style={{ colorScheme: "only dark" }} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

@@ -1,4 +1,6 @@
+import { QrCode } from "lucide-react";
 import { APP_STORE_URL, PLAY_STORE_URL } from "@/stores";
+import { openGetPlaylight } from "./getPlaylight";
 
 /** Brand marks kept to a single path each, colored via currentColor. */
 function AppleIcon() {
@@ -18,30 +20,56 @@ function PlayIcon() {
 }
 
 /**
- * The call to action, now that there is something to download: one button per
- * store, side by side, and the phone decides which of the two you reach for.
+ * The call to action: get the app, from the place that can actually install
+ * it.
  *
- * The "quiet" variant is the one that rides in the header bar, where the
- * labels shorten to the store's name - the full phrase is kept for screen
- * readers, because "App Store" alone does not say what pressing it does.
+ * A phone sees ONE button - its own store's - because a second choice it
+ * cannot use is only something more to read. A desktop cannot install from
+ * a store page at all, so it sees "Get Playlight", which opens the sheet
+ * with a QR code that takes the phone in your hand to its store. Which one
+ * shows is pure CSS off <html data-platform>, set before the first paint
+ * (see __root.tsx); with no script at all, both stores simply show.
+ *
+ * The "quiet" variant rides in the header bar and always carries both, as
+ * short labels - the full phrase is kept for screen readers, because "App
+ * Store" alone does not say what pressing it does.
  */
 export function StoreButtons({
   variant = "solid",
+  note = false,
   className = "",
 }: {
   variant?: "solid" | "quiet";
+  /** Under a solid set, say what a desktop's "Get Playlight" leads to. */
+  note?: boolean;
   className?: string;
 }) {
   const short = variant === "quiet";
 
   return (
     <div className={`pl3-stores ${className}`} data-variant={variant}>
+      {short ? null : (
+        <button
+          type="button"
+          className="pl3-store"
+          data-variant={variant}
+          data-store="get"
+          onClick={(e) => openGetPlaylight(e.currentTarget)}
+        >
+          <span className="pl3-store__icon">
+            <QrCode aria-hidden />
+          </span>
+          <span className="pl3-store__label">Get Playlight</span>
+        </button>
+      )}
+
       <a
         href={APP_STORE_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="pl3-store"
         data-variant={variant}
+        data-store="apple"
         aria-label="Download on the App Store"
       >
         <span className="pl3-store__icon">
@@ -58,6 +86,7 @@ export function StoreButtons({
         rel="noopener noreferrer"
         className="pl3-store"
         data-variant={variant}
+        data-store="play"
         aria-label="Download on the Play Store"
       >
         <span className="pl3-store__icon">
@@ -67,6 +96,8 @@ export function StoreButtons({
           {short ? "Play Store" : "Download on the Play Store"}
         </span>
       </a>
+
+      {note && !short ? <p className="pl3-stores__note">Free on iPhone and Android</p> : null}
     </div>
   );
 }

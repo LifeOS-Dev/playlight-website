@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { LightField } from "./LightField";
 import { SiteHeader } from "./SiteHeader";
 import { V3Footer } from "./V3Footer";
-import { GetPlaylightPanel } from "./TryToday";
+import { GetAppSheet } from "./GetApp";
 
 /**
  * The shell for everything that is words: support, privacy, deletion.
@@ -42,7 +42,7 @@ export function DocPage({
       </main>
 
       <V3Footer />
-      <GetPlaylightPanel />
+      <GetAppSheet />
     </div>
   );
 }

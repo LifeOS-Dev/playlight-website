@@ -13,6 +13,7 @@ import { Route as V3RouteImport } from './routes/v3'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as GetRouteImport } from './routes/get'
 import { Route as DeleteRouteImport } from './routes/delete'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiWaitlistRouteImport } from './routes/api/waitlist'
@@ -36,6 +37,11 @@ const SupportRoute = SupportRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetRoute = GetRouteImport.update({
+  id: '/get',
+  path: '/get',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeleteRoute = DeleteRouteImport.update({
@@ -62,6 +68,7 @@ const ApiDeletionRequestRoute = ApiDeletionRequestRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/delete': typeof DeleteRoute
+  '/get': typeof GetRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/delete': typeof DeleteRoute
+  '/get': typeof GetRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/delete': typeof DeleteRoute
+  '/get': typeof GetRoute
   '/privacy': typeof PrivacyRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/delete'
+    | '/get'
     | '/privacy'
     | '/support'
     | '/terms'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/delete'
+    | '/get'
     | '/privacy'
     | '/support'
     | '/terms'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/delete'
+    | '/get'
     | '/privacy'
     | '/support'
     | '/terms'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DeleteRoute: typeof DeleteRoute
+  GetRoute: typeof GetRoute
   PrivacyRoute: typeof PrivacyRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/get': {
+      id: '/get'
+      path: '/get'
+      fullPath: '/get'
+      preLoaderRoute: typeof GetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/delete': {
       id: '/delete'
       path: '/delete'
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DeleteRoute: DeleteRoute,
+  GetRoute: GetRoute,
   PrivacyRoute: PrivacyRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
