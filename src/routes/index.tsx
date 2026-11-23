@@ -21,6 +21,24 @@ import {
 import { applyVibe, defaultVibe, readVibe, writeVibe } from "@/components/landing/v3/vibe";
 import { vibeById, type Vibe } from "@/components/landing/orb/ramp";
 import { pageMeta } from "@/seo";
+import { APP_STORE_URL, PLAY_STORE_URL } from "@/stores";
+
+/**
+ * What search engines can know about the app itself: free, on both stores,
+ * from Light Technologies. Only facts the Terms and the store links state.
+ */
+const APP_LD = {
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  name: "Playlight",
+  operatingSystem: "iOS, Android",
+  applicationCategory: "LifestyleApplication",
+  description: "Your personalized OS to help you visualize, interpret, and navigate life.",
+  url: "https://www.playlight.app/",
+  downloadUrl: [APP_STORE_URL, PLAY_STORE_URL],
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  publisher: { "@type": "Organization", name: "Light Technologies" },
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +46,7 @@ export const Route = createFileRoute("/")({
       title: "Playlight - your personalized OS for life",
       description: "Your personalized OS to help you visualize, interpret, and navigate life.",
     }),
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(APP_LD) }],
   }),
   component: HomePage,
 });

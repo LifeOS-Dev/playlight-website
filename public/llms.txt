@@ -1,8 +1,8 @@
-# PlayLight
+# Playlight
 
-> PlayLight (also styled Play Light) is a life management and productivity app by Light Technologies - a calm orb that helps you visualize and navigate your day with focus, protocols, goals, and memory of what you meant to do.
+> Playlight is a free app for iPhone and Android by Light Technologies - a personalized OS for life. You give it the pieces of your life (goals, habits, tasks, health, money, time, people) and Light, its guide, helps you visualize them in one place, interpret the patterns, and navigate the next step. Its AI features are optional and ask before any data is sent to a model; your data is never sold.
 
-PlayLight is available at https://www.playlight.app. Contact: hello@playlight.app. Company: Light Technologies.
+Playlight is available at https://www.playlight.app. Contact: hello@playlight.app. Company: Light Technologies.
 
 ## Pages
 
