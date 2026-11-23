@@ -37,8 +37,8 @@ export type SolveHandle = {
  * Scrolling moves the focus along: that tile lifts, its drawing plays once
  * from the problem into the answer (the VIN card's gesture - scattered things
  * gathering into the light), and its one line appears. Then it settles, keeps
- * its answer, and the next one takes the focus. Only the tile in focus ever
- * has a sentence showing.
+ * its answer and its line, and the next one takes the focus - so by the end
+ * all five read as one picture with their answers on it.
  *
  * The light narrates this too: it says what the collage is ("Here's what
  * changes for you."), each tile's line is in its voice, and while a tile is

@@ -198,6 +198,12 @@
   transition-delay: 0s;
 }
 
+/* Once said, a tile keeps its line: the five answers stay readable as
+   the focus moves on, quieter than the one being said. */
+.pl3-solve__tile[data-state="done"] .pl3-solve__line {
+  opacity: 0.78;
+}
+
 .pl3-solve__tile[data-state="on"] .pl3-solve__w {
   animation: pl3-say-in 0.58s cubic-bezier(0.16, 0.8, 0.24, 1) both;
   animation-delay: calc(0.7s + var(--w) * 55ms);
