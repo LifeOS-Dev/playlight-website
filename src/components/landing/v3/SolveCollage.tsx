@@ -177,9 +177,6 @@ const LOAD_ORBITS: Pt[] = [
   [22, 12],
 ];
 
-/** A day that won't sit still - flattened onto the ground when it lands. */
-const JAGGED = "M8 46L17 28L25 62L35 26L43 60L52 30L60 66L70 27L79 58L88 32L97 62L105 34L112 46";
-
 /** Five parts of a life; the low one is the one lifted. */
 const BARS: Array<{ x: number; h: number }> = [
   { x: 21, h: 0.72 },
@@ -266,8 +263,10 @@ function SolveArt({ kind }: { kind: SolveKind }) {
           <g className="slv__floor">
             <path d="M60 46L18 72M60 46L46 72M60 46L74 72M60 46L102 72" />
           </g>
-          <line className="slv__ground" x1={8} y1={46} x2={112} y2={46} />
-          <path className="slv__jag" d={JAGGED} />
+          {/* A horizon a hard week has knocked off level - and the light
+              setting it straight. (It used to be a jagged line flattened,
+              which read as a heart monitor flatlining.) */}
+          <line className="slv__tilt" x1={10} y1={46} x2={110} y2={46} />
           <ellipse className="slv__band" cx={60} cy={46} rx={20} ry={8} />
           <ellipse className="slv__band" cx={60} cy={46} rx={10} ry={4} />
           <circle className="slv__heart" cx={60} cy={46} r={3.4} />
@@ -292,6 +291,11 @@ function SolveArt({ kind }: { kind: SolveKind }) {
             />
           ))}
           <path className="slv__lift" d="M57 21L61 17L65 21" />
+          {/* The one label: which part is low - the sleep the light says
+              it is lifting first. */}
+          <text className="slv__label" x={61} y={69.5} textAnchor="middle">
+            Sleep
+          </text>
         </>
       ) : null}
 

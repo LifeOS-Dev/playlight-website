@@ -327,28 +327,21 @@
   transition: opacity 0.8s ease;
 }
 
-.slv__ground {
-  stroke: rgb(var(--edge-rgb) / 0.28);
-  stroke-width: 0.6;
-}
-
-/* Flattened in place about its own centre line, which is the ground. The
-   stroke must not flatten with it, or the settled line would vanish. */
-.slv__jag {
-  fill: none;
+/* Off level about the heart's own point, then set straight. */
+.slv__tilt {
   stroke: rgb(var(--paper-rgb) / 0.55);
   stroke-width: 1;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  transform-box: fill-box;
-  transform-origin: center;
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 60px 46px;
+  rotate: -13deg;
   transition:
-    scale 1.2s var(--slv-move),
+    rotate 1.2s var(--slv-move),
     stroke 0.8s ease;
 }
 
-:is([data-state="on"], [data-state="done"]) .slv__jag {
-  scale: 1 0.02;
+:is([data-state="on"], [data-state="done"]) .slv__tilt {
+  rotate: 0deg;
   stroke: var(--ember);
   transition-delay: calc(var(--d) + 0.1s);
 }
@@ -359,6 +352,13 @@
 }
 
 /* 3 · Improvement: one part of life, lifted to where it should be. */
+.slv__label {
+  font-family: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 6px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  fill: var(--ash-pale);
+}
 .slv__base {
   stroke: rgb(var(--edge-rgb) / 0.35);
   stroke-width: 0.6;
