@@ -3,6 +3,7 @@ import * as React from "react";
 import { LightVectorBody } from "@/components/landing/orb/LightVectorBody";
 import {
   DEFAULT_VIBE,
+  PRISM_CONIC,
   PRISM_LINEAR,
   VIBES,
   angleForT,
@@ -804,13 +805,14 @@ export function PrismGate({
           ramp={shown?.ramp}
           className="pl-gate__orb"
         />
-        {/* The mark itself, over the orb's white soul. The spectrum on
-            this screen is the brand's own artwork rather than a conic
-            built to look like it - so the orb below keeps the white
-            heart and the chosen hue, and hands the every-colour state
-            up here. It fades out as the choice resolves, uncovering the
-            single light the orb underneath has already become. */}
-        <div className="pl-gate__logo" aria-hidden />
+        {/* The rainbow ring around the light: the colour wheel you pick
+            from, drawn from the same spectrum (and the same angles) the
+            light itself wears here. The light inside is the site's own
+            light, in its every-colour state - the same body, the same
+            white heart - so the light you meet at the gate is visibly the
+            one that lights the page after, in the colour you gave it. The
+            ring fades as the choice resolves. */}
+        <div className="pl-gate__logo" aria-hidden style={{ backgroundImage: PRISM_CONIC }} />
         {/* The wheel's fixed mark: just off the rim at twelve o'clock,
             inside the beam that leaves from under it, and the only part
             of that mechanic which never moves. */}

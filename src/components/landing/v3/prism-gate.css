@@ -220,14 +220,31 @@
    The orb below keeps its white soul and its chosen hue, and gives up
    its conic prism layers - this IS the spectrum now, and two of them
    would double every hue. */
-.pl-gate__orb .light-vector__prism {
-  display: none;
-}
+/* The light's own every-colour state shows now: the site's light body,
+   coloured by the spectrum, rather than a picture laid over it. */
+/* A thin ring of the spectrum around the light - the wheel you choose
+   from. Background (the conic, aligned with the picker's angles) is set
+   inline from PRISM_CONIC; this cuts it to a ring and gives it a glow. */
 .pl-gate__logo {
   position: absolute;
-  inset: 0;
+  inset: 17%;
   z-index: 1;
-  background: url("/orb-prism.png") center / 100% 100% no-repeat;
+  border-radius: 50%;
+  -webkit-mask: radial-gradient(
+    closest-side,
+    transparent calc(100% - 4px),
+    #000 calc(100% - 3px),
+    #000 calc(100% - 1px),
+    transparent 100%
+  );
+  mask: radial-gradient(
+    closest-side,
+    transparent calc(100% - 4px),
+    #000 calc(100% - 3px),
+    #000 calc(100% - 1px),
+    transparent 100%
+  );
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
   pointer-events: none;
   /* The colour resolves over the same beat the app orb's cross-fade
      takes - see --orb-fade below. */
