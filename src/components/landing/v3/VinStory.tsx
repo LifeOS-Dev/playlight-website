@@ -1,7 +1,13 @@
 import * as React from "react";
+import { lightLook, lightSpeak } from "@/components/landing/orb/lightCue";
+import { LINES, wordsOf } from "./narration";
 import { VinPicture } from "./VinPicture";
 import { INSIGHT, NAV_NOTE, RINGS, VIN, VIN_STEPS, type VinStage, type VinStep } from "./vin";
 import "./vin.css";
+
+/** The voice's own timing in vin.css: thinking until 1.1s, then a word every 50ms from 1.15s. */
+const THINK_MS = 1100;
+const WORD_EVERY_MS = 50;
 
 export type VinFrame = {
   /** Which state the card is in. Changes play as timed transitions, never scrubbed. */
@@ -19,8 +25,13 @@ export type VinHandle = {
   drive: (frame: VinFrame) => void;
 };
 
+type Props = {
+  /** Take the road to a state - what pressing one of the V / I / N tabs does. */
+  onJump?: (step: VinStage) => void;
+};
+
 /**
- * Here's how Light helps you: the VIN model, told on the road.
+ * How Light helps, in its own words: the VIN model, told on the road.
  *
  * Three cards come up out of the horizon together - Visualize, Interpret,
  * Navigate - standing in an arc, each with a glimpse of what it does. The
@@ -31,19 +42,33 @@ export type VinHandle = {
  * Underneath, the light says what each one is in a single sentence, the way
  * it would in the app - a beat of thinking while the picture changes, then
  * the words. Never both moving at once: one thing at a time is the product's
- * promise, so it is the page's rule too.
+ * promise, so it is the page's rule too. The three cards are introduced the
+ * same way - by the light, below them - not by a heading above that talked
+ * about "Light" in the third person.
+ *
+ * While it speaks, the light looks at what it means (lightCue.ts): at the
+ * three cards, at "you" in the middle of the picture, at the insight, at the
+ * step that is yours now. The eye runs card, sentence, light - and the
+ * light's heart sends it back up to the part that matters.
  *
  * Travel along the road (arriving, passing the camera) is scrubbed by scroll
  * like everything else on it. The change from one state to the next is not:
  * crossing a threshold plays the whole transformation through, so a reader
  * who stops scrolling is never left looking at a picture caught halfway.
  */
-export const VinStory = React.forwardRef<VinHandle>(function VinStory(_props, ref) {
+export const VinStory = React.forwardRef<VinHandle, Props>(function VinStory({ onJump }, ref) {
   const [step, setStep] = React.useState<VinStep>("intro");
   const stepRef = React.useRef<VinStep>("intro");
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const worldRef = React.useRef<HTMLDivElement | null>(null);
   const shownRef = React.useRef(true);
+  /**
+   * Whether the words around the cards are up. The step is "intro" from the
+   * top of the page, long before the cards arrive, so the light may only
+   * say it - and the line may only play - once this is true.
+   */
+  const [live, setLive] = React.useState(false);
+  const liveRef = React.useRef(false);
 
   React.useImperativeHandle(
     ref,
@@ -58,6 +83,11 @@ export const VinStory = React.forwardRef<VinHandle>(function VinStory(_props, re
         if (world) {
           world.style.transform = `translate3d(0, 0, ${z.toFixed(1)}px)`;
           world.style.opacity = o.toFixed(3);
+        }
+        const nowLive = ui > 0.5;
+        if (nowLive !== liveRef.current) {
+          liveRef.current = nowLive;
+          setLive(nowLive);
         }
         if (root) {
           root.style.setProperty("--vin-ui", ui.toFixed(3));
@@ -77,24 +107,33 @@ export const VinStory = React.forwardRef<VinHandle>(function VinStory(_props, re
 
   const at = step === "intro" ? -1 : VIN_STEPS.indexOf(step);
 
+  // The light says it, and looks at what it means. Only while the cards are
+  // actually up - "intro" is the state from the very top of the page.
+  React.useEffect(() => {
+    if (!live) {
+      lightLook("vin", null);
+      return;
+    }
+    const root = rootRef.current;
+    const target =
+      step === "intro"
+        ? root?.querySelector(".pl3-vin__trio")
+        : step === "v"
+          ? root?.querySelector(".pl3-vin__world .vin-heart")
+          : step === "i"
+            ? root?.querySelector(".pl3-vin__world .pl3-vin__insight")
+            : root?.querySelector(".pl3-vin__world .vin-node[data-first]");
+    lightLook("vin", target ?? null);
+    const line = step === "intro" ? LINES.vin.intro : VIN[step].says;
+    return lightSpeak(wordsOf(line).length, { thinkMs: THINK_MS, everyMs: WORD_EVERY_MS });
+  }, [step, live]);
+
+  React.useEffect(() => () => lightLook("vin", null), []);
+
   return (
     <div ref={rootRef} className="pl3-vin" data-step={step}>
       <div className="pl3-vin__top">
-        <div className="pl3-vin__head">
-          <h2 className="pl3-vin__title">
-            Here's how Light helps you through its{" "}
-            <span className="pl3-vin__acro" aria-label="VIN">
-              <span>V</span>
-              <span>I</span>
-              <span>N</span>
-            </span>{" "}
-            model
-          </h2>
-          <p className="pl3-vin__pun">
-            Designed to make you <em>win</em>. Pun intended.
-          </p>
-        </div>
-
+        {/* Where you are on the model - and a way to any part of it. */}
         <ol className="pl3-vin__tabs" aria-label="The VIN model">
           {VIN_STEPS.map((k, j) => (
             <li
@@ -102,12 +141,16 @@ export const VinStory = React.forwardRef<VinHandle>(function VinStory(_props, re
               className="pl3-vin__tab"
               data-on={j === at ? "" : undefined}
               data-done={j < at ? "" : undefined}
-              aria-current={j === at ? "step" : undefined}
             >
-              <span>
+              <button
+                type="button"
+                className="pl3-vin__tab-btn"
+                aria-current={j === at ? "step" : undefined}
+                onClick={() => onJump?.(k)}
+              >
                 <span className="pl3-vin__tab-l">{VIN[k].letter}</span>
                 {VIN[k].rest}
-              </span>
+              </button>
             </li>
           ))}
         </ol>
@@ -138,11 +181,11 @@ export const VinStory = React.forwardRef<VinHandle>(function VinStory(_props, re
         </div>
       </div>
 
-      <Voice step={step} />
+      <Voice step={step} live={live} />
 
       {/* The same sentence for anyone listening rather than watching. */}
       <p className="pl3-vin__sr" aria-live="polite">
-        {step === "intro" ? "" : `${VIN[step].word}. ${VIN[step].says}`}
+        {!live ? "" : step === "intro" ? LINES.vin.intro : `${VIN[step].word}. ${VIN[step].says}`}
       </p>
 
       <VinStill />
@@ -174,16 +217,24 @@ function CardFoot({ step }: { step: VinStep }) {
 /**
  * The light, talking. A beat of thinking while the picture changes above it,
  * then one sentence, word by word, condensing out of the glow the way the
- * orb speaks at the top of the page. Silent while the three cards stand
- * together: the title above them has just said what they are.
+ * orb speaks at the top of the page. Over the three cards it introduces them
+ * itself - "V, I, N" lit in the cards' own amber, so the letters it says are
+ * visibly the letters above.
+ *
+ * Keyed on `live` as well as the step: the intro is the state from the top of
+ * the page, and without that its words would have played, unseen, long
+ * before the cards arrived.
  */
-function Voice({ step }: { step: VinStep }) {
-  if (step === "intro") return <div className="pl3-vin__voice" aria-hidden="true" />;
-  const words = VIN[step].says.split(" ");
+function Voice({ step, live }: { step: VinStep; live: boolean }) {
+  const line = step === "intro" ? LINES.vin.intro : VIN[step].says;
+  const words = wordsOf(line);
+  // The three letters it names - "V, I, N" - and nothing else: the "I" it
+  // starts the sentence with is the light, not the acronym.
+  const acroAt = step === "intro" ? words.indexOf("V,") : -1;
 
   return (
     <div className="pl3-vin__voice" aria-hidden="true">
-      <div key={step} className="pl3-vin__said">
+      <div key={`${step}:${live}`} className="pl3-vin__said">
         <span className="pl3-vin__think">
           <i />
           <i />
@@ -192,7 +243,11 @@ function Voice({ step }: { step: VinStep }) {
         <p className="pl3-vin__words">
           {words.map((w, i) => (
             <React.Fragment key={i}>
-              <span className="pl3-vin__w" style={{ "--w": i } as React.CSSProperties}>
+              <span
+                className="pl3-vin__w"
+                data-acro={acroAt >= 0 && i >= acroAt && i < acroAt + 3 ? "" : undefined}
+                style={{ "--w": i } as React.CSSProperties}
+              >
                 {w}
               </span>{" "}
             </React.Fragment>
@@ -210,12 +265,7 @@ function Voice({ step }: { step: VinStep }) {
 function VinStill() {
   return (
     <div className="pl3-vin__still">
-      <h2 className="pl3-vin__title">
-        Here's how Light helps you through its <span className="pl3-vin__acro">VIN</span> model
-      </h2>
-      <p className="pl3-vin__pun">
-        Designed to make you <em>win</em>. Pun intended.
-      </p>
+      <p className="pl3-vin__still-says">{LINES.vin.intro}</p>
       {VIN_STEPS.map((k: VinStage) => (
         <section key={k} className="pl3-vin__still-step" aria-label={VIN[k].word}>
           <h3 className="pl3-vin__still-name">

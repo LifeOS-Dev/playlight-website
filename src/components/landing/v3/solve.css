@@ -52,11 +52,14 @@
   pointer-events: none;
 }
 
+/* The light's line over the collage: its voice - Newsreader italic. */
 .pl3-solve__title {
   margin: 0 0 var(--slv-gap);
   font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
   font-weight: 300;
   font-size: clamp(1.3rem, 2.6vw, 2.1rem);
+  text-shadow: 0 0 24px oklch(0.78 0.14 var(--glow-hue) / 0.35);
   line-height: 1.2;
   letter-spacing: -0.015em;
   color: var(--filament);
@@ -169,25 +172,35 @@
   box-shadow: 0 0 8px rgb(var(--ember-rgb) / 0.6);
 }
 
+/* The tile's line is the light's, so it is set in the light's voice and
+   said the way the light says things: word by word, after the drawing. */
 .pl3-solve__line {
-  max-width: 28ch;
+  max-width: 26ch;
   margin: 0.55rem 0 0;
-  font-size: clamp(0.78rem, 1vw, 0.88rem);
-  line-height: 1.45;
-  color: var(--ash-pale);
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.2vw, 1.06rem);
+  line-height: 1.4;
+  color: var(--filament);
   text-wrap: balance;
   opacity: 0;
-  filter: blur(3px);
-  transition:
-    opacity 0.45s ease,
-    filter 0.45s ease;
+  transition: opacity 0.3s ease;
+}
+
+.pl3-solve__w {
+  display: inline-block;
 }
 
 /* Said once the drawing has mostly played - picture first, then words. */
 .pl3-solve__tile[data-state="on"] .pl3-solve__line {
   opacity: 1;
-  filter: none;
-  transition-delay: 0.7s;
+  transition-delay: 0s;
+}
+
+.pl3-solve__tile[data-state="on"] .pl3-solve__w {
+  animation: pl3-say-in 0.58s cubic-bezier(0.16, 0.8, 0.24, 1) both;
+  animation-delay: calc(0.7s + var(--w) * 55ms);
 }
 
 /* ── The drawings ──────────────────────────────────────────────────
@@ -537,7 +550,7 @@
   }
 
   .pl3-solve__line {
-    font-size: 0.76rem;
+    font-size: 0.9rem;
   }
 }
 

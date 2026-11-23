@@ -239,33 +239,36 @@ export type SolveKind = "load" | "ground" | "improve" | "long" | "canvas";
  * What the VIN model does for a life, once it has been shown. Five tiles, and
  * each one carries a drawing, a title and one line - nothing else. The page is
  * claiming to take load off a mind; it cannot make that claim in paragraphs.
+ *
+ * The titles are the five from the notebook. The lines are the light's own,
+ * in the first person like everything else it says, and where they can they
+ * stay with the life the VIN card just showed: the sleep that was slipping,
+ * the long run, the shop.
  */
 export const SOLVES: Array<{ kind: SolveKind; title: string; line: string }> = [
   {
     kind: "load",
     title: "Less cognitive load",
-    line: "Everything important about you, in one place.",
+    line: "You stop carrying it all in your head.",
   },
   {
     kind: "ground",
     title: "Grounding",
-    line: "When life feels off, you know where to look.",
+    line: "When life feels off, I show you where to look.",
   },
   {
     kind: "improve",
     title: "Improvement",
-    line: "Lift one part of your life at a time.",
+    line: "We lift one part at a time. Right now, that's sleep.",
   },
   {
     kind: "long",
     title: "The long game",
-    line: "Light reviews, plans and reflects with you.",
+    line: "Every week, we review, plan and reflect - together.",
   },
   {
     kind: "canvas",
     title: "A canvas for life",
-    line: "Room to design the life you want.",
+    line: "Sketch the life you want. I'll help you build it.",
   },
 ];
-
-export const SOLVE_TITLE = "What it solves";

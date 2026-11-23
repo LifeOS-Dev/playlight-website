@@ -175,27 +175,43 @@
   pointer-events: none;
 }
 
-.pl3-road__phil .pl3-try,
-.pl3-road__phil .pl3-stores {
-  pointer-events: auto;
-  margin-top: clamp(22px, 3.6vh, 38px);
-}
-
+/* The light's question at the road's end - its voice, Newsreader italic. */
 .pl3-road__phil-line {
   font-family: "Newsreader", ui-serif, Georgia, serif;
-  font-weight: 200;
-  font-size: clamp(1.9rem, 5.4vw, 3.9rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.7rem, 4.4vw, 3.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--filament);
+  text-shadow: 0 0 28px oklch(0.78 0.14 var(--glow-hue) / 0.35);
+  text-wrap: balance;
+}
+
+/* The way down to the screens: a label and the road's own pulse under it,
+   pointing where the next thing is. */
+.pl3-road__down {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: clamp(18px, 3vh, 30px);
+  padding: 8px 14px;
+  border-radius: 12px;
+  pointer-events: auto;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  color: var(--ash);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.pl3-road__down:hover,
+.pl3-road__down:focus-visible {
   color: var(--filament);
 }
 
-.pl3-road__phil-sub {
-  margin-top: 18px;
-  font-size: clamp(0.85rem, 1.2vw, 1rem);
-  line-height: 1.6;
-  color: var(--ash);
-  text-wrap: balance;
+.pl3-road__down .pl3-road__cue {
+  margin-top: 12px;
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────

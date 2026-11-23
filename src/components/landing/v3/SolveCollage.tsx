@@ -1,6 +1,12 @@
 import * as React from "react";
-import { SOLVES, SOLVE_TITLE, type SolveKind } from "./vin";
+import { lightLook, lightSpeak } from "@/components/landing/orb/lightCue";
+import { LINES, wordsOf } from "./narration";
+import { SOLVES, type SolveKind } from "./vin";
 import "./solve.css";
+
+/** When a tile's line starts, after its drawing has mostly played (solve.css). */
+const LINE_AT_MS = 700;
+const LINE_EVERY_MS = 55;
 
 export type SolveFrame = {
   /** Depth of each tile on the road, in px - one per tile, so they can stagger in. */
@@ -18,6 +24,8 @@ export type SolveFrame = {
 
 export type SolveHandle = {
   drive: (frame: SolveFrame) => void;
+  /** Where tile `i` is across the screen, in px - the light leans toward it. */
+  tileCentre: (i: number) => number | null;
 };
 
 /**
@@ -31,12 +39,22 @@ export type SolveHandle = {
  * gathering into the light), and its one line appears. Then it settles, keeps
  * its answer, and the next one takes the focus. Only the tile in focus ever
  * has a sentence showing.
+ *
+ * The light narrates this too: it says what the collage is ("Here's what
+ * changes for you."), each tile's line is in its voice, and while a tile is
+ * in focus the light leans toward it on the road below and looks at it
+ * (RoadJourney moves it; this asks it to look). The eye goes where the
+ * light goes.
  */
 export const SolveCollage = React.forwardRef<SolveHandle>(function SolveCollage(_props, ref) {
   const rootRef = React.useRef<HTMLElement | null>(null);
   const tileRefs = React.useRef<Array<HTMLElement | null>>([]);
   const shownRef = React.useRef(true);
   const focusRef = React.useRef(-2);
+  /** The light only talks about the collage while its words are up. */
+  const liveRef = React.useRef(false);
+  const [live, setLive] = React.useState(false);
+  const [focus, setFocus] = React.useState(-1);
 
   React.useImperativeHandle(
     ref,
@@ -50,6 +68,11 @@ export const SolveCollage = React.forwardRef<SolveHandle>(function SolveCollage(
           tile.style.opacity = (o[i] ?? 0).toFixed(3);
         });
         root.style.setProperty("--slv-ui", ui.toFixed(3));
+        const nowLive = ui > 0.5;
+        if (nowLive !== liveRef.current) {
+          liveRef.current = nowLive;
+          setLive(nowLive);
+        }
         const shown = ui > 0.02 || o.some((n) => n > 0.02);
         if (shown !== shownRef.current) {
           shownRef.current = shown;
@@ -63,16 +86,44 @@ export const SolveCollage = React.forwardRef<SolveHandle>(function SolveCollage(
             tile.dataset.state = focus < i ? "wait" : focus === i ? "on" : "done";
           });
           root.toggleAttribute("data-all", focus >= SOLVES.length);
+          setFocus(focus);
         }
+      },
+      tileCentre(i) {
+        const tile = tileRefs.current[i];
+        if (!tile) return null;
+        const r = tile.getBoundingClientRect();
+        return r.width > 0 ? r.left + r.width / 2 : null;
       },
     }),
     [],
   );
 
+  // Look at the tile in focus, and say its line as it appears. Once every
+  // tile has had its turn, the light looks back over the whole collage.
+  React.useEffect(() => {
+    if (!live || focus < 0) {
+      lightLook("solve", null);
+      return;
+    }
+    if (focus >= SOLVES.length) {
+      lightLook("solve", rootRef.current?.querySelector(".pl3-solve__grid") ?? null);
+      return;
+    }
+    lightLook("solve", tileRefs.current[focus]);
+    return lightSpeak(wordsOf(SOLVES[focus].line).length, {
+      startMs: LINE_AT_MS,
+      everyMs: LINE_EVERY_MS,
+    });
+  }, [live, focus]);
+
+  React.useEffect(() => () => lightLook("solve", null), []);
+
   return (
     <section ref={rootRef} className="pl3-solve" aria-labelledby="pl3-solve-title">
+      {/* The light's line over the collage - in its voice, not a heading's. */}
       <h2 id="pl3-solve-title" className="pl3-solve__title">
-        {SOLVE_TITLE}
+        {LINES.solve.intro}
       </h2>
       <div className="pl3-solve__grid">
         {SOLVES.map((s, i) => (
@@ -89,7 +140,15 @@ export const SolveCollage = React.forwardRef<SolveHandle>(function SolveCollage(
               <SolveArt kind={s.kind} />
             </div>
             <h3 className="pl3-solve__name">{s.title}</h3>
-            <p className="pl3-solve__line">{s.line}</p>
+            <p className="pl3-solve__line">
+              {wordsOf(s.line).map((w, j) => (
+                <React.Fragment key={j}>
+                  <span className="pl3-solve__w" style={{ "--w": j } as React.CSSProperties}>
+                    {w}
+                  </span>{" "}
+                </React.Fragment>
+              ))}
+            </p>
           </article>
         ))}
       </div>

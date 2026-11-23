@@ -300,6 +300,23 @@
   transform-origin: 50% 50%;
 }
 
+/* Under the collage the light leans toward the tile in focus. Focus moves
+   in steps, so the move is eased here rather than written frame by frame:
+   a slow walk across the road, not a jump. */
+.pl3[data-lean] .pl3-orb,
+.pl3[data-lean] .pl3-lightfall {
+  transition:
+    left 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.05s linear;
+}
+
+.pl3[data-lean] .pl3-say {
+  transition:
+    opacity 0.45s ease,
+    left 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.05s linear;
+}
+
 /* ── The light speaking ───────────────────────────────────────
    Sibling of the orb, same origin, lifted into the upper corona.
    No box: a panel would turn the companion into a chatbot.

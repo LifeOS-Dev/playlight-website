@@ -1,9 +1,11 @@
 import * as React from "react";
+import { lightLook } from "@/components/landing/orb/lightCue";
 import { StoreButtons } from "./StoreButtons";
 import { LifeMap, type LifeMapHandle } from "./LifeMap";
 import { VinStory, type VinHandle } from "./VinStory";
 import { SolveCollage, type SolveHandle } from "./SolveCollage";
-import { SOLVES, type VinStep } from "./vin";
+import { LINES } from "./narration";
+import { SOLVES, type VinStage, type VinStep } from "./vin";
 import { DEPART_TRAVEL, LIGHT, ROAD, STAGE_SCREENS, zForScale } from "./roadPlan";
 import "./road.css";
 
@@ -41,7 +43,14 @@ const travelO = (arrive: number, pass: number) => clamp01(arrive / 0.45) * (1 - 
  * VIN model. They fold into one card that visualizes, interprets and then
  * navigates, while the light below says what each of those means. As that
  * card passes, what it all solves comes up the road behind it as a collage
- * of five tiles. Then the road opens.
+ * of five tiles. Then the road opens, and the light asks whether you want
+ * to see it for real - the app screens are right below.
+ *
+ * The light narrates all of it, from its crown: what it is (hero), where
+ * it is taking you (the empty road, looking up at the point of light it is
+ * heading for), each step (VIN), what changes (the collage, leaning toward
+ * the tile in focus). Wherever it is, its line sits between the picture and
+ * the light, and its heart looks back at the picture.
  *
  * All travel is written straight to the DOM from one scroll handler. React
  * renders only when the VIN card changes state - four times on the whole
@@ -55,6 +64,22 @@ export function RoadJourney() {
   const heroRef = React.useRef<HTMLDivElement | null>(null);
   const signalRef = React.useRef<HTMLDivElement | null>(null);
   const philRef = React.useRef<HTMLDivElement | null>(null);
+
+  /**
+   * The V / I / N tabs: take the road straight to a state. Instant rather
+   * than smooth - a smooth scroll would cross the states in between and set
+   * each of their transformations off on the way.
+   */
+  const jump = React.useCallback((k: VinStage) => {
+    const el = section.current;
+    if (!el) return;
+    const travel = el.offsetHeight - window.innerHeight;
+    if (travel <= 0) return;
+    // A little into the band, so the state is settled rather than on its edge.
+    const s = ROAD.vin[k] + 0.3;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + (s / STAGE_SCREENS) * travel, behavior: "auto" });
+  }, []);
 
   React.useEffect(() => {
     const el = section.current;
@@ -106,6 +131,9 @@ export function RoadJourney() {
         const grow = span(s, V.sigIn, V.sigOut);
         signalRef.current.style.opacity = (rise * fall).toFixed(3);
         signalRef.current.style.setProperty("--sig-s", lerp(0.3, 2.6, grow).toFixed(3));
+        // The light looks up the road at where it is taking you, while it
+        // says so - and the eye follows its look to the point of light.
+        lightLook("road", pinned && rise * fall > 0.2 ? signalRef.current : null);
       }
 
       const arrive = smooth(span(s, V.arriveFrom, V.arriveTo));
@@ -169,14 +197,21 @@ export function RoadJourney() {
       if (!pinned) {
         root.style.setProperty("--speech-o", "0");
         root.removeAttribute("data-speech");
+        root.removeAttribute("data-lean");
         return;
       }
 
-      // First real scroll: the orb has not visibly leaned yet. Hold the
-      // line through that lean, then dissolve as the hero starts to fly.
+      // First real scroll: the light says where it is taking you, and holds
+      // that line down the empty road - the hero flying past, the point of
+      // light coming up - until the cards arrive and their own voice takes
+      // over. Before, it dissolved with the hero and left a screen of road
+      // with nothing said on it.
       if (dep > 0.012) root.setAttribute("data-speech", "go");
       else root.removeAttribute("data-speech");
-      root.style.setProperty("--speech-o", (1 - smooth(clamp01((dep - 0.16) / 0.28))).toFixed(3));
+      root.style.setProperty(
+        "--speech-o",
+        (1 - smooth(span(s, V.arriveFrom + 0.1, V.arriveFrom + 0.45))).toFixed(3),
+      );
 
       // ── The light itself ─────────────────────────────────────────
       // The hero flies and the light settles onto the road below the
@@ -214,7 +249,18 @@ export function RoadJourney() {
         grid = lerp(grid, 0.34, e);
       }
 
-      root.style.setProperty("--orb-x", "50vw");
+      // Under the collage, the light leans toward the tile in focus - a
+      // third of the way there, never off the road - so the eye is led to
+      // the tile that is speaking. The move itself is eased in CSS
+      // (data-lean), because focus changes in steps and the light must not.
+      let lean = 0;
+      const collageUp = sArrive * (1 - sPass);
+      if (focus >= 0 && focus < tiles && collageUp > 0.01) {
+        const cx = solveRef.current?.tileCentre(focus);
+        if (cx != null) lean = (cx - window.innerWidth / 2) * 0.32 * collageUp;
+      }
+      root.toggleAttribute("data-lean", collageUp > 0.01);
+      root.style.setProperty("--orb-x", `calc(50vw + ${lean.toFixed(1)}px)`);
       root.style.setProperty("--orb-y", `${y.toFixed(2)}vh`);
       root.style.setProperty("--orb-scale", size.toFixed(3));
       root.style.setProperty("--orb-i", glow.toFixed(3));
@@ -308,8 +354,10 @@ export function RoadJourney() {
       window.removeEventListener("resize", onScroll);
       root.removeAttribute("data-road");
       root.removeAttribute("data-speech");
+      root.removeAttribute("data-lean");
       root.style.removeProperty("--road-rush");
       root.style.removeProperty("--speech-o");
+      lightLook("road", null);
     };
   }, []);
 
@@ -332,7 +380,7 @@ export function RoadJourney() {
         </div>
 
         {/* Visualize, interpret, navigate - three cards that become one. */}
-        <VinStory ref={vinRef} />
+        <VinStory ref={vinRef} onJump={jump} />
 
         {/* What all of that solves, as one collage. */}
         <SolveCollage ref={solveRef} />
@@ -349,10 +397,15 @@ export function RoadJourney() {
           <span className="pl3-road__cue" aria-hidden="true" />
         </div>
 
+        {/* The road's end. Not a close - the light hands over to the real
+            app screens just below, and points the way down. The one close
+            is at the foot of the page, after the proof and the questions. */}
         <div ref={philRef} className="pl3-road__phil">
-          <p className="pl3-road__phil-line">Come into the light.</p>
-          <p className="pl3-road__phil-sub">Not more noise. A calmer next step.</p>
-          <StoreButtons />
+          <p className="pl3-road__phil-line">{LINES.roadEnd}</p>
+          <a className="pl3-road__down" href="#look">
+            <span className="pl3-road__down-label">See inside the app</span>
+            <span className="pl3-road__cue" aria-hidden="true" />
+          </a>
         </div>
 
         {/* Past the road, not past everything: the app screens are the
