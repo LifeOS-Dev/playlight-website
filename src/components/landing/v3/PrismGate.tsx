@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import { LightVectorBody } from "@/components/landing/orb/LightVectorBody";
+import { LightBody } from "@/components/landing/orb/LightBody";
 import {
   DEFAULT_VIBE,
+  PRISM_CONIC,
   PRISM_LINEAR,
   VIBES,
   angleForT,
@@ -790,29 +791,25 @@ export function PrismGate({
             no cursor to carry it, it is not worth its cost, so the orb
             answers with a bloom instead (see prism-gate.css). */}
         {mode === "track" ? null : <div className="pl-gate__torch" aria-hidden />}
-        {/* The still body, not the shader. The torch is welded to the orb's
-            rim, and the living body's silhouette DRIFTS - that is the point
-            of it - so a shader here would walk the beam's junction off the
-            edge it leaves from. The vector body is the shader's own angular
-            mean, which is to say a perfectly round version of it: the same
-            orb, holding still, which is exactly what this screen needs. */}
-        <LightVectorBody
-          size={FIELD}
+        {/* The light itself - the same living body the page uses (its
+            currents, its layers, a heart that looks at your cursor and
+            blinks), not a still drawing of it. Its silhouette drifts, so the
+            beam's junction at the rim breathes a little with it; being the
+            same light everywhere matters more. Until a colour is taken it
+            is the house light, and the spectrum layer below turns its hue;
+            after, it is that light in the chosen colour. */}
+        <LightBody
+          size={200}
           accent
-          /* Resolved once a hand is on the bar: on a phone the orb IS
-             the feedback, so it stops holding every colour and starts
-             wearing the one being chosen. A cursor keeps the spectrum,
-             because it has a beam to answer with instead. */
-          mode={orbMode}
-          /* While it holds every colour, the body underneath is the house
-             light - the very light a visitor who never chose would get - and
-             the spectrum only turns its hue (see prism-gate.css), so its
-             depth, saturation and glow are the final light's exactly. Once
-             a colour is taken - or a finger is on the track - it is that
-             light, in that colour. */
+          interactive
           ramp={orbMode === "prism" ? HOUSE_RAMP : shown?.ramp}
           className="pl-gate__orb"
         />
+        {/* Every colour, as hue only: hue from the spectrum (aligned with the
+            picker's angles), brightness and saturation from the light under
+            it - so every layer of the light stays, wearing the whole
+            spectrum. It lets go as a colour is taken. */}
+        <div className="pl-gate__spectrum" aria-hidden style={{ backgroundImage: PRISM_CONIC }} />
         {/* The wheel's fixed mark: just off the rim at twelve o'clock,
             inside the beam that leaves from under it, and the only part
             of that mechanic which never moves. */}

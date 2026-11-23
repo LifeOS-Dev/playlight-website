@@ -121,7 +121,11 @@
 
 .pl-gate[data-taken="1"] .pl-gate__hit {
   transform: translate(var(--fly-x, 0px), var(--fly-y, 0px)) scale(var(--fly-s, 1));
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.58s;
+  /* The black under the spectrum lets go only once the spectrum has
+     (0.55s), and before the flight (0.58s). */
+  transition:
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.58s,
+    background-color 0.02s linear 0.55s;
 }
 /* The ground and the vignette go one at a time. Fading the root itself
    would take the orb down with them and there would be nothing left to
@@ -223,19 +227,42 @@
 /* The light's own every-colour state shows now: the site's light body,
    coloured by the spectrum, rather than a picture laid over it. */
 /* ── the light, in every colour ───────────────────────────────
-   The gate shows the site's own light - the same body, the same white
-   heart, the same soft falloff - and lays the spectrum over it as colour
-   only: hue from the spectrum, brightness from the light. It is the light
-   the page ends on, wearing every colour; choosing lets the spectrum go
-   and leaves that same light in the one colour picked. The body under the
-   spectrum is the house light (PrismGate passes its ramp until a colour is
-   taken) and the spectrum turns only its HUE, so saturation, depth and
-   glow stay exactly the final light's. */
-.pl-gate .pl-gate__orb[data-mode="prism"] {
-  --solid-a: 1;
+   The gate draws the page's own living light (LightBody: the still body
+   under the shader), sized from the hit box like the rest of this screen,
+   with the spectrum laid over it as HUE only: hue from the spectrum,
+   brightness and saturation from the light, so all of its layers stay.
+   The hit box is its own stacking context, and a blend in an isolated
+   group sees transparency where the light is not - so the box wears the
+   gate's own black, and the spectrum has only the light to turn. The black
+   goes with the spectrum when a colour is taken, before the flight, so no
+   dark disc ever crosses the page. */
+.pl-gate__hit {
+  background: #000;
+  transition: background-color 0.4s ease;
 }
-.pl-gate__orb .light-vector__prism {
+.pl-gate[data-taken="1"] .pl-gate__hit {
+  background-color: transparent;
+}
+.pl-gate__orb .light-body__vector {
+  width: 100% !important;
+  height: 100% !important;
+}
+.pl-gate__orb .light-body__gl {
+  transform: scale(var(--s)) !important;
+}
+.pl-gate__spectrum {
+  position: absolute;
+  /* exactly the box's black disc: past it there is nothing to blend with */
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  /* ...and gone just before its edge, where the light is already dark, so
+     the two discs' antialiased rims never meet as a visible hairline */
+  -webkit-mask: radial-gradient(closest-side, #000 88%, transparent 97%);
+  mask: radial-gradient(closest-side, #000 88%, transparent 97%);
   mix-blend-mode: hue;
+  pointer-events: none;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* ── the breath ───────────────────────────────────────────────
    A light that never moves reads as a picture of a light. This is the
@@ -259,10 +286,8 @@
    It rides the same animation shorthand as the arrival bloom but a
    different property, so the two cannot fight, and neither disturbs the
    opacity the resolve transitions. */
-.pl-gate__orb .light-vector__prism {
-  animation:
-    pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards,
-    pl-gate-breath 5.2s ease-in-out infinite;
+.pl-gate__spectrum {
+  animation: pl-gate-bloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.15s backwards;
 }
 @keyframes pl-gate-breath {
   0%,
@@ -277,7 +302,8 @@
 /* Beat one of the handover, and the track's first touch: every colour
    gives way to the one that was chosen, which the orb beneath is already
    wearing. */
-.pl-gate[data-orb="solid"] .pl-gate__orb .light-vector__prism {
+.pl-gate[data-orb="solid"] .pl-gate__spectrum {
+  opacity: 0;
   /* Nothing left to look at, and the handover is the busiest moment this
      screen has - stop repainting a mark that is on its way out. */
   animation-play-state: paused;
@@ -544,7 +570,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pl-gate__orb,
-  .pl-gate__orb .light-vector__prism,
+  .pl-gate__spectrum,
   .pl-gate__w,
   .pl-gate__say,
   .pl-gate__skip,
@@ -591,7 +617,7 @@
    .pl-gate__orb too, and killing every animation on a replay would kill
    that one along with the arrival it was aimed at. */
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb,
-.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__orb .light-vector__prism,
+.pl-gate[data-replay="1"]:not([data-taken="1"]) .pl-gate__spectrum,
 .pl-gate[data-replay="1"]:not([data-taken="1"]) .light-vector,
 .pl-gate[data-replay="1"] .pl-gate__w,
 .pl-gate[data-replay="1"] .pl-gate__say,
