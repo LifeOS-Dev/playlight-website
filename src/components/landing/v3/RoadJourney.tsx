@@ -355,7 +355,10 @@ export function RoadJourney() {
           <StoreButtons />
         </div>
 
-        <a className="pl3-skip" href="#faq">
+        {/* Past the road, not past everything: the app screens are the
+            most concrete thing on the page, and skipping the journey
+            should land on them rather than on the questions after them. */}
+        <a className="pl3-skip" href="#look">
           Skip ahead
         </a>
       </div>
