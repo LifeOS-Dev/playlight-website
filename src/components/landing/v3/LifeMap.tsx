@@ -235,9 +235,16 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
             window.clearTimeout(leaving.current);
             say(null);
           }
-          if (rest && stale.current) {
+          // Back at rest: always measure again, not only after a resize. A
+          // page that loads part-way down the road - a reload, or coming
+          // Back to it - wired the ring to wherever the light stood THEN,
+          // which is the FAQ or the footer, and the filaments kept aiming
+          // there after the light came home. Once a frame later, once more
+          // after the light's own 50ms easing has finished.
+          if (rest) {
             stale.current = false;
             requestAnimationFrame(measure);
+            window.setTimeout(measure, 120);
           }
         }
       },
