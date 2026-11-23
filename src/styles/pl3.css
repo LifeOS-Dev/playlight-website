@@ -1673,82 +1673,111 @@
   color: var(--filament);
 }
 
-/* ── Download ───────────────────────────────────────────────
-   One word and two marks: "Download", then the App Store and Google Play
-   logos, each a link to its store. As little as a call to action can be
-   while still saying what it does. */
+/* ── Get it on ──────────────────────────────────────────────
+   A quiet caption, said once, and two pills under it: each store's mark
+   and name. The caption is set like the site's other small labels (mono,
+   spaced, muted), so the pills - the things to press - are the only
+   weight. Equal pills; App Store solid, Play Store in outline beside it,
+   so the pair is one call to action rather than two competing ones. */
 
 .pl3-stores {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 6px 6px 6px 20px;
-  border: 1px solid rgb(var(--paper-rgb) / 0.22);
-  border-radius: 999px;
-  background: rgb(var(--paper-rgb) / 0.05);
-  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.12);
+  gap: 12px;
 }
 
 .pl3-stores__label {
-  margin-right: 6px;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.005em;
-  color: var(--filament);
-  white-space: nowrap;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.pl3-stores__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
 .pl3-store {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 152px;
+  padding: 12px 22px;
+  border: 1px solid rgb(var(--paper-rgb) / 0.28);
   border-radius: 999px;
-  background: var(--filament);
-  color: var(--void);
-  cursor: pointer;
+  background: rgb(var(--paper-rgb) / 0.05);
+  color: var(--filament);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
   transition:
     transform 0.35s cubic-bezier(0.16, 0.8, 0.24, 1),
     background 0.35s,
+    border-color 0.35s,
+    color 0.35s,
     box-shadow 0.35s;
 }
 
-.pl3-store svg {
-  width: 18px;
-  height: 18px;
+.pl3-store__icon {
+  display: inline-flex;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.pl3-store__icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .pl3-store:hover,
 .pl3-store:focus-visible {
   transform: translateY(-2px);
+  border-color: rgb(var(--ember-rgb) / 0.6);
+  background: rgb(var(--ember-rgb) / 0.12);
+  box-shadow: 0 0 40px rgb(var(--ember-rgb) / 0.18);
+}
+
+/* The primary: solid, in the page's own light ink. */
+.pl3-store[data-variant="solid"][data-store="apple"] {
+  border-color: var(--filament);
+  background: var(--filament);
+  color: var(--void);
+  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.16);
+}
+
+.pl3-store[data-variant="solid"][data-store="apple"]:hover,
+.pl3-store[data-variant="solid"][data-store="apple"]:focus-visible {
+  border-color: #ffffff;
   background: #ffffff;
-  box-shadow: 0 0 30px rgb(var(--ember-rgb) / 0.35);
+  box-shadow: 0 0 60px rgb(var(--ember-rgb) / 0.3);
 }
 
-/* The header's, smaller and quieter. */
-.pl3-stores[data-variant="quiet"] {
-  gap: 5px;
-  padding: 4px 4px 4px 13px;
-  border-color: var(--line);
-  background: rgb(var(--paper-rgb) / 0.03);
-  box-shadow: none;
-}
-
-.pl3-stores[data-variant="quiet"] .pl3-stores__label {
-  margin-right: 4px;
-  font-size: 12.5px;
-  font-weight: 400;
-  color: rgb(var(--paper-rgb) / 0.9);
+/* The header's: the two pills alone, small and quiet. */
+.pl3-stores[data-variant="quiet"] .pl3-stores__row {
+  gap: 8px;
 }
 
 .pl3-store[data-variant="quiet"] {
-  width: 28px;
-  height: 28px;
-  background: rgb(var(--paper-rgb) / 0.1);
-  color: var(--filament);
+  gap: 7px;
+  min-width: 0;
+  padding: 8px 15px;
+  border-color: var(--line);
+  background: rgb(var(--paper-rgb) / 0.03);
+  color: rgb(var(--paper-rgb) / 0.9);
+  font-size: 12.5px;
+  font-weight: 400;
 }
 
-.pl3-store[data-variant="quiet"] svg {
+.pl3-store[data-variant="quiet"] .pl3-store__icon {
   width: 13px;
   height: 13px;
 }
@@ -1756,19 +1785,29 @@
 .pl3-store[data-variant="quiet"]:hover,
 .pl3-store[data-variant="quiet"]:focus-visible {
   transform: none;
-  background: rgb(var(--ember-rgb) / 0.25);
   box-shadow: none;
 }
 
-/* A narrow phone's bar has the wordmark and the vibe dot to fit as well:
-   the marks say it on their own there. */
-@media (max-width: 380px) {
-  .pl3-stores[data-variant="quiet"] .pl3-stores__label {
-    display: none;
+/* A phone's bar shares its row with the wordmark and the vibe dot: the
+   marks say it on their own there. */
+@media (max-width: 460px) {
+  .pl3-store[data-variant="quiet"] {
+    padding: 8px 10px;
   }
 
-  .pl3-stores[data-variant="quiet"] {
-    padding-left: 4px;
+  .pl3-store[data-variant="quiet"] .pl3-store__name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Two equal pills side by side still fit a phone; under 360 they stack. */
+  .pl3-store[data-variant="solid"] {
+    min-width: 140px;
+    padding: 12px 18px;
   }
 }
 

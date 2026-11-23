@@ -18,15 +18,16 @@ function PlayIcon() {
 }
 
 /**
- * The call to action, as little as it can be: one word, "Download", and the
- * two stores' marks beside it - each mark is the link to its store. One
- * thing to read, two places to tap, instead of two long buttons that both
- * say "Download on the ...".
+ * The call to action: a quiet "Get it on", and under it two pills - each a
+ * store's mark and its name, each a link. The caption is said once instead
+ * of twice ("Download on the App Store", "Download on the Play Store"), and
+ * the pills carry only what tells them apart. App Store is solid and Play
+ * Store in outline beside it, so the pair reads as one call to action.
  *
- * The "quiet" variant is the same thing, smaller, in the header bar. The
- * word is a label, not a link: each mark carries the full phrase for
- * screen readers ("Download on the App Store"), because a bare logo does
- * not say what pressing it does.
+ * The "quiet" variant rides in the header bar: the two pills alone, small,
+ * with no caption - the bar has one row to give. Each link keeps the full
+ * phrase for screen readers, because a store's name alone does not say
+ * what pressing it does.
  */
 export function StoreButtons({
   variant = "solid",
@@ -37,33 +38,41 @@ export function StoreButtons({
 }) {
   return (
     <div className={`pl3-stores ${className}`} data-variant={variant}>
-      <span className="pl3-stores__label" aria-hidden>
-        Download
-      </span>
-      <a
-        href={APP_STORE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="pl3-store"
-        data-variant={variant}
-        data-store="apple"
-        aria-label="Download on the App Store"
-        title="App Store"
-      >
-        <AppleIcon />
-      </a>
-      <a
-        href={PLAY_STORE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="pl3-store"
-        data-variant={variant}
-        data-store="play"
-        aria-label="Download on Google Play"
-        title="Google Play"
-      >
-        <PlayIcon />
-      </a>
+      {variant === "solid" ? (
+        <p className="pl3-stores__label" aria-hidden>
+          Get it on
+        </p>
+      ) : null}
+      <div className="pl3-stores__row">
+        <a
+          href={APP_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pl3-store"
+          data-variant={variant}
+          data-store="apple"
+          aria-label="Download on the App Store"
+        >
+          <span className="pl3-store__icon">
+            <AppleIcon />
+          </span>
+          <span className="pl3-store__name">App Store</span>
+        </a>
+        <a
+          href={PLAY_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pl3-store"
+          data-variant={variant}
+          data-store="play"
+          aria-label="Download on the Play Store"
+        >
+          <span className="pl3-store__icon">
+            <PlayIcon />
+          </span>
+          <span className="pl3-store__name">Play Store</span>
+        </a>
+      </div>
     </div>
   );
 }
