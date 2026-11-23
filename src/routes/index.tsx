@@ -8,7 +8,6 @@ import { Faq } from "@/components/landing/v3/Faq";
 import { LookInside } from "@/components/landing/v3/LookInside";
 import { SiteHeader } from "@/components/landing/v3/SiteHeader";
 import { V3Footer } from "@/components/landing/v3/V3Footer";
-import { GetAppSheet } from "@/components/landing/v3/GetApp";
 import { useLightScroll, type OrbStop } from "@/components/landing/v3/useLightScroll";
 import { PrismGate, gateCloseMs, gateExitMs } from "@/components/landing/v3/PrismGate";
 import {
@@ -257,7 +256,6 @@ function HomePage() {
         <V3Footer />
       </section>
 
-      <GetAppSheet />
     </div>
   );
 }
