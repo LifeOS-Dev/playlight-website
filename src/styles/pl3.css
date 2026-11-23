@@ -1261,7 +1261,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: clamp(14px, 2vw, 26px);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ash);
 }
 
@@ -1274,9 +1274,9 @@
 
 .pl3-footer__legal {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ash-dim);
 }
 
@@ -1580,12 +1580,12 @@
   right: clamp(18px, 4vw, 46px);
   bottom: clamp(18px, 3.4vh, 32px);
   z-index: 20;
-  padding: 7px 15px;
+  padding: 9px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ash);
   transition:
