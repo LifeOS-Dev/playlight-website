@@ -19,18 +19,20 @@
      it is sized off the pose the light is heading for, not the live one. */
   --vin-top: clamp(64px, 10svh, 112px);
   --vin-gap: clamp(10px, 2.2svh, 28px);
-  /* The V / I / N tabs - the only thing above the card now. The light
-     introduces the three cards itself, from below them. */
-  --vin-head: 40px;
-  /* The light's one sentence - two lines at most on a laptop. */
-  --vin-voice: 66px;
+  /* The V / I / N tabs - the only thing above the card now (their buttons'
+     real height). The light introduces the three cards itself, from below. */
+  --vin-head: 52px;
+  /* The light's one sentence - one line on a laptop (its box is wide enough
+     never to wrap there), and the gap between it and the card above. */
+  --vin-voice: 34px;
+  --vin-said-gap: 26px;
   --vin-orb-y: 82vh;
   --vin-orb-s: 0.64;
   --vin-said-at: calc(var(--vin-orb-y) - var(--orb-base) * var(--vin-orb-s) * 0.5 - 10px);
   /* 74px is the card's chrome around the picture; 1.78 turns the picture's
      16:9 height into a width. */
   --vin-room: calc(
-    var(--vin-said-at) - var(--vin-voice) - 18px - var(--vin-top) - var(--vin-head) -
+    var(--vin-said-at) - var(--vin-voice) - var(--vin-said-gap) - var(--vin-top) - var(--vin-head) -
       var(--vin-gap) - 74px
   );
   /* Up to 720px wide: at 560 the picture's labels came out at 7.5-10.5px. */
@@ -45,6 +47,11 @@
   flex-direction: column;
   align-items: center;
   padding-top: var(--vin-top);
+  /* The tabs and the card sit as one group directly above the light's
+     sentence, which sits directly above the light: card, words, light - one
+     frame, rather than a card at the top of the screen and the light at the
+     bottom with the words floating between. */
+  padding-bottom: calc(100vh - var(--vin-said-at) + var(--vin-voice) + var(--vin-said-gap));
   /* The cards come down the same road as everything else: one vanishing
      point, on the horizon, on the light's own axis (vw, not %, for the
      reason the ring gives in life-map.css). */
@@ -58,6 +65,7 @@
 .pl3-vin__top {
   display: grid;
   width: min(46rem, 92vw);
+  margin-top: auto;
   margin-bottom: var(--vin-gap);
   opacity: var(--vin-ui);
   text-align: center;
@@ -180,12 +188,14 @@
 
 .pl3-vin__world {
   display: grid;
-  place-items: center;
+  /* Bottom-aligned: the three cards, and then the one, stand on the same
+     line just above the light's sentence. */
+  place-items: end center;
   width: 100%;
   /* Whatever height the card doesn't need is split above and below it, so
      the picture and the sentence about it sit together instead of at
      opposite ends of the frame. 0.5625 is the picture's 16:9. */
-  margin-top: clamp(0px, calc((var(--vin-room) - var(--vin-w) * 0.5625) / 2), 80px);
+  margin-top: 0;
   opacity: 0;
   transform: translate3d(0, 0, -6000px);
   will-change: transform, opacity;
@@ -980,7 +990,7 @@
   position: absolute;
   left: 50vw;
   top: calc(var(--orb-y) - var(--orb-base) * var(--orb-scale) * 0.5 - 10px);
-  width: min(36rem, 88vw);
+  width: min(50rem, 90vw);
   translate: -50% -100%;
   text-align: center;
   opacity: var(--vin-ui);
@@ -1165,9 +1175,9 @@
 
 @media (max-width: 820px) {
   .pl3-vin {
-    /* The tabs keep one line; the light's sentence takes up to three. */
-    --vin-head: 44px;
-    --vin-voice: 92px;
+    /* The tabs keep one line; the light's sentence takes two at most. */
+    --vin-head: 52px;
+    --vin-voice: 62px;
     --vin-w: min(92vw, 460px, calc(var(--vin-room) * 1.78));
   }
 
