@@ -26,11 +26,11 @@
   --vin-voice: 66px;
   --vin-orb-y: 86vh;
   --vin-orb-s: 0.64;
-  --vin-said-at: calc(var(--vin-orb-y) - var(--orb-base) * var(--vin-orb-s) * 0.38);
+  --vin-said-at: calc(var(--vin-orb-y) - var(--orb-base) * var(--vin-orb-s) * 0.32);
   /* 74px is the card's chrome around the picture; 1.78 turns the picture's
      16:9 height into a width. */
   --vin-room: calc(
-    var(--vin-said-at) - var(--vin-voice) - 16px - var(--vin-top) - var(--vin-head) -
+    var(--vin-said-at) - var(--vin-voice) - 40px - var(--vin-top) - var(--vin-head) -
       var(--vin-gap) - 74px
   );
   /* Up to 720px wide: at 560 the picture's labels came out at 7.5-10.5px. */
@@ -979,7 +979,7 @@
 .pl3-vin__voice {
   position: absolute;
   left: 50vw;
-  top: calc(var(--orb-y) - var(--orb-base) * var(--orb-scale) * 0.38);
+  top: calc(var(--orb-y) - var(--orb-base) * var(--orb-scale) * 0.32);
   width: min(36rem, 88vw);
   translate: -50% -100%;
   text-align: center;

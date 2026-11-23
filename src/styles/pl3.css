@@ -44,6 +44,13 @@
      near, oklch(0.139 0.01 308) far - so a panel's faint warmth comes from
      the light above it and its far edge stays on the neutral --void. */
   --ash-pale: oklch(0.83 0.042 var(--glow-hue));
+  /* Light's voice: the only text on the page that wears the light - a warm
+     tint of the chosen hue and a glow - so what it says is never mistaken
+     for the page's own words. */
+  --voice: oklch(0.94 0.055 var(--glow-hue));
+  --voice-glow:
+    0 0 1px oklch(0.9 0.1 var(--glow-hue) / 0.6), 0 0 18px oklch(0.8 0.15 var(--glow-hue) / 0.6),
+    0 0 42px oklch(0.75 0.15 var(--glow-hue) / 0.3);
   --line: rgb(var(--edge-rgb) / 0.42);
   --line-soft: rgb(var(--edge-rgb) / 0.16);
   --horizon: 64%;
@@ -1890,4 +1897,42 @@ html[data-platform="android"] .pl3-store[data-variant="solid"][data-store="apple
   .pl3-skip {
     display: none;
   }
+}
+
+/* ── Light's voice, wherever it speaks ───────────────────────────
+   One look for everything the light says: the tint and the glow above,
+   and - where it speaks on the road, over the grid and under the
+   pictures - a soft pool of night behind the words, so they hold on
+   their own instead of reading as one more caption on the scene. */
+.pl3 .pl3-say__line,
+.pl3 .pl3-vin__words,
+.pl3 .pl3-vin__still-says,
+.pl3 .pl3-solve__title,
+.pl3 .pl3-solve__line,
+.pl3 .pl3-road__phil-line,
+.pl3 .pl3-look__say,
+.pl3 .pl3-footer__line {
+  color: var(--voice);
+  text-shadow: var(--voice-glow);
+}
+
+.pl3 .pl3-say__line,
+.pl3 .pl3-vin__said {
+  isolation: isolate;
+}
+
+.pl3 .pl3-say__line::before,
+.pl3 .pl3-vin__said::before {
+  content: "";
+  position: absolute;
+  inset: -0.9em -1.8em;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(7 6 10 / 0.72),
+    rgb(7 6 10 / 0.38) 62%,
+    transparent
+  );
+  pointer-events: none;
 }
