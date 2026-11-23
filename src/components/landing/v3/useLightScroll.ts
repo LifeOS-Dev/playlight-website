@@ -14,6 +14,8 @@ export type OrbStop = {
   grid: number;
   /** Seconds for the floor grid to travel one tile - higher is slower */
   road: number;
+  /** Where this stop differs on a phone-width screen (820px and under). */
+  narrow?: Partial<Omit<OrbStop, "narrow">>;
 };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -73,8 +75,10 @@ export function useLightScroll(
       // Ease so the orb settles inside a section rather than sliding constantly.
       const e = t * t * (3 - 2 * t);
 
-      const a = stops[idx];
-      const b = stops[idx + 1] ?? stops[idx];
+      const narrow = window.innerWidth <= 820;
+      const pick = (st: OrbStop): OrbStop => (narrow && st.narrow ? { ...st, ...st.narrow } : st);
+      const a = pick(stops[idx]);
+      const b = pick(stops[idx + 1] ?? stops[idx]);
 
       // The road owns the light while its stage is pinned. One writer at a
       // time - two systems setting --orb-* in the same frame is what made

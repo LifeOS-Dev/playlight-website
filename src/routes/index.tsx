@@ -44,8 +44,18 @@ const STOPS: OrbStop[] = [
   // has to be read through it.
   { y: 1.08, size: 0.72, i: 0.8, grid: 0.26, road: 8 }, // look inside
   // Off to the side while you read: centred, even small and dim, it sat
-  // right on top of the questions.
-  { x: 0.87, y: 0.3, size: 0.34, i: 0.55, grid: 0.16, road: 9 }, // faq
+  // right on top of the questions. A phone has no side - the questions run
+  // edge to edge and the light sat on their toggles - so there it rests
+  // just under the fold and glows up into them instead.
+  {
+    x: 0.87,
+    y: 0.3,
+    size: 0.34,
+    i: 0.55,
+    grid: 0.16,
+    road: 9,
+    narrow: { x: 0.5, y: 1.04, size: 0.42 },
+  }, // faq
   { y: 0.84, size: 0.46, i: 1.1, grid: 0.3, road: 7.5 }, // footer - settles, blooms
 ];
 
