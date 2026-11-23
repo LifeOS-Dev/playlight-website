@@ -223,7 +223,7 @@
 /* The light's own every-colour state shows now: the site's light body,
    coloured by the spectrum, rather than a picture laid over it. */
 /* A thin ring of the spectrum around the light - the wheel you choose
-   from. Background (the conic, aligned with the picker's angles) is set
+   from - with its colour falling softly inward, toward the light. Background (the conic, aligned with the picker's angles) is set
    inline from PRISM_CONIC; this cuts it to a ring and gives it a glow. */
 .pl-gate__logo {
   position: absolute;
@@ -232,14 +232,18 @@
   border-radius: 50%;
   -webkit-mask: radial-gradient(
     closest-side,
-    transparent calc(100% - 4px),
+    transparent calc(100% - 16px),
+    rgb(0 0 0 / 0.14) calc(100% - 10px),
+    rgb(0 0 0 / 0.5) calc(100% - 4.5px),
     #000 calc(100% - 3px),
     #000 calc(100% - 1px),
     transparent 100%
   );
   mask: radial-gradient(
     closest-side,
-    transparent calc(100% - 4px),
+    transparent calc(100% - 16px),
+    rgb(0 0 0 / 0.14) calc(100% - 10px),
+    rgb(0 0 0 / 0.5) calc(100% - 4.5px),
     #000 calc(100% - 3px),
     #000 calc(100% - 1px),
     transparent 100%
