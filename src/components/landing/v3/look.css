@@ -126,15 +126,28 @@
   color: var(--ash);
 }
 
+/* A phone swipes through the three rather than scrolling past three
+   full-height captures (about 2,500px of them). Each snaps to the middle,
+   and the next one peeks in from the edge - which is what says "swipe". */
 @media (max-width: 860px) {
   .pl3-look__row {
-    grid-template-columns: 1fr;
-    gap: clamp(34px, 6vh, 54px);
-    justify-items: center;
+    display: flex;
+    gap: 16px;
+    margin-inline: calc(-1 * clamp(20px, 5vw, 48px));
+    padding: 4px clamp(20px, 5vw, 48px) 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .pl3-look__row::-webkit-scrollbar {
+    display: none;
   }
 
   .pl3-look__panel {
-    width: min(320px, 100%);
+    flex: 0 0 min(76vw, 300px);
+    scroll-snap-align: center;
   }
 }
 
