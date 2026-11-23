@@ -1,8 +1,13 @@
 import "./look.css";
 
 /**
- * What it actually looks like - early captures from the app, framed in the
+ * What it actually looks like - real captures from the app, framed in the
  * same warm night as the rest of the page. Accents are amber to match the light.
+ *
+ * The life in them is the road's sample life (the long run, the shop, the
+ * runway, the Spanish), not anyone's own: scripts/sample-life-screens.py set
+ * it into the captures in the app's own typefaces. The road describes one
+ * life, so the screens show that same one.
  */
 
 const PANELS = [
@@ -10,7 +15,7 @@ const PANELS = [
     id: "now",
     src: "/look/now.webp",
     fallback: "/look/now.png",
-    alt: "Playlight home: one current focus, a play control, and the light on the floor.",
+    alt: "Playlight home: one current focus - a 12 km long run - with a play control and the light on the floor.",
     title: "Open it for ten seconds",
     body: "One lit thing, and everything else kept quiet behind it. You leave with a next move, not a backlog.",
   },
@@ -18,7 +23,7 @@ const PANELS = [
     id: "whole",
     src: "/look/whole.webp",
     fallback: "/look/whole.png",
-    alt: "Playlight life surface: active arc and five pillars scored side by side.",
+    alt: "Playlight player screen: the active arc, Launch Season, above five life pillars scored side by side.",
     title: "The whole life on one surface",
     body: "Work, health, money, people - held together, so a trade-off shows up before it turns into damage.",
   },
@@ -26,7 +31,7 @@ const PANELS = [
     id: "trail",
     src: "/look/trail.webp",
     fallback: "/look/trail.png",
-    alt: "Playlight Game Plan: goals, habits consistency, and systems at a glance.",
+    alt: "Playlight Game Plan: three goals - kilometres this week, a runway fund and Spanish lessons - above habit consistency.",
     title: "Your own evidence, on request",
     body: "What you did, what it cost, what it moved. Every insight can be asked why, and it answers with your history.",
   },
@@ -40,9 +45,9 @@ export function LookInside() {
         <h2 id="pl3-look-title" className="pl3-look__title">
           One surface, three ways in.
         </h2>
-        <p className="pl3-look__note">
-          Early captures from the app - still in build.
-        </p>
+        {/* Light's voice, the same as on the road: it hands over from the
+            sample life it just described to that life in the app. */}
+        <p className="pl3-look__say">This is that same life, in the app.</p>
       </header>
 
       <div className="pl3-look__row">

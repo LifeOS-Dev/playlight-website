@@ -17,8 +17,8 @@
 
 .pl3-look__eyebrow {
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.3em;
+  font-size: 11px;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--ember);
 }
@@ -33,10 +33,16 @@
   color: var(--filament);
 }
 
-.pl3-look__note {
-  margin-top: 12px;
-  font-size: 12.5px;
-  color: var(--ash-dim);
+/* Light speaking - the voice the road uses: Newsreader italic, warm. */
+.pl3-look__say {
+  margin-top: 14px;
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  line-height: 1.4;
+  color: var(--filament);
+  text-shadow: 0 0 22px oklch(0.78 0.14 var(--glow-hue) / 0.32);
 }
 
 .pl3-look__row {
