@@ -24,6 +24,7 @@ import {
   queueStretch,
   type LightState,
 } from "./lightCharacter";
+import { lightCue, lookPoint } from "./lightCue";
 import { hexToRgb } from "./lightProfile";
 import { LIGHT_CANVAS, LIGHT_VERTEX_SRC, makeLightShader } from "./lightShader";
 import { LightVectorBody } from "./LightVectorBody";
@@ -218,6 +219,13 @@ export function LightBody({
     // ---- character --------------------------------------------------------
     const state: LightState = "resting";
     const posture = postureFor(state);
+    /**
+     * The page's voice can ask the body to think (see lightCue.ts): the app's
+     * own `thinking` posture, blended in and out rather than switched, so a
+     * sentence being found reads as the currents quickening, not a cut.
+     */
+    const thinking = postureFor("thinking");
+    let thinkNow = 0;
 
     const t0 = performance.now();
     const lid = new Track(posture.lid, t0);
@@ -283,7 +291,7 @@ export function LightBody({
         case "glance": {
           // While a cursor is leading the heart, a glance would be the orb
           // looking away from the person watching it - so it blinks instead.
-          if (cursorOn) {
+          if (cursorOn || leading) {
             queueBlink(lid, now);
             break;
           }
@@ -330,6 +338,15 @@ export function LightBody({
     let cursorOn = false;
     let cursorX = 0;
     let cursorY = 0;
+    /**
+     * What the voice has asked it to look at, in viewport px - resolved with
+     * the other sampled reads, since an element target moves as the page does.
+     * It outranks the cursor: while Light is talking about something, it
+     * looks at that, and the eye follows it there.
+     */
+    let leading = false;
+    let leadX = 0;
+    let leadY = 0;
     /** Where the orb is on screen, refreshed with the other sampled reads. */
     let centreX = 0;
     let centreY = 0;
@@ -422,6 +439,12 @@ export function LightBody({
         perRadius = r.width / 5;
       }
       sizeTo(r.width || size);
+      const target = look.current.interactive && lightCue.look ? lookPoint(lightCue.look) : null;
+      leading = target !== null;
+      if (target) {
+        leadX = target.x;
+        leadY = target.y;
+      }
     };
     measure();
 
@@ -487,14 +510,28 @@ export function LightBody({
        * Nothing new is invented here; the page is simply allowed to drive
        * what a thumb drives in the app.
        */
+      // Thinking, eased: about a quarter of a second each way.
+      const wantThink = look.current.interactive && lightCue.thinking ? 1 : 0;
+      thinkNow += (wantThink - thinkNow) * Math.min(1, dt * 4.5);
+      const pFlow = posture.flow + (thinking.flow - posture.flow) * thinkNow;
+      const pSwirl = posture.swirl + (thinking.swirl - posture.swirl) * thinkNow;
+      const pTense = posture.tense + (thinking.tense - posture.tense) * thinkNow;
+      const pLean = posture.lean + (thinking.lean - posture.lean) * thinkNow;
+
+      // A word landing: a warm swell that rises and falls in about half a
+      // second, so speech is visible in the body as a soft pulse per word.
+      const sinceWord = lightCue.word > 0 ? now - lightCue.word : Infinity;
+      const spoken =
+        look.current.interactive && sinceWord < 520 ? Math.sin((sinceWord / 520) * Math.PI) * 0.32 : 0;
+
       const bloom = Math.max(0, glow - 1.08);
-      const heatNow = Math.min(1, heat.at(now) + bloom * 0.5);
-      const tenseNow = Math.min(1, posture.tense + rush * 0.42);
-      const swirlNow = posture.swirl + rush * 0.9;
+      const heatNow = Math.min(1, heat.at(now) + bloom * 0.5 + spoken);
+      const tenseNow = Math.min(1, pTense + rush * 0.42);
+      const swirlNow = pSwirl + rush * 0.9;
 
       // The app's clock, plus the road: charge is a hold, which the site
       // has no equivalent of.
-      flow += dt * posture.flow * (1 + heatNow * 1.6 + rush * 1.5);
+      flow += dt * pFlow * (1 + heatNow * 1.6 + rush * 1.5);
       if (flow > FLOW_WRAP) flow -= FLOW_WRAP;
 
       if (now >= nextQuirk) {
@@ -514,16 +551,19 @@ export function LightBody({
       /**
        * Who the heart is following.
        *
-       * The cursor while there is one, the quirk tracks otherwise - never
-       * both, or a glance and the cursor would add up and throw the heart
-       * further than it can go. Either way the result is EASED rather than
+       * Whatever the voice is talking about, while it talks about something;
+       * otherwise the cursor while there is one, and the quirk tracks after
+       * that - never two at once, or a glance and the cursor would add up and
+       * throw the heart further than it can go. Either way the result is EASED rather than
        * set, so a cursor flung across the page turns the heart rather than
        * teleporting it, and losing the cursor lets it drift back instead of
        * snapping to the middle.
        */
-      const want = cursorOn
-        ? gazeToward(cursorX - centreX, cursorY - centreY, perRadius)
-        : { x: gazeX.at(now), y: gazeY.at(now) };
+      const want = leading
+        ? gazeToward(leadX - centreX, leadY - centreY, perRadius)
+        : cursorOn
+          ? gazeToward(cursorX - centreX, cursorY - centreY, perRadius)
+          : { x: gazeX.at(now), y: gazeY.at(now) };
       const turn = Math.min(1, dt * 5.5);
       gazeNow = {
         x: gazeNow.x + (want.x - gazeNow.x) * turn,
@@ -568,7 +608,7 @@ export function LightBody({
       const hp = hop.at(now);
       const sk = shake.at(now);
       canvas.style.transform =
-        `translate(${(sk * 1.5).toFixed(2)}px, ${(hp + posture.lean).toFixed(2)}px) ` +
+        `translate(${(sk * 1.5).toFixed(2)}px, ${(hp + pLean).toFixed(2)}px) ` +
         `scale(${(1 - sq).toFixed(4)}, ${(1 + sq).toFixed(4)})`;
     };
 
