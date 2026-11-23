@@ -115,7 +115,7 @@ export const LIGHT = {
    * vin.css sizes the card off this pose (--vin-orb-y / --vin-orb-s): change
    * one, change the other.
    */
-  vinY: 86,
+  vinY: 82,
   vinSize: 0.64,
   /**
    * Under the "what it solves" collage. Nothing to say here, so the light
