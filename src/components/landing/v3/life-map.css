@@ -236,40 +236,6 @@
   }
 }
 
-/* Paired with "Skip ahead" on the other corner, at the same weight. */
-.pl3-map__hint {
-  position: absolute;
-  left: clamp(18px, 4vw, 46px);
-  bottom: clamp(18px, 3.4vh, 32px);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ash-dim);
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-}
-
-.pl3-map__hint [data-touch] {
-  display: none;
-}
-
-@media (hover: none) {
-  .pl3-map__hint [data-pointer] {
-    display: none;
-  }
-
-  .pl3-map__hint [data-touch] {
-    display: inline;
-  }
-}
-
-/* Once it has been answered, it has done its job. */
-.pl3-map[data-on] .pl3-map__hint,
-.pl3-map:not([data-live]) .pl3-map__hint {
-  opacity: 0;
-}
-
 .pl3-map__sr {
   position: absolute;
   width: 1px;

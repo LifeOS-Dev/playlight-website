@@ -302,16 +302,20 @@
 
 /* ── The light speaking ───────────────────────────────────────
    Sibling of the orb, same origin, lifted into the upper corona.
-   No box: a panel would turn the companion into a chatbot. */
+   No box: a panel would turn the companion into a chatbot.
+
+   Anchored by its BOTTOM edge to the orb's crown, so a line that wraps
+   grows up, away from the light, and the sentence always sits between
+   the picture above and the light below - the order the eye reads in. */
 
 .pl3-say {
   position: fixed;
   left: var(--orb-x, 50vw);
   top: var(--orb-y, 70vh);
   z-index: 5;
-  width: min(22rem, 88vw);
+  width: min(30rem, 88vw);
   margin: 0;
-  transform: translate(-50%, calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 1.6rem));
+  transform: translate(-50%, calc(-100% - (var(--orb-base) * var(--orb-scale) * 0.5) - 0.75rem));
   text-align: center;
   pointer-events: none;
   opacity: var(--speech-o, 1);
@@ -321,14 +325,16 @@
     top 0.05s linear;
 }
 
+/* The light's voice: Newsreader italic, warm - the one look its words have
+   anywhere on the page. */
 .pl3-say__line {
+  position: relative;
   display: inline-block;
   max-width: 100%;
-  white-space: nowrap;
   font-family: "Newsreader", ui-serif, Georgia, serif;
   font-style: italic;
   font-weight: 300;
-  font-size: clamp(0.95rem, 1.7vw, 1.2rem);
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
   line-height: 1.35;
   letter-spacing: 0.01em;
   color: var(--filament);
@@ -336,14 +342,64 @@
   text-wrap: balance;
 }
 
-.pl3-say__ch {
+/* Word by word, so a line never breaks mid-word while it is arriving. */
+.pl3-say__w {
   display: inline-block;
   opacity: 0;
   animation: pl3-say-in 0.58s cubic-bezier(0.16, 0.8, 0.24, 1) both;
+  animation-delay: calc(var(--think, 0ms) + var(--i) * var(--every, 60ms));
 }
 
-.pl3-say__line.is-out {
-  animation: pl3-say-out 0.7s ease both;
+/* A line coming back - the intro after a readout - is not said again. */
+.pl3-say__line[data-instant] .pl3-say__w {
+  animation: pl3-say-back 0.35s ease both;
+}
+
+/* A beat of thinking before the words - the light, not a spinner. */
+.pl3-say__think {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  gap: 5px;
+  translate: -50% -50%;
+  animation: pl3-say-think-out 0.25s ease var(--think, 0ms) both;
+}
+
+.pl3-say__think i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ember-bright);
+  box-shadow: 0 0 8px rgb(var(--ember-rgb) / 0.7);
+  animation: pl3-say-think 0.9s ease-in-out infinite;
+}
+
+.pl3-say__think i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pl3-say__think i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes pl3-say-think {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pl3-say-think-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes pl3-say-in {
@@ -359,36 +415,32 @@
   }
 }
 
-@keyframes pl3-say-out {
-  to {
+@keyframes pl3-say-back {
+  from {
     opacity: 0;
-    filter: blur(8px);
-    transform: translateY(0.55em);
+  }
+  to {
+    opacity: 1;
   }
 }
 
 /* On a phone the light speaks into the gap between the orb and the top of
-   the life map's ring, and that gap is only so big. Sit closer, and closer
-   still when the phone is short. */
+   the life map's ring, and that gap is only so big: narrower, smaller, and
+   closer to the light. */
 @media (max-width: 820px) {
   .pl3-say {
-    transform: translate(-50%, calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 0.9rem));
+    width: min(19rem, 80vw);
+    transform: translate(-50%, calc(-100% - (var(--orb-base) * var(--orb-scale) * 0.5) - 0.2rem));
+  }
+
+  .pl3-say__line {
+    font-size: 0.98rem;
   }
 }
 
 @media (max-width: 820px) and (max-height: 700px) {
   .pl3-say {
-    transform: translate(-50%, calc(-50% - (var(--orb-base) * var(--orb-scale) * 0.5) - 0.4rem));
-  }
-}
-
-@media (max-width: 420px) {
-  .pl3-say {
-    width: min(18rem, 84vw);
-  }
-
-  .pl3-say__line {
-    white-space: normal;
+    transform: translate(-50%, calc(-100% - (var(--orb-base) * var(--orb-scale) * 0.5) + 0.2rem));
   }
 }
 
@@ -2006,15 +2058,19 @@
     position: fixed !important;
   }
 
-  .pl3-say__ch,
-  .pl3-say__line.is-out {
+  .pl3-say__w,
+  .pl3-say__think {
     animation: none !important;
   }
 
-  .pl3-say__ch {
+  .pl3-say__w {
     opacity: 1;
     filter: none;
     transform: none;
+  }
+
+  .pl3-say__think {
+    display: none;
   }
 
   /* Unpin the intro - no sticky stage, no fly-through, no zoom. */

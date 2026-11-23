@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ESSENCE, ORB_BOX } from "@/components/landing/orb/ramp";
+import { lightLook } from "@/components/landing/orb/lightCue";
 import { FACET_BY_ID, type FacetId } from "./faces";
 import { FacetGlyph } from "./glyphs";
 import { CAMERA_Z, FACET_PLACES } from "./roadPlan";
@@ -117,6 +118,10 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
     // writer: nothing else on the page touches data-say.
     if (id) page.setAttribute("data-say", FACET_BY_ID[id].says);
     else page.removeAttribute("data-say");
+    // ...and turns its heart toward the piece it is talking about, so the
+    // eye goes facet, light, sentence - and back.
+    const port = id ? ports.current[FACET_PLACES.findIndex((f) => f.id === id)] : null;
+    lightLook("map", port ?? null);
   }, []);
 
   const hold = React.useCallback(
@@ -373,11 +378,9 @@ export const LifeMap = React.forwardRef<LifeMapHandle>(function LifeMap(_props, 
         </button>
       ))}
 
-      {/* The readout is the demo, so it cannot be left to be stumbled on. */}
-      <p className="pl3-map__hint" aria-hidden="true">
-        <span data-pointer>Hover a facet</span>
-        <span data-touch>Tap a facet</span>
-      </p>
+      {/* The readout is the demo, so it cannot be left to be stumbled on -
+          the light itself offers it now, after a quiet moment, in its own
+          voice on its crown (OrbSpeech), instead of a label in a corner. */}
 
       {/* The light's answer is drawn above the orb and hidden from readers.
           This is the same sentence, for anyone listening instead. */}
