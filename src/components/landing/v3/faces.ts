@@ -17,7 +17,9 @@ export const FACETS = [
   { id: "personality", label: "Personality", says: "You commit fast, then renegotiate." },
   { id: "time", label: "Time", says: "Tuesday went to meetings." },
   { id: "goals", label: "Goals", says: "One goal carried the other four." },
-  { id: "mind", label: "Mind", says: "Your focus is best before eleven." },
+  // Not a time of day: the sample life is a night owl, and "best before
+  // eleven" argued with it. Problems are first-party - the app tracks them.
+  { id: "mind", label: "Mind", says: "Two worries keep coming back." },
 ] as const;
 
 export type FacetId = (typeof FACETS)[number]["id"];
