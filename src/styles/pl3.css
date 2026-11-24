@@ -1673,12 +1673,10 @@
   color: var(--filament);
 }
 
-/* ── Get it on ──────────────────────────────────────────────
-   A quiet caption, said once, and two pills under it: each store's mark
-   and name. The caption is set like the site's other small labels (mono,
-   spaced, muted), so the pills - the things to press - are the only
-   weight. Equal pills; App Store solid, Play Store in outline beside it,
-   so the pair is one call to action rather than two competing ones. */
+/* ── Where to open Playlight ─────────────────────────────────
+   Three equal pills: App Store, Play Store, Desktop. The marks are the
+   only colour, taken from the light the visitor chose. The pills share
+   one outline so the row stays a single choice. */
 
 .pl3-stores {
   display: inline-flex;
@@ -1731,6 +1729,7 @@
   width: 17px;
   height: 17px;
   flex: 0 0 auto;
+  color: var(--ember);
 }
 
 .pl3-store__icon svg {
@@ -1746,22 +1745,7 @@
   box-shadow: 0 0 40px rgb(var(--ember-rgb) / 0.18);
 }
 
-/* The primary: solid, in the page's own light ink. */
-.pl3-store[data-variant="solid"][data-store="apple"] {
-  border-color: var(--filament);
-  background: var(--filament);
-  color: var(--void);
-  box-shadow: 0 0 44px rgb(var(--ember-rgb) / 0.16);
-}
-
-.pl3-store[data-variant="solid"][data-store="apple"]:hover,
-.pl3-store[data-variant="solid"][data-store="apple"]:focus-visible {
-  border-color: #ffffff;
-  background: #ffffff;
-  box-shadow: 0 0 60px rgb(var(--ember-rgb) / 0.3);
-}
-
-/* The header's: the two pills alone, small and quiet. */
+/* The header's: the same pills, small and quiet. */
 .pl3-stores[data-variant="quiet"] .pl3-stores__row {
   gap: 8px;
 }

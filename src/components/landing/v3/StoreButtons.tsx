@@ -1,4 +1,5 @@
 import { APP_STORE_URL, PLAY_STORE_URL } from "@/stores";
+import { webAppUrl } from "@/webApp";
 
 /** Brand marks kept to a single path each, colored via currentColor. */
 function AppleIcon() {
@@ -17,17 +18,23 @@ function PlayIcon() {
   );
 }
 
+function DesktopIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path
+        fillRule="evenodd"
+        d="M4 4.2h16c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3h-5.05l.5 1.7H18v1.6H6v-1.6h2.55l.5-1.7H4c-.7 0-1.3-.6-1.3-1.3V5.5c0-.7.6-1.3 1.3-1.3zm1.8 1.8v6.2h12.4V6H5.8z"
+      />
+    </svg>
+  );
+}
+
 /**
- * The call to action: a quiet "Get it on", and under it two pills - each a
- * store's mark and its name, each a link. The caption is said once instead
- * of twice ("Download on the App Store", "Download on the Play Store"), and
- * the pills carry only what tells them apart. App Store is solid and Play
- * Store in outline beside it, so the pair reads as one call to action.
- *
- * The "quiet" variant rides in the header bar: the two pills alone, small,
- * with no caption - the bar has one row to give. Each link keeps the full
- * phrase for screen readers, because a store's name alone does not say
- * what pressing it does.
+ * Three ways in, one pill: App Store, Play Store, and Desktop. The marks
+ * are single-colour glyphs in the light the visitor chose. The pills
+ * themselves match, so the row reads as one choice of where to open
+ * Playlight. The quiet variant is the same row, smaller, for the header.
+ * Each link keeps a full phrase for screen readers.
  */
 export function StoreButtons({
   variant = "solid",
@@ -38,11 +45,6 @@ export function StoreButtons({
 }) {
   return (
     <div className={`pl3-stores ${className}`} data-variant={variant}>
-      {variant === "solid" ? (
-        <p className="pl3-stores__label" aria-hidden>
-          Get it on
-        </p>
-      ) : null}
       <div className="pl3-stores__row">
         <a
           href={APP_STORE_URL}
@@ -72,6 +74,22 @@ export function StoreButtons({
           </span>
           <span className="pl3-store__name">Play Store</span>
         </a>
+        {webAppUrl ? (
+          <a
+            href={webAppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pl3-store"
+            data-variant={variant}
+            data-store="desktop"
+            aria-label="Open Playlight on desktop"
+          >
+            <span className="pl3-store__icon">
+              <DesktopIcon />
+            </span>
+            <span className="pl3-store__name">Desktop</span>
+          </a>
+        ) : null}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-/** Set only after the signed-in web app has a verified deployment URL. */
-const configuredUrl = import.meta.env.VITE_PLAYLIGHT_WEB_APP_URL?.trim();
+/** The signed-in web app. An env override can point elsewhere, including /app. */
+const DEFAULT_WEB_APP_URL = "https://app.playlight.app/";
+const configuredUrl = import.meta.env.VITE_PLAYLIGHT_WEB_APP_URL?.trim() || DEFAULT_WEB_APP_URL;
 
 export const webAppUrl = (() => {
   if (!configuredUrl) return null;
