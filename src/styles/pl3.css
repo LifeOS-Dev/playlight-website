@@ -575,43 +575,112 @@
   background: linear-gradient(to bottom, var(--void) 18%, rgba(7, 6, 10, 0.78) 58%, transparent);
 }
 
-/* The wordmark's "play": the light each visitor chose. Light stays white. */
-.pl3-play {
-  color: var(--ember);
+/* ── The mark ─────────────────────────────────────────────────
+   "light" in a 10deg italic geometric sans, with the living orb
+   replacing the i's dot and italic PLAY set into the pocket between
+   the l and h ascenders. Both PLAY and the halo around the orb take
+   the visitor's chosen light (--ember / --v-bright / --v-hot / --v-deep);
+   "light" stays the page's paper-white and the orb's heart stays white. */
+
+.pl-mark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  color: inherit;
+  user-select: none;
 }
 
-/* Just chosen at the gate: the light lands in "play" as the gate lifts -
-   the player's word lighting up in the player's colour. Once. */
+.pl-mark__svg {
+  display: block;
+  width: auto;
+  overflow: visible;
+}
+
+.pl-mark__light {
+  fill: currentColor;
+}
+
+.pl-mark__halo {
+  transform-box: view-box;
+  transform-origin: 234.6px 100px;
+}
+
+/* The wordmark's "play": the light each visitor chose. */
+.pl3-play,
+.pl-mark__play {
+  color: var(--ember);
+  fill: var(--ember);
+}
+
+/* Just chosen at the gate: the light lands in PLAY, and in the air
+   around the orb, as the gate lifts. Once. */
 .pl3[data-handed] .pl3-road__mark .pl3-play {
   animation: pl3-play-take 1.7s cubic-bezier(0.16, 0.8, 0.24, 1) 1.05s both;
 }
 
+.pl3[data-handed] .pl3-road__mark .pl-mark__halo {
+  animation: pl3-halo-take 1.7s cubic-bezier(0.16, 0.8, 0.24, 1) 1.05s both;
+}
+
 @keyframes pl3-play-take {
   0% {
-    text-shadow: 0 0 0 transparent;
+    filter: drop-shadow(0 0 0 transparent);
   }
   35% {
-    text-shadow:
-      0 0 18px rgb(var(--ember-rgb) / 0.9),
-      0 0 44px rgb(var(--ember-rgb) / 0.55);
+    filter:
+      drop-shadow(0 0 10px rgb(var(--ember-rgb) / 0.85))
+      drop-shadow(0 0 28px rgb(var(--ember-rgb) / 0.55));
   }
   100% {
-    text-shadow: 0 0 0 transparent;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes pl3-halo-take {
+  0% {
+    transform: scale(0.62);
+    opacity: 0.25;
+  }
+  38% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pl3[data-handed] .pl3-road__mark .pl3-play {
+  .pl3[data-handed] .pl3-road__mark .pl3-play,
+  .pl3[data-handed] .pl3-road__mark .pl-mark__halo {
     animation: none;
   }
 }
 
+.pl-mark--nav .pl-mark__svg {
+  height: clamp(34px, 3.4vw, 42px);
+}
+
+.pl-mark--footer .pl-mark__svg {
+  height: 38px;
+}
+
+.pl-mark--hero .pl-mark__svg {
+  height: min(clamp(5.2rem, 13vw, 9.2rem), 18.5vh);
+}
+
 .pl3-nav__mark {
-  font-weight: 300;
-  font-size: 15px;
-  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  color: rgb(var(--paper-rgb) / 0.92);
+  text-decoration: none;
+}
+
+.pl3-nav__mark:hover,
+.pl3-nav__mark:focus-visible {
   color: var(--filament);
-  opacity: 0.9;
 }
 
 .pl3-nav__preview,
@@ -1258,10 +1327,8 @@
 }
 
 .pl3-footer__mark {
-  font-weight: 300;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  color: rgb(var(--paper-rgb) / 0.7);
+  color: rgb(var(--paper-rgb) / 0.78);
+  line-height: 1;
 }
 
 .pl3-footer__nav {

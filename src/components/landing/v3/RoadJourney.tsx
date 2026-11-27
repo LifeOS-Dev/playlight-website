@@ -1,6 +1,7 @@
 import * as React from "react";
 import { lightLook } from "@/components/landing/orb/lightCue";
 import { StoreButtons } from "./StoreButtons";
+import { Wordmark } from "./Wordmark";
 import { LifeMap, type LifeMapHandle } from "./LifeMap";
 import { VinStory, type VinHandle } from "./VinStory";
 import { SolveCollage, type SolveHandle } from "./SolveCollage";
@@ -387,8 +388,8 @@ export function RoadJourney() {
 
         {/* Hero rides at the front of the camera and flies past first */}
         <div ref={heroRef} className="pl3-road__hero">
-          <h1 className="pl3-road__mark">
-            <span className="pl3-play">play</span>light
+          <h1 className="pl3-road__mark" aria-label="Playlight">
+            <Wordmark size="hero" decorative />
           </h1>
           <p className="pl3-road__line">
             Your personalized OS to help you visualize, interpret, and navigate life.

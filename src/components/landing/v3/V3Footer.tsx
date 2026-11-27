@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { StoreButtons } from "./StoreButtons";
+import { Wordmark } from "./Wordmark";
 import { LINES } from "./narration";
 
 export function V3Footer() {
@@ -16,7 +17,7 @@ export function V3Footer() {
 
       <div className="pl3-footer__base">
         <span className="pl3-footer__mark">
-          <span className="pl3-play">play</span>light
+          <Wordmark size="footer" />
         </span>
 
         <nav className="pl3-footer__nav" aria-label="Footer">

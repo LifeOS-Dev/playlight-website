@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { LightField } from "./LightField";
 import { SiteHeader } from "./SiteHeader";
 import { V3Footer } from "./V3Footer";
+import { applyVibe, readVibe } from "./vibe";
+import { vibeById } from "@/components/landing/orb/ramp";
 
 /**
  * The shell for everything that is words: support, privacy, deletion.
@@ -24,8 +26,17 @@ export function DocPage({
   lead?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const root = React.useRef<HTMLDivElement>(null);
+
+  // The home page publishes the chosen light onto .pl3. These pages are
+  // their own root, so the mark — PLAY, and the air around its orb —
+  // would otherwise fall back to amber no matter what was chosen.
+  React.useEffect(() => {
+    applyVibe(root.current, vibeById(readVibe()));
+  }, []);
+
   return (
-    <div className="pl3 pl3-doc">
+    <div ref={root} className="pl3 pl3-doc">
       <LightField still />
       <SiteHeader />
 

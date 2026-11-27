@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { StoreButtons } from "./StoreButtons";
+import { Wordmark } from "./Wordmark";
 import type { Vibe } from "@/components/landing/orb/ramp";
 
 type Props = {
@@ -20,8 +21,8 @@ type Props = {
 export function SiteHeader({ vibe, onChangeVibe }: Props = {}) {
   return (
     <header className="pl3-nav">
-      <Link to="/" className="pl3-nav__mark">
-        <span className="pl3-play">play</span>light
+      <Link to="/" className="pl3-nav__mark" aria-label="Playlight">
+        <Wordmark size="nav" decorative />
       </Link>
       <nav className="pl3-nav__links" aria-label="Main">
         <Link to="/support">Support</Link>
