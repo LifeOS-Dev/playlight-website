@@ -668,7 +668,7 @@
 }
 
 .pl-mark--hero .pl-mark__svg {
-  height: min(clamp(5.2rem, 13vw, 9.2rem), 18.5vh);
+  height: min(clamp(3.6rem, 8.5vw, 5.75rem), 11.5vh);
 }
 
 .pl3-nav__mark {
